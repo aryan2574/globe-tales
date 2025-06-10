@@ -143,3 +143,4 @@ dist
 !.vscode/extensions.json
 *.code-workspace
 .history/*
+frontend/.vscode
