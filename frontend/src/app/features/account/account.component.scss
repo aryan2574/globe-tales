@@ -1,0 +1,44 @@
+.account-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 2rem;
+}
+
+.account-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 100%;
+    max-width: 600px;
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+}
+
+.profile-info {
+    .info-item {
+        display: flex;
+        margin-bottom: 1rem;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        label {
+            font-weight: 600;
+            color: #2c3e50;
+            width: 120px;
+        }
+
+        span {
+            color: #34495e;
+        }
+    }
+}

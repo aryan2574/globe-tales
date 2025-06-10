@@ -1,0 +1,19 @@
+<div class="account-container">
+    <div class="account-card">
+        <h2>My Account</h2>
+        <div class="profile-info">
+            <div class="info-item">
+                <label>Name:</label>
+                <span>{{ userProfile.name }}</span>
+            </div>
+            <div class="info-item">
+                <label>Email:</label>
+                <span>{{ userProfile.email }}</span>
+            </div>
+            <div class="info-item">
+                <label>Member Since:</label>
+                <span>{{ userProfile.joinDate | date:'longDate' }}</span>
+            </div>
+        </div>
+    </div>
+</div>
