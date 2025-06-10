@@ -144,3 +144,9 @@ dist
 *.code-workspace
 .history/*
 frontend/.vscode
+
+# Docker
+.docker/
+docker-compose.override.yml
+*.env
+.env.*
