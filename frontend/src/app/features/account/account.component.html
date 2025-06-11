@@ -1,9 +1,7 @@
 <div class="account-container">
+    <button class="btn-logout" (click)="logout()">Logout</button>
     <div class="account-card">
-        <div class="header">
-            <h2>My Account</h2>
-            <button class="btn-logout" (click)="logout()">Logout</button>
-        </div>
+        <h2>My Account</h2>
         <div class="profile-info" *ngIf="user">
             <div class="info-item">
                 <label>Name:</label>

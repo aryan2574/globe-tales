@@ -1,29 +1,101 @@
 import { Routes } from '@angular/router';
-import { AccountComponent } from './features/account/account.component';
-import { LoginComponent } from './features/auth/login/login.component';
-import { SignupComponent } from './features/auth/signup/signup.component';
-import { inject } from '@angular/core';
-import { AuthService } from './services/auth.service';
-import { Router } from '@angular/router';
-
-const authGuard = () => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
-
-  if (authService.isLoggedIn()) {
-    return true;
-  }
-
-  return router.parseUrl('/login');
-};
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
-  { path: 'signup', component: SignupComponent },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   {
-    path: 'account',
-    component: AccountComponent,
+    path: 'auth',
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('./features/auth/login/login.component').then(
+            (m) => m.LoginComponent
+          ),
+      },
+      {
+        path: 'signup',
+        loadComponent: () =>
+          import('./features/auth/signup/signup.component').then(
+            (m) => m.SignupComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
     canActivate: [authGuard],
   },
-  { path: '', redirectTo: '/account', pathMatch: 'full' },
+  {
+    path: 'account',
+    loadComponent: () =>
+      import('./features/account/account.component').then(
+        (m) => m.AccountComponent
+      ),
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        redirectTo: 'profile',
+        pathMatch: 'full',
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/account/profile/profile.component').then(
+            (m) => m.ProfileComponent
+          ),
+      },
+      {
+        path: 'favorites',
+        loadComponent: () =>
+          import('./features/account/favorites/favorites.component').then(
+            (m) => m.FavoritesComponent
+          ),
+      },
+      {
+        path: 'visited',
+        loadComponent: () =>
+          import('./features/account/visited/visited.component').then(
+            (m) => m.VisitedComponent
+          ),
+      },
+      {
+        path: 'achievements',
+        loadComponent: () =>
+          import('./features/account/achievements/achievements.component').then(
+            (m) => m.AchievementsComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: 'sites',
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/sites/site-list/site-list.component').then(
+            (m) => m.SiteListComponent
+          ),
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./features/sites/site-detail/site-detail.component').then(
+            (m) => m.SiteDetailComponent
+          ),
+      },
+    ],
+  },
+  {
+    path: 'admin',
+    loadComponent: () =>
+      import('./features/admin/admin.component').then((m) => m.AdminComponent),
+    canActivate: [authGuard],
+  },
 ];
