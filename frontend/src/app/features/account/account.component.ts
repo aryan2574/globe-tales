@@ -1,17 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-account',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './account.component.html',
-  styleUrl: './account.component.scss',
+  styleUrls: ['./account.component.scss'],
 })
-export class AccountComponent {
-  userProfile = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    joinDate: new Date('2024-01-01'),
-  };
+export class AccountComponent implements OnInit {
+  user: any;
+
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    this.authService.currentUser$.subscribe((user) => {
+      this.user = user;
+      if (!this.user) {
+        this.router.navigate(['/login']);
+      }
+    });
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

@@ -1,0 +1,34 @@
+<div class="login-container">
+    <div class="login-card">
+        <h2>Login to GlobeTales</h2>
+
+        <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" [(ngModel)]="email" required email #emailInput="ngModel"
+                    class="form-control" [class.is-invalid]="emailInput.invalid && emailInput.touched">
+                <div class="error-message" *ngIf="emailInput.invalid && emailInput.touched">
+                    Please enter a valid email address
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" [(ngModel)]="password" required minlength="6"
+                    #passwordInput="ngModel" class="form-control"
+                    [class.is-invalid]="passwordInput.invalid && passwordInput.touched">
+                <div class="error-message" *ngIf="passwordInput.invalid && passwordInput.touched">
+                    Password must be at least 6 characters
+                </div>
+            </div>
+
+            <div class="error-message" *ngIf="error">
+                {{ error }}
+            </div>
+
+            <button type="submit" [disabled]="loginForm.invalid" class="btn-login">
+                Login
+            </button>
+        </form>
+    </div>
+</div>

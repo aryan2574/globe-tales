@@ -1,18 +1,21 @@
 <div class="account-container">
     <div class="account-card">
-        <h2>My Account</h2>
-        <div class="profile-info">
+        <div class="header">
+            <h2>My Account</h2>
+            <button class="btn-logout" (click)="logout()">Logout</button>
+        </div>
+        <div class="profile-info" *ngIf="user">
             <div class="info-item">
                 <label>Name:</label>
-                <span>{{ userProfile.name }}</span>
+                <span>{{ user.name }}</span>
             </div>
             <div class="info-item">
                 <label>Email:</label>
-                <span>{{ userProfile.email }}</span>
+                <span>{{ user.email }}</span>
             </div>
-            <div class="info-item">
+            <div class="info-item" *ngIf="user.createdAt">
                 <label>Member Since:</label>
-                <span>{{ userProfile.joinDate | date:'longDate' }}</span>
+                <span>{{ user.createdAt | date:'mediumDate' }}</span>
             </div>
         </div>
     </div>
