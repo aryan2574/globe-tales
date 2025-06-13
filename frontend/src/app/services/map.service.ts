@@ -21,21 +21,41 @@ export class MapService {
   private readonly OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 
   constructor(private http: HttpClient) {
-    // Fix marker shadow issue
-    const iconRetinaUrl = 'assets/marker-icon-2x.png';
-    const iconUrl = 'src/assets/marker-icon.png';
-    const shadowUrl = 'assets/marker-shadow.png';
-    const iconDefault = L.icon({
-      iconRetinaUrl,
-      iconUrl,
-      shadowUrl,
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      tooltipAnchor: [16, -28],
-      shadowSize: [41, 41],
-    });
-    L.Marker.prototype.options.icon = iconDefault;
+    // Create custom marker icon using Font Awesome
+    const createCustomIcon = (type: string) => {
+      const iconHtml = `
+        <div class="custom-marker">
+          <i class="fas ${this.getIconForType(type)}"></i>
+        </div>
+      `;
+
+      return L.divIcon({
+        html: iconHtml,
+        className: 'custom-marker-container',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+      });
+    };
+
+    // Override default marker icon
+    L.Marker.prototype.options.icon = createCustomIcon('default');
+  }
+
+  private getIconForType(type: string): string {
+    switch (type) {
+      case 'hotel':
+        return 'fa-hotel';
+      case 'attraction':
+        return 'fa-landmark';
+      case 'museum':
+        return 'fa-university';
+      case 'restaurant':
+        return 'fa-utensils';
+      case 'viewpoint':
+        return 'fa-mountain';
+      default:
+        return 'fa-map-marker-alt';
+    }
   }
 
   initializeMap(elementId: string, lat: number, lng: number): L.Map {
@@ -44,6 +64,35 @@ export class MapService {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors',
     }).addTo(this.map);
+
+    // Add custom marker styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .custom-marker-container {
+        background: none;
+        border: none;
+      }
+      .custom-marker {
+        background: #3498db;
+        color: white;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+      }
+      .custom-marker i {
+        font-size: 16px;
+      }
+      .custom-marker:hover {
+        transform: scale(1.1);
+        background: #2980b9;
+      }
+    `;
+    document.head.appendChild(style);
 
     return this.map;
   }
@@ -144,20 +193,35 @@ export class MapService {
     // Add new markers
     places.forEach((place) => {
       if (place.lat && place.lon) {
-        const marker = L.marker([place.lat, place.lon]).bindPopup(`
-            <strong>${place.name}</strong><br>
-            Type: ${place.type}<br>
+        const marker = L.marker([place.lat, place.lon], {
+          icon: L.divIcon({
+            html: `
+              <div class="custom-marker">
+                <i class="fas ${this.getIconForType(place.type)}"></i>
+              </div>
+            `,
+            className: 'custom-marker-container',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15],
+          }),
+        }).bindPopup(`
+          <div class="marker-popup">
+            <h3><i class="fas ${this.getIconForType(place.type)}"></i> ${
+          place.name
+        }</h3>
+            <p class="popup-type">${place.type}</p>
             ${
               place.tags['description']
-                ? `Description: ${place.tags['description']}<br>`
+                ? `<p class="popup-description">${place.tags['description']}</p>`
                 : ''
             }
             ${
               place.tags['website']
-                ? `<a href="${place.tags['website']}" target="_blank">Website</a>`
+                ? `<a href="${place.tags['website']}" target="_blank" class="popup-website"><i class="fas fa-external-link-alt"></i> Website</a>`
                 : ''
             }
-          `);
+          </div>
+        `);
 
         marker.addTo(this.map!);
         this.markers.push(marker);
