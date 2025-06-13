@@ -20,7 +20,7 @@ interface Site {
     address: string;
   };
   rating: number;
-  imageUrl: string;
+  iconClass?: string;
   openingHours?: string;
   contact?: Contact;
   facilities: string[];
@@ -41,12 +41,8 @@ interface Site {
   template: `
     <div class="site-detail-container" *ngIf="site">
       <div class="site-header">
-        <div
-          class="site-image"
-          [style.background-image]="
-            'url(' + (site.imageUrl || 'assets/placeholder.jpg') + ')'
-          "
-        >
+        <div class="site-icon">
+          <i [class]="getIconClass(site.type)"></i>
           <div class="site-rating">
             <i class="fas fa-star"></i>
             {{ site.rating }}
@@ -152,25 +148,19 @@ interface Site {
         margin-bottom: 2rem;
       }
 
-      .site-image {
+      .site-icon {
         height: 400px;
-        background-size: cover;
-        background-position: center;
+        background: #f8f9fa;
         border-radius: 8px;
         position: relative;
-      }
-
-      .site-rating {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 0.5rem;
-        border-radius: 4px;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        justify-content: center;
+
+        i {
+          font-size: 8rem;
+          color: #2c3e50;
+        }
       }
 
       .site-info {
@@ -348,41 +338,35 @@ export class SiteDetailComponent implements OnInit {
   }
 
   private loadSiteDetails() {
-    // Mock data for demonstration
+    // TODO: Implement loading site details from the backend
+    // For now, using mock data
     this.site = {
       id: 1,
       name: 'Ancient Temple',
-      type: 'Historical Site',
+      type: 'religious',
       description:
-        'A magnificent ancient temple with rich cultural heritage...',
+        'A magnificent ancient temple with stunning architecture and religious significance.',
       location: {
-        lat: 51.5074,
-        lng: -0.1278,
-        address: '123 Temple Street, London',
+        lat: 0,
+        lng: 0,
+        address: '123 Temple Street, City',
       },
-      rating: 4.5,
-      imageUrl: 'assets/images/temple.jpg',
+      rating: 4.7,
       openingHours: '9:00 AM - 5:00 PM',
       contact: {
-        phone: '+44 123 456 7890',
-        email: 'info@ancienttemple.com',
-        website: 'https://ancienttemple.com',
+        phone: '+1 234 567 890',
+        email: 'info@temple.com',
+        website: 'https://temple.com',
       },
-      facilities: [
-        'Guided Tours',
-        'Gift Shop',
-        'Restrooms',
-        'Parking',
-        'Wheelchair Access',
-      ],
+      facilities: ['Parking', 'Guided Tours', 'Gift Shop', 'Restrooms'],
       reviews: [
         {
           id: 1,
           userId: 1,
           userName: 'John Doe',
           rating: 5,
-          comment: 'Amazing historical site with beautiful architecture.',
-          date: '2024-02-15',
+          comment: 'Amazing place with rich history!',
+          date: '2024-01-15',
         },
       ],
     };
@@ -395,5 +379,22 @@ export class SiteDetailComponent implements OnInit {
 
   markAsVisited() {
     // TODO: Update visited status in backend
+  }
+
+  getIconClass(type: string): string {
+    switch (type.toLowerCase()) {
+      case 'museum':
+        return 'fas fa-landmark';
+      case 'monument':
+        return 'fas fa-monument';
+      case 'historic':
+        return 'fas fa-archway';
+      case 'religious':
+        return 'fas fa-church';
+      case 'cultural':
+        return 'fas fa-theater-masks';
+      default:
+        return 'fas fa-map-marker-alt';
+    }
   }
 }

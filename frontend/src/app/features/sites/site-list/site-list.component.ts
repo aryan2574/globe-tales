@@ -13,7 +13,7 @@ interface Site {
     lng: number;
   };
   rating: number;
-  imageUrl?: string;
+  iconClass?: string;
 }
 
 @Component({
@@ -68,12 +68,8 @@ interface Site {
           class="site-card"
           [routerLink]="['/sites', site.id]"
         >
-          <div
-            class="site-image"
-            [style.background-image]="
-              'url(' + (site.imageUrl || 'assets/placeholder.jpg') + ')'
-            "
-          >
+          <div class="site-icon">
+            <i [class]="getIconClass(site.type)"></i>
             <div class="site-rating">
               <i class="fas fa-star"></i>
               {{ site.rating }}
@@ -146,11 +142,18 @@ interface Site {
         }
       }
 
-      .site-image {
+      .site-icon {
         height: 200px;
-        background-size: cover;
-        background-position: center;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         position: relative;
+
+        i {
+          font-size: 5rem;
+          color: #2c3e50;
+        }
       }
 
       .site-rating {
@@ -233,7 +236,6 @@ export class SiteListComponent implements OnInit {
           "A comprehensive museum showcasing the country's rich cultural heritage.",
         location: { lat: 0, lng: 0 },
         rating: 4.5,
-        imageUrl: 'assets/museum.jpg',
       },
       {
         id: '2',
@@ -243,7 +245,6 @@ export class SiteListComponent implements OnInit {
           'A magnificent cathedral with stunning architecture and religious artifacts.',
         location: { lat: 0, lng: 0 },
         rating: 4.8,
-        imageUrl: 'assets/cathedral.jpg',
       },
     ];
     this.loading = false;
@@ -259,5 +260,22 @@ export class SiteListComponent implements OnInit {
 
   onSortChange() {
     // TODO: Implement sorting
+  }
+
+  getIconClass(type: string): string {
+    switch (type.toLowerCase()) {
+      case 'museum':
+        return 'fas fa-landmark';
+      case 'monument':
+        return 'fas fa-monument';
+      case 'historic':
+        return 'fas fa-archway';
+      case 'religious':
+        return 'fas fa-church';
+      case 'cultural':
+        return 'fas fa-theater-masks';
+      default:
+        return 'fas fa-map-marker-alt';
+    }
   }
 }
