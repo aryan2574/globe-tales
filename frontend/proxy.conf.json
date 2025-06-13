@@ -1,0 +1,15 @@
+{
+  "/api/ors": {
+    "target": "https://api.openrouteservice.org",
+    "secure": true,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api/ors": ""
+    },
+    "logLevel": "debug",
+    "headers": {
+      "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+      "Content-Type": "application/json; charset=utf-8"
+    }
+  }
+}

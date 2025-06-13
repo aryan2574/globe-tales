@@ -3,13 +3,22 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MapService, Place } from '../../services/map.service';
+import { RouteService } from '../../services/route.service';
 import { AuthService } from '../../services/auth.service';
 import { finalize } from 'rxjs/operators';
+import { DistancePipe } from '../../shared/pipes/distance.pipe';
+import { DurationPipe } from '../../shared/pipes/duration.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    DistancePipe,
+    DurationPipe,
+  ],
   template: `
     <div class="dashboard-container">
       <div class="map-section">
@@ -17,6 +26,44 @@ import { finalize } from 'rxjs/operators';
         <button class="current-location-btn" (click)="goToCurrentLocation()">
           <i class="fas fa-crosshairs"></i>
         </button>
+        <div class="route-controls" *ngIf="selectedPlace">
+          <div class="route-info" *ngIf="routeInfo">
+            <div class="info-item">
+              <i class="fas fa-road"></i>
+              <span>{{ routeInfo.distance | distance }}</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <span>{{ routeInfo.duration | duration }}</span>
+            </div>
+          </div>
+          <div class="transport-modes">
+            <button
+              class="transport-btn"
+              [class.active]="transportMode === 'driving-car'"
+              (click)="getRoute('driving-car')"
+            >
+              <i class="fas fa-car"></i>
+            </button>
+            <button
+              class="transport-btn"
+              [class.active]="transportMode === 'foot-walking'"
+              (click)="getRoute('foot-walking')"
+            >
+              <i class="fas fa-walking"></i>
+            </button>
+            <button
+              class="transport-btn"
+              [class.active]="transportMode === 'cycling-regular'"
+              (click)="getRoute('cycling-regular')"
+            >
+              <i class="fas fa-bicycle"></i>
+            </button>
+          </div>
+          <button class="clear-route-btn" (click)="clearRoute()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
       </div>
 
       <div class="places-panel">
@@ -72,6 +119,7 @@ import { finalize } from 'rxjs/operators';
           <div
             *ngFor="let place of places"
             class="place-card"
+            [class.selected]="place === selectedPlace"
             (click)="selectPlace(place)"
           >
             <h3>
@@ -158,6 +206,94 @@ import { finalize } from 'rxjs/operators';
         }
       }
 
+      .route-controls {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: white;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .route-info {
+        display: flex;
+        gap: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e0e0e0;
+      }
+
+      .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+
+        i {
+          color: #3498db;
+        }
+      }
+
+      .transport-modes {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .transport-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        background: white;
+        color: #666;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #f5f5f5;
+        }
+
+        &.active {
+          background: #3498db;
+          color: white;
+          border-color: #3498db;
+        }
+
+        i {
+          font-size: 1.2rem;
+        }
+      }
+
+      .clear-route-btn {
+        width: 100%;
+        padding: 0.5rem;
+        border: none;
+        border-radius: 4px;
+        background: #e74c3c;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background: #c0392b;
+        }
+
+        i {
+          font-size: 1rem;
+        }
+      }
+
       .places-panel {
         background: white;
         border-left: 1px solid #e0e0e0;
@@ -221,6 +357,11 @@ import { finalize } from 'rxjs/operators';
         &:hover {
           transform: translateY(-2px);
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        &.selected {
+          border-color: #3498db;
+          background: #f8f9fa;
         }
 
         h3 {
@@ -327,6 +468,52 @@ import { finalize } from 'rxjs/operators';
         .leaflet-popup-tip {
           background: white;
         }
+
+        .current-location-marker {
+          .location-marker-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+          }
+
+          i {
+            color: #3498db;
+            font-size: 2rem;
+            z-index: 2;
+            background: white;
+            border-radius: 50%;
+            padding: 2px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          }
+
+          .location-pulse {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: rgba(52, 152, 219, 0.2);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+            z-index: 1;
+          }
+
+          @keyframes pulse {
+            0% {
+              transform: scale(0.8);
+              opacity: 1;
+            }
+            50% {
+              transform: scale(1.2);
+              opacity: 0.5;
+            }
+            100% {
+              transform: scale(0.8);
+              opacity: 1;
+            }
+          }
+        }
       }
     `,
   ],
@@ -337,9 +524,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   error: string | null = null;
   selectedType = '';
   searchRadius = 1000;
+  selectedPlace: Place | null = null;
+  transportMode: 'driving-car' | 'foot-walking' | 'cycling-regular' =
+    'driving-car';
+  routeInfo: { distance: number; duration: number } | null = null;
+  private currentLocation: [number, number] | null = null;
 
   constructor(
     private mapService: MapService,
+    private routeService: RouteService,
     private authService: AuthService
   ) {}
 
@@ -359,8 +552,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     try {
       const location = await this.mapService.getCurrentLocation().toPromise();
       if (location) {
+        this.currentLocation = [location.lat, location.lng];
         const map = this.mapService.initializeMap(
           'map',
+          location.lat,
+          location.lng
+        );
+        this.routeService.updateCurrentLocation(
+          map,
           location.lat,
           location.lng
         );
@@ -419,9 +618,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   selectPlace(place: Place) {
+    this.selectedPlace = place;
     const map = this.mapService.getMap();
     if (map) {
       map.setView([place.lat, place.lon], 16);
+      if (this.currentLocation) {
+        this.getRoute(this.transportMode);
+      }
     }
   }
 
@@ -429,15 +632,57 @@ export class DashboardComponent implements OnInit, OnDestroy {
     try {
       const location = await this.mapService.getCurrentLocation().toPromise();
       if (location) {
+        this.currentLocation = [location.lat, location.lng];
         const map = this.mapService.getMap();
         if (map) {
           map.setView([location.lat, location.lng], 15);
+          this.routeService.updateCurrentLocation(
+            map,
+            location.lat,
+            location.lng
+          );
           this.searchPlaces(location.lat, location.lng);
+          if (this.selectedPlace) {
+            this.getRoute(this.transportMode);
+          }
         }
       }
     } catch (error) {
       this.error =
         'Could not get your location. Please enable location services.';
     }
+  }
+
+  getRoute(profile: 'driving-car' | 'foot-walking' | 'cycling-regular') {
+    if (!this.currentLocation || !this.selectedPlace) return;
+
+    this.transportMode = profile;
+    this.routeService
+      .getRoute(
+        this.currentLocation,
+        [this.selectedPlace.lat, this.selectedPlace.lon],
+        profile
+      )
+      .subscribe({
+        next: (route) => {
+          const map = this.mapService.getMap();
+          if (map) {
+            this.routeService.drawRoute(
+              map,
+              route.features[0].geometry.coordinates
+            );
+            this.routeInfo = this.routeService.getRouteInfo(route);
+          }
+        },
+        error: (error) => {
+          console.error('Error getting route:', error);
+          this.error = 'Failed to get route. Please try again.';
+        },
+      });
+  }
+
+  clearRoute() {
+    this.routeService.clearRoute();
+    this.routeInfo = null;
   }
 }
