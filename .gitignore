@@ -150,3 +150,9 @@ frontend/.vscode
 docker-compose.override.yml
 *.env
 .env.*
+
+# Ignore application.properties
+backend/src/main/resources/application.properties
+
+# Ignore environment.ts
+frontend/src/environments/environment.ts
