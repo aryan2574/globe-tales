@@ -1,39 +1,67 @@
 import { Routes } from '@angular/router';
-import { HeaderComponent } from './shared/components/header/header.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
     path: '',
-    component: HeaderComponent,
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
+  {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/dashboard/dashboard.component').then(
+        (m) => m.DashboardComponent
+      ),
+  },
+  {
+    path: 'sites',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/sites/site-list/site-list.component').then(
+        (m) => m.SiteListComponent
+      ),
+  },
+  {
+    path: 'account',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/account/account.component').then(
+        (m) => m.AccountComponent
+      ),
     children: [
       {
         path: '',
-        redirectTo: 'dashboard',
+        redirectTo: 'profile',
         pathMatch: 'full',
       },
       {
-        path: 'dashboard',
-        canActivate: [authGuard],
+        path: 'profile',
         loadComponent: () =>
-          import('./features/dashboard/dashboard.component').then(
-            (m) => m.DashboardComponent
+          import('./features/account/profile/profile.component').then(
+            (m) => m.ProfileComponent
           ),
       },
       {
-        path: 'sites',
-        canActivate: [authGuard],
+        path: 'favorites',
         loadComponent: () =>
-          import('./features/sites/site-list/site-list.component').then(
-            (m) => m.SiteListComponent
+          import('./features/account/favorites/favorites.component').then(
+            (m) => m.FavoritesComponent
           ),
       },
       {
-        path: 'account',
-        canActivate: [authGuard],
+        path: 'visited',
         loadComponent: () =>
-          import('./features/account/account.component').then(
-            (m) => m.AccountComponent
+          import('./features/account/visited/visited.component').then(
+            (m) => m.VisitedComponent
+          ),
+      },
+      {
+        path: 'achievements',
+        loadComponent: () =>
+          import('./features/account/achievements/achievements.component').then(
+            (m) => m.AchievementsComponent
           ),
       },
     ],

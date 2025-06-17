@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { RouteInfo } from '../models/route.model';
 import { environment } from '../../environments/environment';
 import * as L from 'leaflet';
 
@@ -27,34 +28,34 @@ export interface RouteResponse {
 export class RouteService {
   private routeLayer: L.Polyline | null = null;
   private currentLocationMarker: L.Marker | null = null;
+  private readonly API_URL = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
   getRoute(
     start: [number, number],
     end: [number, number],
-    profile: 'driving-car' | 'foot-walking' | 'cycling-regular' = 'driving-car'
-  ): Observable<RouteResponse> {
-    const headers = new HttpHeaders({
-      Authorization: environment.openRouteApiKey,
-      Accept:
-        'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-      'Content-Type': 'application/json; charset=utf-8',
-    });
-
+    transportMode: 'driving-car' | 'foot-walking' | 'cycling-regular'
+  ): Observable<RouteInfo> {
+    const url = `${this.API_URL}/routes`;
     const body = {
-      coordinates: [start, end],
-      format: 'geojson',
-      preference: 'fastest',
-      units: 'm',
-      language: 'en',
-      geometry_simplify: true,
+      start,
+      end,
+      transportMode,
     };
 
-    return this.http.post<RouteResponse>(
-      `/api/ors/v2/directions/${profile}`,
-      body,
-      { headers }
+    return this.http.post<any>(url, body).pipe(
+      map((response) => ({
+        distance: response.distance,
+        duration: response.duration,
+        geometry: response.geometry,
+        steps: response.steps.map((step: any) => ({
+          distance: step.distance,
+          duration: step.duration,
+          instruction: step.instruction,
+          geometry: step.geometry,
+        })),
+      }))
     );
   }
 

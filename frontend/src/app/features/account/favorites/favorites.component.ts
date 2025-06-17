@@ -2,6 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
+interface FavoritePlace {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  location: string;
+}
+
 @Component({
   selector: 'app-favorites',
   standalone: true,
@@ -10,10 +18,9 @@ import { RouterModule } from '@angular/router';
     <div class="favorites-container">
       <h2>My Favorite Places</h2>
 
-      <div class="favorites-list">
+      <div class="favorites-grid">
         <div *ngIf="loading" class="loading">Loading favorites...</div>
         <div *ngIf="error" class="error">{{ error }}</div>
-
         <div
           *ngIf="!loading && !error && favorites.length === 0"
           class="no-favorites"
@@ -21,19 +28,19 @@ import { RouterModule } from '@angular/router';
           You haven't added any places to your favorites yet.
         </div>
 
-        <div *ngFor="let favorite of favorites" class="favorite-card">
-          <h3>{{ favorite.name }}</h3>
-          <p class="favorite-type">{{ favorite.type }}</p>
-          <p *ngIf="favorite.description" class="favorite-description">
-            {{ favorite.description }}
-          </p>
-          <div class="favorite-actions">
-            <button class="btn-view" (click)="viewPlace(favorite)">
-              View Details
-            </button>
-            <button class="btn-remove" (click)="removeFavorite(favorite)">
-              Remove
-            </button>
+        <div *ngFor="let place of favorites" class="favorite-card">
+          <div class="favorite-image">
+            <img [src]="place.imageUrl" [alt]="place.name" />
+          </div>
+          <div class="favorite-content">
+            <h3>{{ place.name }}</h3>
+            <p class="location">{{ place.location }}</p>
+            <p class="description">{{ place.description }}</p>
+            <div class="favorite-actions">
+              <button class="btn-remove" (click)="removeFavorite(place.id)">
+                Remove from Favorites
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -50,56 +57,70 @@ import { RouterModule } from '@angular/router';
         margin-bottom: 2rem;
       }
 
-      .favorites-list {
+      .favorites-grid {
         display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1.5rem;
       }
 
       .favorite-card {
         background: white;
         border-radius: 8px;
-        padding: 1.5rem;
+        overflow: hidden;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+        }
       }
 
-      .favorite-type {
-        color: #666;
-        font-size: 0.9rem;
-        margin: 0.5rem 0;
+      .favorite-image {
+        height: 200px;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
       }
 
-      .favorite-description {
-        color: #666;
-        margin: 1rem 0;
+      .favorite-content {
+        padding: 1.5rem;
+
+        h3 {
+          color: #2c3e50;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .location {
+          color: #7f8c8d;
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .description {
+          color: #34495e;
+          font-size: 0.95rem;
+          margin-bottom: 1rem;
+        }
       }
 
       .favorite-actions {
         display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-      }
-
-      .btn-view,
-      .btn-remove {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .btn-view {
-        background: #3498db;
-        color: white;
-
-        &:hover {
-          background: #2980b9;
-        }
+        justify-content: flex-end;
       }
 
       .btn-remove {
         background: #e74c3c;
         color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
 
         &:hover {
           background: #c0392b;
@@ -112,6 +133,7 @@ import { RouterModule } from '@angular/router';
         text-align: center;
         padding: 2rem;
         color: #666;
+        grid-column: 1 / -1;
       }
 
       .error {
@@ -121,7 +143,7 @@ import { RouterModule } from '@angular/router';
   ],
 })
 export class FavoritesComponent implements OnInit {
-  favorites: any[] = [];
+  favorites: FavoritePlace[] = [];
   loading = false;
   error: string | null = null;
 
@@ -134,14 +156,28 @@ export class FavoritesComponent implements OnInit {
   private loadFavorites() {
     this.loading = true;
     // TODO: Implement loading favorites from the backend
+    // For now, using mock data
+    this.favorites = [
+      {
+        id: '1',
+        name: 'Eiffel Tower',
+        description: 'Iconic iron lattice tower on the Champ de Mars in Paris.',
+        imageUrl: 'assets/images/eiffel-tower.jpg',
+        location: 'Paris, France',
+      },
+      {
+        id: '2',
+        name: 'Taj Mahal',
+        description: 'White marble mausoleum in Agra, India.',
+        imageUrl: 'assets/images/taj-mahal.jpg',
+        location: 'Agra, India',
+      },
+    ];
     this.loading = false;
   }
 
-  viewPlace(favorite: any) {
-    // TODO: Implement navigation to place details
-  }
-
-  removeFavorite(favorite: any) {
-    // TODO: Implement removing favorite
+  removeFavorite(id: string) {
+    // TODO: Implement removing favorite from the backend
+    this.favorites = this.favorites.filter((place) => place.id !== id);
   }
 }

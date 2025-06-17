@@ -2,6 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
+interface VisitedPlace {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  location: string;
+  visitDate: Date;
+  rating: number;
+}
+
 @Component({
   selector: 'app-visited',
   standalone: true,
@@ -10,33 +20,42 @@ import { RouterModule } from '@angular/router';
     <div class="visited-container">
       <h2>Places I've Visited</h2>
 
-      <div class="visited-list">
+      <div class="visited-grid">
         <div *ngIf="loading" class="loading">Loading visited places...</div>
         <div *ngIf="error" class="error">{{ error }}</div>
-
         <div
           *ngIf="!loading && !error && visitedPlaces.length === 0"
           class="no-places"
         >
-          You haven't marked any places as visited yet.
+          You haven't visited any places yet.
         </div>
 
         <div *ngFor="let place of visitedPlaces" class="visited-card">
-          <div class="visited-header">
-            <h3>{{ place.name }}</h3>
-            <span class="visit-date">{{ place.visitDate | date }}</span>
+          <div class="visited-image">
+            <img [src]="place.imageUrl" [alt]="place.name" />
           </div>
-          <p class="place-type">{{ place.type }}</p>
-          <p *ngIf="place.description" class="place-description">
-            {{ place.description }}
-          </p>
-          <div class="place-actions">
-            <button class="btn-view" (click)="viewPlace(place)">
-              View Details
-            </button>
-            <button class="btn-remove" (click)="removeVisited(place)">
-              Remove
-            </button>
+          <div class="visited-content">
+            <h3>{{ place.name }}</h3>
+            <p class="location">{{ place.location }}</p>
+            <p class="description">{{ place.description }}</p>
+            <div class="visit-info">
+              <span class="visit-date"
+                >Visited on {{ place.visitDate | date : 'mediumDate' }}</span
+              >
+              <div class="rating">
+                <span
+                  *ngFor="let star of [1, 2, 3, 4, 5]"
+                  [class.filled]="star <= place.rating"
+                  class="star"
+                  >★</span
+                >
+              </div>
+            </div>
+            <div class="visited-actions">
+              <button class="btn-review" (click)="writeReview(place.id)">
+                Write Review
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -53,71 +72,99 @@ import { RouterModule } from '@angular/router';
         margin-bottom: 2rem;
       }
 
-      .visited-list {
+      .visited-grid {
         display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1.5rem;
       }
 
       .visited-card {
         background: white;
         border-radius: 8px;
-        padding: 1.5rem;
+        overflow: hidden;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-
-      .visited-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.5rem;
-      }
-
-      .visit-date {
-        color: #666;
-        font-size: 0.9rem;
-      }
-
-      .place-type {
-        color: #666;
-        font-size: 0.9rem;
-        margin: 0.5rem 0;
-      }
-
-      .place-description {
-        color: #666;
-        margin: 1rem 0;
-      }
-
-      .place-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-      }
-
-      .btn-view,
-      .btn-remove {
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-
-      .btn-view {
-        background: #3498db;
-        color: white;
+        transition: transform 0.3s ease;
 
         &:hover {
-          background: #2980b9;
+          transform: translateY(-4px);
         }
       }
 
-      .btn-remove {
-        background: #e74c3c;
+      .visited-image {
+        height: 200px;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .visited-content {
+        padding: 1.5rem;
+
+        h3 {
+          color: #2c3e50;
+          margin: 0 0 0.5rem 0;
+        }
+
+        .location {
+          color: #7f8c8d;
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+        }
+
+        .description {
+          color: #34495e;
+          font-size: 0.95rem;
+          margin-bottom: 1rem;
+        }
+      }
+
+      .visit-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+      }
+
+      .visit-date {
+        color: #7f8c8d;
+      }
+
+      .rating {
+        display: flex;
+        gap: 0.25rem;
+      }
+
+      .star {
+        color: #ddd;
+        font-size: 1.2rem;
+
+        &.filled {
+          color: #f1c40f;
+        }
+      }
+
+      .visited-actions {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .btn-review {
+        background: #3498db;
         color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
 
         &:hover {
-          background: #c0392b;
+          background: #2980b9;
         }
       }
 
@@ -127,6 +174,7 @@ import { RouterModule } from '@angular/router';
         text-align: center;
         padding: 2rem;
         color: #666;
+        grid-column: 1 / -1;
       }
 
       .error {
@@ -136,7 +184,7 @@ import { RouterModule } from '@angular/router';
   ],
 })
 export class VisitedComponent implements OnInit {
-  visitedPlaces: any[] = [];
+  visitedPlaces: VisitedPlace[] = [];
   loading = false;
   error: string | null = null;
 
@@ -149,14 +197,32 @@ export class VisitedComponent implements OnInit {
   private loadVisitedPlaces() {
     this.loading = true;
     // TODO: Implement loading visited places from the backend
+    // For now, using mock data
+    this.visitedPlaces = [
+      {
+        id: '1',
+        name: 'Eiffel Tower',
+        description: 'Iconic iron lattice tower on the Champ de Mars in Paris.',
+        imageUrl: 'assets/images/eiffel-tower.jpg',
+        location: 'Paris, France',
+        visitDate: new Date('2024-01-15'),
+        rating: 5,
+      },
+      {
+        id: '2',
+        name: 'Taj Mahal',
+        description: 'White marble mausoleum in Agra, India.',
+        imageUrl: 'assets/images/taj-mahal.jpg',
+        location: 'Agra, India',
+        visitDate: new Date('2024-02-01'),
+        rating: 4,
+      },
+    ];
     this.loading = false;
   }
 
-  viewPlace(place: any) {
-    // TODO: Implement navigation to place details
-  }
-
-  removeVisited(place: any) {
-    // TODO: Implement removing from visited places
+  writeReview(id: string) {
+    // TODO: Implement writing a review
+    console.log('Writing review for place:', id);
   }
 }

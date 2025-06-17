@@ -109,6 +109,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         user.setDeletedAt(OffsetDateTime.now());
+        user.setDeleted(true);
         userRepository.save(user);
     }
 

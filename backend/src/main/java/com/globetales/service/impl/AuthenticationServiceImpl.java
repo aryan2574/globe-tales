@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 @Service
@@ -43,7 +44,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .displayName(request.getUsername())
+                .createdAt(OffsetDateTime.now())
                 .roles(Set.of("USER"))
+                .isDeleted(false)
                 .build();
 
         userRepository.save(user);

@@ -21,12 +21,12 @@ import { AuthService } from '../../../services/auth.service';
         class="profile-form"
       >
         <div class="form-group">
-          <label for="name">Full Name</label>
+          <label for="username">Username</label>
           <input
             type="text"
-            id="name"
-            formControlName="name"
-            placeholder="Enter your full name"
+            id="username"
+            formControlName="username"
+            placeholder="Enter your username"
           />
         </div>
         <div class="form-group">
@@ -40,12 +40,12 @@ import { AuthService } from '../../../services/auth.service';
           />
         </div>
         <div class="form-group">
-          <label for="currentLocation">Current Location</label>
+          <label for="location">Location</label>
           <input
             type="text"
-            id="currentLocation"
-            formControlName="currentLocation"
-            placeholder="Your current location"
+            id="location"
+            formControlName="location"
+            placeholder="Your location"
           />
         </div>
         <button type="submit" class="btn-save" [disabled]="profileForm.invalid">
@@ -130,9 +130,9 @@ export class ProfileComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private authService: AuthService) {
     this.profileForm = this.fb.group({
-      name: ['', Validators.required],
+      username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      currentLocation: [''],
+      location: [''],
     });
   }
 
@@ -141,9 +141,9 @@ export class ProfileComponent implements OnInit {
     this.authService.currentUser$.subscribe((user) => {
       if (user) {
         this.profileForm.patchValue({
-          name: user.name,
+          username: user.username,
           email: user.email,
-          currentLocation: user.currentLocation,
+          location: user.location || '',
         });
       }
     });

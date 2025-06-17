@@ -1,120 +1,144 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { environment } from '../../environments/environment';
+import { Place } from '../models/place.model';
+import { RouteInfo } from '../models/route.model';
 import * as L from 'leaflet';
-
-export interface Place {
-  id: string;
-  name: string;
-  type: string;
-  lat: number;
-  lon: number;
-  tags: Record<string, string>;
-}
 
 @Injectable({
   providedIn: 'root',
 })
-export class MapService {
+export class MapService implements OnDestroy {
   private map: L.Map | null = null;
   private markers: L.Marker[] = [];
+  private routeLayer: L.Polyline | null = null;
   private readonly OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 
-  constructor(private http: HttpClient) {
-    // Create custom marker icon using Font Awesome
-    const createCustomIcon = (type: string) => {
-      const iconHtml = `
-        <div class="custom-marker">
-          <i class="fas ${this.getIconForType(type)}"></i>
-        </div>
-      `;
+  constructor(private http: HttpClient) {}
 
-      return L.divIcon({
-        html: iconHtml,
-        className: 'custom-marker-container',
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
-      });
-    };
-
-    // Override default marker icon
-    L.Marker.prototype.options.icon = createCustomIcon('default');
+  ngOnDestroy(): void {
+    this.destroyMap();
   }
 
-  private getIconForType(type: string): string {
-    switch (type) {
-      case 'hotel':
-        return 'fa-hotel';
-      case 'attraction':
-        return 'fa-landmark';
-      case 'museum':
-        return 'fa-university';
-      case 'restaurant':
-        return 'fa-utensils';
-      case 'viewpoint':
-        return 'fa-mountain';
-      default:
-        return 'fa-map-marker-alt';
+  initializeMap(elementId: string): void {
+    if (this.map) {
+      this.destroyMap();
+    }
+
+    try {
+      this.map = L.map(elementId).setView([0, 0], 2);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+      }).addTo(this.map);
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      throw new Error('Failed to initialize map');
     }
   }
 
-  initializeMap(elementId: string, lat: number, lng: number): L.Map {
-    this.map = L.map(elementId).setView([lat, lng], 13);
+  destroyMap(): void {
+    if (this.map) {
+      this.clearMarkers();
+      this.clearRoute();
+      this.map.remove();
+      this.map = null;
+    }
+  }
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+  private clearMarkers(): void {
+    this.markers.forEach((marker) => marker.remove());
+    this.markers = [];
+  }
+
+  public clearRoute(): void {
+    if (this.routeLayer) {
+      this.routeLayer.remove();
+      this.routeLayer = null;
+    }
+  }
+
+  flyTo(coordinates: [number, number]): void {
+    if (!this.map) {
+      throw new Error('Map not initialized');
+    }
+    this.map.flyTo(coordinates, 13);
+  }
+
+  displayPlaces(places: Place[]): void {
+    if (!this.map) {
+      throw new Error('Map not initialized');
+    }
+
+    this.clearMarkers();
+    places.forEach((place) => {
+      const marker = L.marker(place.coordinates).bindPopup(`
+          <strong>${place.name}</strong><br>
+          ${place.description || ''}
+        `);
+      marker.addTo(this.map!);
+      this.markers.push(marker);
+    });
+  }
+
+  displayRoute(geometry: {
+    coordinates: [number, number][];
+    type: string;
+  }): void {
+    if (!this.map) {
+      throw new Error('Map not initialized');
+    }
+
+    this.clearRoute();
+    const latLngs = geometry.coordinates.map(
+      (coord) => [coord[1], coord[0]] as [number, number]
+    );
+    this.routeLayer = L.polyline(latLngs, {
+      color: '#3388ff',
+      weight: 5,
+      opacity: 0.7,
     }).addTo(this.map);
-
-    // Add custom marker styles
-    const style = document.createElement('style');
-    style.textContent = `
-      .custom-marker-container {
-        background: none;
-        border: none;
-      }
-      .custom-marker {
-        background: #3498db;
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
-      }
-      .custom-marker i {
-        font-size: 16px;
-      }
-      .custom-marker:hover {
-        transform: scale(1.1);
-        background: #2980b9;
-      }
-    `;
-    document.head.appendChild(style);
-
-    return this.map;
   }
 
   getCurrentLocation(): Observable<{ lat: number; lng: number }> {
     return new Observable((observer) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            observer.next({
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            });
-            observer.complete();
-          },
-          (error) => {
-            observer.error(error);
-          }
+      if (!navigator.geolocation) {
+        observer.error(
+          new Error('Geolocation is not supported by this browser.')
         );
-      } else {
-        observer.error('Geolocation is not supported by this browser.');
+        return;
       }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          observer.next({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          observer.complete();
+        },
+        (error) => {
+          let errorMessage = 'Failed to get current location';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'Location permission denied';
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Location information unavailable';
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'Location request timed out';
+              break;
+          }
+          observer.error(new Error(errorMessage));
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
+        }
+      );
     });
   }
 
@@ -150,88 +174,19 @@ export class MapService {
   }
 
   private processOverpassResponse(data: any): Place[] {
-    const places: Place[] = [];
-
-    if (!data.elements) {
-      return places;
+    if (!data || !data.elements) {
+      return [];
     }
 
-    data.elements.forEach((element: any) => {
-      if (element.tags && element.tags.tourism && element.lat && element.lon) {
-        // Generate a meaningful name if none exists
-        let name = element.tags.name;
-        if (!name) {
-          const type =
-            element.tags.tourism.charAt(0).toUpperCase() +
-            element.tags.tourism.slice(1);
-          const address =
-            element.tags['addr:street'] || element.tags['addr:place'] || '';
-          name = `${type}${address ? ` on ${address}` : ''}`;
-        }
-
-        places.push({
-          id: element.id.toString(),
-          name: name,
-          type: element.tags.tourism,
-          lat: element.lat,
-          lon: element.lon,
-          tags: element.tags,
-        });
-      }
-    });
-
-    return places;
-  }
-
-  addMarkersToMap(places: Place[]): void {
-    if (!this.map) return;
-
-    // Clear existing markers
-    this.markers.forEach((marker) => marker.remove());
-    this.markers = [];
-
-    // Add new markers
-    places.forEach((place) => {
-      if (place.lat && place.lon) {
-        const marker = L.marker([place.lat, place.lon], {
-          icon: L.divIcon({
-            html: `
-              <div class="custom-marker">
-                <i class="fas ${this.getIconForType(place.type)}"></i>
-              </div>
-            `,
-            className: 'custom-marker-container',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15],
-          }),
-        }).bindPopup(`
-          <div class="marker-popup">
-            <h3><i class="fas ${this.getIconForType(place.type)}"></i> ${
-          place.name
-        }</h3>
-            <p class="popup-type">${place.type}</p>
-            ${
-              place.tags['description']
-                ? `<p class="popup-description">${place.tags['description']}</p>`
-                : ''
-            }
-            ${
-              place.tags['website']
-                ? `<a href="${place.tags['website']}" target="_blank" class="popup-website"><i class="fas fa-external-link-alt"></i> Website</a>`
-                : ''
-            }
-          </div>
-        `);
-
-        marker.addTo(this.map!);
-        this.markers.push(marker);
-      }
-    });
-  }
-
-  clearMarkers(): void {
-    this.markers.forEach((marker) => marker.remove());
-    this.markers = [];
+    return data.elements
+      .filter((element: any) => element.tags && element.tags.name)
+      .map((element: any) => ({
+        id: element.id,
+        name: element.tags.name,
+        description: element.tags.description || '',
+        coordinates: [element.lat, element.lon],
+        type: element.tags.tourism || 'unknown',
+      }));
   }
 
   getMap(): L.Map | null {

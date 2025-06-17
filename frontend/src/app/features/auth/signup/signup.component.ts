@@ -24,18 +24,18 @@ import { AuthService } from '../../../services/auth.service';
             <input
               type="text"
               id="name"
-              formControlName="name"
+              formControlName="username"
               class="form-control"
               [class.is-invalid]="
-                signupForm.get('name')?.invalid &&
-                signupForm.get('name')?.touched
+                signupForm.get('username')?.invalid &&
+                signupForm.get('username')?.touched
               "
             />
             <div
               class="error-message"
               *ngIf="
-                signupForm.get('name')?.invalid &&
-                signupForm.get('name')?.touched
+                signupForm.get('username')?.invalid &&
+                signupForm.get('username')?.touched
               "
             >
               Please enter your full name
@@ -119,7 +119,14 @@ export class SignupComponent {
     private router: Router
   ) {
     this.signupForm = this.fb.group({
-      name: ['', [Validators.required]],
+      username: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(50),
+        ],
+      ],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
@@ -128,8 +135,8 @@ export class SignupComponent {
   onSubmit() {
     if (this.signupForm.valid) {
       this.errorMessage = '';
-      const { name, email, password } = this.signupForm.value;
-      this.authService.register({ username: name, email, password }).subscribe({
+      const { username, email, password } = this.signupForm.value;
+      this.authService.register({ username, email, password }).subscribe({
         next: () => {
           this.router.navigate(['/account']);
         },

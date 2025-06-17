@@ -1,7 +1,7 @@
 package com.globetales.service;
 
+import com.globetales.dto.LocationDTO;
 import com.globetales.dto.UserDTO;
-import com.globetales.entity.User;
 import java.util.Optional;
 import java.util.UUID;
 
