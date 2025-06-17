@@ -15,8 +15,12 @@ import { AuthService } from '../../../services/auth.service';
         </div>
 
         <div class="nav-links">
-          <a routerLink="/dashboard" class="nav-link">Explore</a>
-          <a routerLink="/sites" class="nav-link">Cultural Sites</a>
+          <a routerLink="/dashboard" class="nav-link" *ngIf="isAuthenticated()"
+            >Explore</a
+          >
+          <a routerLink="/sites" class="nav-link" *ngIf="isAuthenticated()"
+            >Cultural Sites</a
+          >
           <a routerLink="/account" class="nav-link" *ngIf="isAuthenticated()"
             >My Journey</a
           >

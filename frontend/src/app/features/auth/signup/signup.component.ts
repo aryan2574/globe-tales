@@ -6,13 +6,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   template: `
     <div class="signup-container">
       <div class="signup-card">
@@ -136,7 +136,7 @@ export class SignupComponent {
         error: (error) => {
           console.error('Registration failed:', error);
           this.errorMessage =
-            error.error?.error || 'Registration failed. Please try again.';
+            error.error?.message || 'Registration failed. Please try again.';
         },
       });
     }

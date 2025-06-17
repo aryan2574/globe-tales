@@ -78,7 +78,7 @@ import { AuthService } from '../../../services/auth.service';
           </button>
 
           <div class="auth-links">
-            Don't have an account? <a routerLink="/signup">Sign Up</a>
+            Don't have an account? <a routerLink="/register">Sign Up</a>
           </div>
         </form>
       </div>
