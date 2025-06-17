@@ -12,17 +12,21 @@ import java.util.UUID;
 
 @Repository
 public interface UserPlaceRepository extends JpaRepository<UserPlace, UserPlaceId> {
-    List<UserPlace> findByUserId(UUID userId);
+    @Query("SELECT up FROM UserPlace up WHERE up.user.id = :userId")
+    List<UserPlace> findByUserId(@Param("userId") UUID userId);
     
-    boolean existsByUserIdAndSiteId(UUID userId, Long siteId);
+    @Query("SELECT CASE WHEN COUNT(up) > 0 THEN true ELSE false END FROM UserPlace up WHERE up.user.id = :userId AND up.site.id = :siteId")
+    boolean existsByUserIdAndSiteId(@Param("userId") UUID userId, @Param("siteId") Long siteId);
     
-    void deleteByUserIdAndSiteId(UUID userId, Long siteId);
+    @Query("DELETE FROM UserPlace up WHERE up.user.id = :userId AND up.site.id = :siteId")
+    void deleteByUserIdAndSiteId(@Param("userId") UUID userId, @Param("siteId") Long siteId);
     
-    @Query("SELECT up FROM UserPlace up JOIN up.site cs WHERE up.userId = :userId AND cs.siteType = :siteType")
+    @Query("SELECT up FROM UserPlace up WHERE up.user.id = :userId AND up.site.siteType = :siteType")
     List<UserPlace> findByUserIdAndSiteType(@Param("userId") UUID userId, @Param("siteType") String siteType);
     
-    @Query("SELECT up FROM UserPlace up WHERE up.userId = :userId AND up.visitStatus = :visitStatus")
+    @Query("SELECT up FROM UserPlace up WHERE up.user.id = :userId AND up.visitStatus = :visitStatus")
     List<UserPlace> findByUserIdAndVisitStatus(@Param("userId") UUID userId, @Param("visitStatus") String visitStatus);
 
-    List<UserPlace> findRecentPlacesByUserId(UUID userId, int limit);
+    @Query(value = "SELECT up FROM UserPlace up WHERE up.user.id = :userId ORDER BY up.visitedAt DESC LIMIT :limit", nativeQuery = true)
+    List<UserPlace> findRecentPlacesByUserId(@Param("userId") UUID userId, @Param("limit") int limit);
 } 

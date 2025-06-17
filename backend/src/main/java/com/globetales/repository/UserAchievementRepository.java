@@ -18,13 +18,13 @@ public interface UserAchievementRepository extends JpaRepository<UserAchievement
     @Query("SELECT CASE WHEN COUNT(ua) > 0 THEN true ELSE false END FROM UserAchievement ua WHERE ua.user.id = :userId AND ua.achievement.code = :achievementCode")
     boolean existsByUserIdAndAchievementCode(@Param("userId") UUID userId, @Param("achievementCode") String achievementCode);
     
-    @Query("SELECT ua FROM UserAchievement ua WHERE ua.user.id = :userId ORDER BY ua.unlockedAt DESC")
+    @Query("SELECT ua FROM UserAchievement ua WHERE ua.user.id = :userId ORDER BY ua.earnedAt DESC")
     List<UserAchievement> findRecentAchievements(@Param("userId") UUID userId, Pageable pageable);
     
     @Query("SELECT ua FROM UserAchievement ua WHERE ua.user.id = :userId AND ua.achievement.category = :category")
     List<UserAchievement> findByUserIdAndCategory(@Param("userId") UUID userId, @Param("category") String category);
 
-    @Query("SELECT ua FROM UserAchievement ua WHERE ua.user.id = :userId ORDER BY ua.unlockedAt DESC")
+    @Query("SELECT ua FROM UserAchievement ua WHERE ua.user.id = :userId ORDER BY ua.earnedAt DESC")
     List<UserAchievement> findRecentAchievementsByUserId(UUID userId, Pageable pageable);
 
     @Query("SELECT ua FROM UserAchievement ua WHERE ua.user.id = :userId AND ua.achievement.category = :category")

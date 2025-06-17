@@ -23,9 +23,15 @@ public class UserPlace {
     @Column(name = "visited_at")
     private OffsetDateTime visitedAt;
 
+    @Column(name = "visit_status", nullable = false)
+    private String visitStatus = "VISITED";
+
     @PrePersist
     protected void onCreate() {
         visitedAt = OffsetDateTime.now();
+        if (visitStatus == null) {
+            visitStatus = "VISITED";
+        }
     }
 
     // Getters and Setters
@@ -59,5 +65,13 @@ public class UserPlace {
 
     public void setVisitedAt(OffsetDateTime visitedAt) {
         this.visitedAt = visitedAt;
+    }
+
+    public String getVisitStatus() {
+        return visitStatus;
+    }
+
+    public void setVisitStatus(String visitStatus) {
+        this.visitStatus = visitStatus;
     }
 } 
