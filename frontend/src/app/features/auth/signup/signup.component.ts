@@ -129,7 +129,7 @@ export class SignupComponent {
     if (this.signupForm.valid) {
       this.errorMessage = '';
       const { name, email, password } = this.signupForm.value;
-      this.authService.register(name, email, password).subscribe({
+      this.authService.register({ username: name, email, password }).subscribe({
         next: () => {
           this.router.navigate(['/account']);
         },
