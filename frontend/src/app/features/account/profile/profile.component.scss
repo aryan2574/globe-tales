@@ -1,12 +1,43 @@
 .profile-container {
     max-width: 600px;
     margin: 0 auto;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.10);
+    padding: 2.5rem 2rem 2rem 2rem;
+    margin-top: 2rem;
+    position: relative;
+    font-family: 'Montserrat', Arial, sans-serif;
 
     h2 {
-        color: #2c3e50;
+        color: #1a5276;
         margin-bottom: 2rem;
-        font-size: 1.8rem;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        &::before {
+            content: '\f007';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            color: #3498db;
+            font-size: 1.5rem;
+        }
     }
+}
+
+.profile-avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #3498db;
+    margin: 0 auto 1.5rem auto;
+    display: block;
+    background: #e0eafc url('/assets/marker-icon.png') center/60% no-repeat;
 }
 
 .profile-form {
@@ -16,47 +47,60 @@
 }
 
 .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
     label {
         display: block;
-        margin-bottom: 0.5rem;
-        color: #2c3e50;
-        font-weight: 500;
+        margin-bottom: 0.2rem;
+        color: #1a5276;
+        font-weight: 600;
+        font-size: 1.05rem;
     }
 
     input {
         width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 1rem;
+        padding: 0.85rem;
+        border: 1px solid #b2bec3;
+        border-radius: 8px;
+        font-size: 1.05rem;
         transition: border-color 0.3s, box-shadow 0.3s;
+        background: #f5fafd;
+        font-family: 'Montserrat', Arial, sans-serif;
 
         &:focus {
             outline: none;
             border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.13);
         }
 
         &[readonly] {
-            background-color: #f5f6fa;
+            background-color: #e0eafc;
             cursor: not-allowed;
         }
     }
 }
 
 .btn-save {
-    padding: 0.75rem;
-    background-color: #3498db;
+    padding: 0.85rem;
+    background: linear-gradient(90deg, #3498db 60%, #2ecc71 100%);
     color: white;
     border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background 0.3s, box-shadow 0.3s;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
 
     &:hover {
-        background-color: #2980b9;
+        background: linear-gradient(90deg, #2980b9 60%, #27ae60 100%);
+        box-shadow: 0 4px 16px rgba(52, 152, 219, 0.15);
     }
 
     &:disabled {
