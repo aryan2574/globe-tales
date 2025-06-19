@@ -6,10 +6,10 @@ interface VisitedPlace {
   id: string;
   name: string;
   description: string;
-  imageUrl: string;
   location: string;
   visitDate: Date;
   rating: number;
+  iconClass?: string;
 }
 
 @Component({
@@ -32,7 +32,10 @@ interface VisitedPlace {
 
         <div *ngFor="let place of visitedPlaces" class="visited-card">
           <div class="visited-image">
-            <img [src]="place.imageUrl" [alt]="place.name" />
+            <i
+              [class]="place.iconClass || 'fas fa-map-marker-alt'"
+              style="font-size:3rem;color:#4a90e2;"
+            ></i>
           </div>
           <div class="visited-content">
             <h3>{{ place.name }}</h3>
@@ -203,19 +206,19 @@ export class VisitedComponent implements OnInit {
         id: '1',
         name: 'Eiffel Tower',
         description: 'Iconic iron lattice tower on the Champ de Mars in Paris.',
-        imageUrl: 'assets/images/eiffel-tower.jpg',
         location: 'Paris, France',
         visitDate: new Date('2024-01-15'),
         rating: 5,
+        iconClass: 'fas fa-landmark',
       },
       {
         id: '2',
         name: 'Taj Mahal',
         description: 'White marble mausoleum in Agra, India.',
-        imageUrl: 'assets/images/taj-mahal.jpg',
         location: 'Agra, India',
         visitDate: new Date('2024-02-01'),
         rating: 4,
+        iconClass: 'fas fa-archway',
       },
     ];
     this.loading = false;

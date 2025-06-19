@@ -13,7 +13,7 @@ import { AuthService } from '../../services/auth.service';
         <a routerLink="/">GlobeTales</a>
       </div>
       <nav class="main-nav">
-        <a routerLink="/dashboard" routerLinkActive="active">Explore</a>
+        <a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
         <a routerLink="/sites" routerLinkActive="active">Cultural Sites</a>
         <a routerLink="/account" routerLinkActive="active">My Journey</a>
         <a routerLink="/about" routerLinkActive="active">About</a>

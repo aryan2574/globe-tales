@@ -15,7 +15,7 @@ import { RouterModule } from '@angular/router';
         </div>
         <div class="footer-section">
           <h3>Quick Links</h3>
-          <a routerLink="/dashboard">Explore</a>
+          <a routerLink="/dashboard">Dashboard</a>
           <a routerLink="/sites">Cultural Sites</a>
           <a routerLink="/account">My Journey</a>
         </div>

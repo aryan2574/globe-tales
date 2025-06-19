@@ -6,8 +6,8 @@ interface FavoritePlace {
   id: string;
   name: string;
   description: string;
-  imageUrl: string;
   location: string;
+  iconClass?: string;
 }
 
 @Component({
@@ -30,7 +30,10 @@ interface FavoritePlace {
 
         <div *ngFor="let place of favorites" class="favorite-card">
           <div class="favorite-image">
-            <img [src]="place.imageUrl" [alt]="place.name" />
+            <i
+              [class]="place.iconClass || 'fas fa-map-marker-alt'"
+              style="font-size:3rem;color:#e67e22;"
+            ></i>
           </div>
           <div class="favorite-content">
             <h3>{{ place.name }}</h3>
@@ -162,15 +165,15 @@ export class FavoritesComponent implements OnInit {
         id: '1',
         name: 'Eiffel Tower',
         description: 'Iconic iron lattice tower on the Champ de Mars in Paris.',
-        imageUrl: 'assets/images/eiffel-tower.jpg',
         location: 'Paris, France',
+        iconClass: 'fas fa-landmark',
       },
       {
         id: '2',
         name: 'Taj Mahal',
         description: 'White marble mausoleum in Agra, India.',
-        imageUrl: 'assets/images/taj-mahal.jpg',
         location: 'Agra, India',
+        iconClass: 'fas fa-archway',
       },
     ];
     this.loading = false;
