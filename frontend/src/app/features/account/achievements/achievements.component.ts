@@ -13,39 +13,40 @@ interface Achievement {
 }
 
 @Component({
-  selector: 'app-achievements',
+  selector: 'app-rewards',
   standalone: true,
   imports: [CommonModule, RouterModule],
   template: `
     <div class="achievements-container">
-      <h2>My Achievements</h2>
+      <h2>My Rewards</h2>
 
       <div class="achievements-grid">
-        <div *ngIf="loading" class="loading">Loading achievements...</div>
+        <div *ngIf="loading" class="loading">Loading rewards...</div>
         <div *ngIf="error" class="error">{{ error }}</div>
 
-        <div
-          *ngFor="let achievement of achievements"
-          class="achievement-card"
-          [class.completed]="achievement.completed"
-        >
+        <div class="achievement-card" [class.completed]="rewards[0].completed">
           <div class="achievement-icon">
-            <i [class]="achievement.icon"></i>
+            <i class="fas fa-gift"></i>
           </div>
           <div class="achievement-content">
-            <h3>{{ achievement.title }}</h3>
-            <p>{{ achievement.description }}</p>
+            <h3>Visit 10 places to get 5 points</h3>
+            <p>Track your journey and earn rewards!</p>
             <div class="progress-bar">
               <div
                 class="progress"
                 [style.width.%]="
-                  (achievement.progress / achievement.total) * 100
+                  ((rewards[0].progress || 0) / (rewards[0].total || 1)) * 100
                 "
               ></div>
             </div>
-            <span class="progress-text"
-              >{{ achievement.progress }}/{{ achievement.total }}</span
-            >
+            <span class="progress-text">
+              {{ rewards[0].progress || 0 }}/{{ rewards[0].total || 10 }}
+              <span
+                *ngIf="rewards[0].completed"
+                style="color:#27ae60;font-weight:600;"
+                >Completed!</span
+              >
+            </span>
           </div>
         </div>
       </div>
@@ -143,48 +144,34 @@ interface Achievement {
     `,
   ],
 })
-export class AchievementsComponent implements OnInit {
-  achievements: Achievement[] = [];
+export class RewardsComponent implements OnInit {
+  rewards: { progress: number; total: number; completed: boolean }[] = [];
   loading = false;
   error: string | null = null;
 
   constructor() {}
 
   ngOnInit() {
-    this.loadAchievements();
+    this.loadRewards();
   }
 
-  private loadAchievements() {
+  private loadRewards() {
     this.loading = true;
-    // TODO: Implement loading achievements from the backend
-    // For now, using mock data
-    this.achievements = [
+    // Get visited places from localStorage
+    let visited: any[] = [];
+    try {
+      const stored = localStorage.getItem('visited');
+      visited = stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      visited = [];
+    }
+    const progress = visited.length;
+    const total = 10;
+    this.rewards = [
       {
-        id: '1',
-        title: 'Explorer',
-        description: 'Visit 10 different places',
-        progress: 3,
-        total: 10,
-        completed: false,
-        icon: 'fas fa-map-marker-alt',
-      },
-      {
-        id: '2',
-        title: 'Culture Enthusiast',
-        description: 'Visit 5 museums',
-        progress: 2,
-        total: 5,
-        completed: false,
-        icon: 'fas fa-landmark',
-      },
-      {
-        id: '3',
-        title: 'Foodie',
-        description: 'Try 15 different restaurants',
-        progress: 15,
-        total: 15,
-        completed: true,
-        icon: 'fas fa-utensils',
+        progress,
+        total,
+        completed: progress >= total,
       },
     ];
     this.loading = false;

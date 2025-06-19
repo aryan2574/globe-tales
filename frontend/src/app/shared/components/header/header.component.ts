@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { AchievementService } from '../../../services/achievement.service';
+import { Achievement } from '../../../models/achievement.model';
 
 @Component({
   selector: 'app-header',
@@ -12,6 +14,19 @@ import { AuthService } from '../../../services/auth.service';
       <nav class="nav-container">
         <div class="nav-brand">
           <a routerLink="/" class="brand-link">GlobeTales</a>
+          <span
+            *ngIf="isAuthenticated()"
+            class="user-status"
+            [title]="statusTooltip"
+          >
+            <i class="fas" [ngClass]="statusIcon" style="margin-right:4px;"></i>
+            <span class="status-name">{{ userStatus }}</span>
+            <ng-container *ngIf="pointsToNext !== null">
+              <div class="status-next">
+                Get {{ pointsToNext }} more points to become next status
+              </div>
+            </ng-container>
+          </span>
         </div>
 
         <div class="nav-links" [class.active]="isMenuOpen">
@@ -72,6 +87,41 @@ import { AuthService } from '../../../services/auth.service';
 
       .brand-link:hover {
         color: #3498db;
+      }
+
+      .user-status {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-left: 16px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #27ae60;
+        background: #eafaf1;
+        border-radius: 12px;
+        padding: 2px 12px;
+        box-shadow: 0 1px 2px rgba(39, 174, 96, 0.08);
+      }
+
+      .user-status .fa-hiking {
+        color: #e67e22;
+      }
+      .user-status .fa-map-marked-alt {
+        color: #2980b9;
+      }
+      .user-status .fa-compass {
+        color: #27ae60;
+      }
+      .user-status .status-name {
+        font-weight: bold;
+        color: #222;
+        margin-left: 2px;
+      }
+      .user-status .status-next {
+        font-size: 0.85em;
+        color: #888;
+        font-weight: 400;
+        margin-top: 2px;
       }
 
       .nav-links {
@@ -228,13 +278,29 @@ import { AuthService } from '../../../services/auth.service';
     `,
   ],
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   isMenuOpen = false;
   isMobile = false;
+  userStatus: string = '';
+  statusIcon: string = 'fa-compass';
+  statusTooltip: string = '';
+  pointsToNext: number | null = null;
+  points: number = 0;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private achievementService: AchievementService
+  ) {
     this.checkScreenSize();
     window.addEventListener('resize', () => this.checkScreenSize());
+  }
+
+  ngOnInit(): void {
+    console.log('Header ngOnInit, isAuthenticated:', this.isAuthenticated());
+    if (this.isAuthenticated()) {
+      this.loadUserStatus();
+    }
   }
 
   private checkScreenSize(): void {
@@ -255,5 +321,33 @@ export class HeaderComponent {
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  loadUserStatus(): void {
+    // Simulate unlocked achievements from localStorage
+    const unlocked = localStorage.getItem('unlockedAchievements');
+    let achievements: any[] = [];
+    try {
+      achievements = unlocked ? JSON.parse(unlocked) : [];
+    } catch (e) {
+      achievements = [];
+    }
+    this.points = (achievements?.length || 0) * 5;
+    if (this.points >= 40) {
+      this.userStatus = 'Adventurer';
+      this.statusIcon = 'fa-hiking';
+      this.statusTooltip = '40+ points';
+      this.pointsToNext = null;
+    } else if (this.points >= 20) {
+      this.userStatus = 'Pro Explorer';
+      this.statusIcon = 'fa-map-marked-alt';
+      this.statusTooltip = '20+ points';
+      this.pointsToNext = 40 - this.points;
+    } else {
+      this.userStatus = 'Explorer';
+      this.statusIcon = 'fa-compass';
+      this.statusTooltip = '0+ points';
+      this.pointsToNext = 20 - this.points;
+    }
   }
 }

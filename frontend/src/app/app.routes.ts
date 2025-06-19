@@ -61,7 +61,7 @@ export const routes: Routes = [
         path: 'achievements',
         loadComponent: () =>
           import('./features/account/achievements/achievements.component').then(
-            (m) => m.AchievementsComponent
+            (m) => m.RewardsComponent
           ),
       },
     ],
