@@ -1,0 +1,299 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+.site-detail-container {
+    padding: 2.5rem 1rem 3rem 1rem;
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    min-height: 100vh;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.site-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.site-icon {
+    height: 340px;
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    border-radius: 18px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 32px rgba(74, 144, 226, 0.10);
+
+    i {
+        font-size: 7rem;
+        color: #4a90e2;
+        filter: drop-shadow(0 2px 8px rgba(74, 144, 226, 0.12));
+    }
+}
+
+.site-rating {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: linear-gradient(90deg, #4a90e2 60%, #2ecc71 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.12);
+
+    i {
+        color: #f1c40f;
+        font-size: 1.2rem;
+    }
+}
+
+.site-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.10);
+    padding: 2rem 2rem 2rem 2.5rem;
+}
+
+h1 {
+    color: #1a5276;
+    margin: 0 0 0.5rem 0;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+
+    &::before {
+        content: '\f3c5';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #4a90e2;
+        font-size: 1.5rem;
+    }
+}
+
+.site-type {
+    color: #2ecc71;
+    font-size: 1.1rem;
+    margin: 0.5rem 0 1.5rem 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    &::before {
+        content: '\f02d';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #2ecc71;
+        font-size: 1rem;
+    }
+}
+
+.site-actions {
+    display: flex;
+    gap: 1.2rem;
+}
+
+.btn-favorite,
+.btn-visited {
+    padding: 0.85rem 1.7rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 1.08rem;
+    font-weight: 700;
+    font-family: 'Montserrat', Arial, sans-serif;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.08);
+}
+
+.btn-favorite {
+    background: linear-gradient(90deg, #e74c3c 60%, #f39c12 100%);
+    color: white;
+
+    &:hover {
+        background: linear-gradient(90deg, #c0392b 60%, #e67e22 100%);
+        box-shadow: 0 4px 16px rgba(231, 76, 60, 0.15);
+    }
+}
+
+.btn-visited {
+    background: linear-gradient(90deg, #3498db 60%, #2ecc71 100%);
+    color: white;
+
+    &:hover {
+        background: linear-gradient(90deg, #2980b9 60%, #27ae60 100%);
+        box-shadow: 0 4px 16px rgba(52, 152, 219, 0.15);
+    }
+}
+
+.site-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2.5rem;
+}
+
+section {
+    margin-bottom: 2.2rem;
+}
+
+h2 {
+    color: #1a5276;
+    margin-bottom: 1.2rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+        content: '\f5a0';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #4a90e2;
+        font-size: 1.1rem;
+    }
+}
+
+.site-map {
+    height: 300px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.10);
+}
+
+.reviews-list {
+    display: grid;
+    gap: 1.2rem;
+}
+
+.review-card {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 14px;
+    padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+    box-shadow: 0 4px 24px rgba(74, 144, 226, 0.08);
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.reviewer-name {
+    font-weight: bold;
+    color: #1a5276;
+}
+
+.review-date {
+    color: #666;
+    font-size: 0.98rem;
+}
+
+.review-rating {
+    color: #f1c40f;
+    margin-bottom: 0.5rem;
+
+    i {
+        color: #f1c40f;
+        font-size: 1.1rem;
+    }
+
+    .filled {
+        color: #f1c40f;
+        text-shadow: 0 1px 4px #fffbe6;
+    }
+}
+
+.review-comment {
+    color: #34495e;
+    font-size: 1.05rem;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.sidebar section {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 14px;
+    padding: 1.5rem 1.2rem 1.2rem 1.2rem;
+    box-shadow: 0 4px 24px rgba(74, 144, 226, 0.08);
+}
+
+h3 {
+    color: #1a5276;
+    margin-bottom: 1rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    &::before {
+        content: '\f05a';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #3498db;
+        font-size: 1rem;
+    }
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.7rem;
+    color: #666;
+    font-size: 1.05rem;
+
+    i {
+        color: #3498db;
+        font-size: 1.1rem;
+    }
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.facilities-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: #2ecc71;
+        font-weight: 600;
+
+        i {
+            color: #2ecc71;
+            font-size: 1rem;
+        }
+    }
+}

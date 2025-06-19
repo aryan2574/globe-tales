@@ -77,9 +77,9 @@ export class MapService implements OnDestroy {
 
   displayPlaces(places: Place[]): void {
     if (!this.map) {
-      throw new Error('Map not initialized');
+      console.warn('Map not initialized, skipping displayPlaces');
+      return;
     }
-
     this.clearMarkers();
     places.forEach((place) => {
       const iconClass = this.getIconClassForPlace(place.type);

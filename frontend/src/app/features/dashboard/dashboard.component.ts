@@ -90,6 +90,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       this.mapService.initializeMap('map', coordinates);
       if (coordinates) {
         this.mapService.showUserLocationMarker(coordinates);
+        await this.searchNearbyPlaces(coordinates);
       }
     } catch (error) {
       this.error = 'Failed to initialize map. Please refresh the page.';
