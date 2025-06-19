@@ -23,7 +23,14 @@ import { Achievement } from '../../../models/achievement.model';
             <span class="status-name">{{ userStatus }}</span>
             <ng-container *ngIf="pointsToNext !== null">
               <div class="status-next">
-                Get {{ pointsToNext }} more points to become next status
+                Get {{ pointsToNext }} points to become {{ nextStatus }}
+              </div>
+            </ng-container>
+            <ng-container
+              *ngIf="pointsToNext === null && userStatus === 'Adventurer'"
+            >
+              <div class="status-next">
+                Congratulations - You are Adventurer
               </div>
             </ng-container>
           </span>
@@ -63,6 +70,7 @@ export class HeaderComponent implements OnInit {
   statusTooltip: string = '';
   pointsToNext: number | null = null;
   points: number = 0;
+  nextStatus: string | null = null;
 
   constructor(
     private authService: AuthService,
@@ -115,16 +123,19 @@ export class HeaderComponent implements OnInit {
       this.statusIcon = 'fa-hiking';
       this.statusTooltip = '40+ points';
       this.pointsToNext = null;
+      this.nextStatus = null;
     } else if (this.points >= 20) {
       this.userStatus = 'Pro Explorer';
       this.statusIcon = 'fa-map-marked-alt';
       this.statusTooltip = '20+ points';
       this.pointsToNext = 40 - this.points;
+      this.nextStatus = 'Adventurer';
     } else {
       this.userStatus = 'Explorer';
       this.statusIcon = 'fa-compass';
       this.statusTooltip = '0+ points';
       this.pointsToNext = 20 - this.points;
+      this.nextStatus = 'Pro Explorer';
     }
   }
 
