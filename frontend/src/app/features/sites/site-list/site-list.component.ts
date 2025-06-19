@@ -213,7 +213,7 @@ export class SiteListComponent implements OnInit {
       filtered = filtered.sort((a, b) => b.rating - a.rating);
     }
     this.totalPages = Math.ceil(filtered.length / this.pageSize) || 1;
-    this.currentPage = Math.min(this.currentPage, this.totalPages);
+    if (this.currentPage > this.totalPages) this.currentPage = this.totalPages;
     if (this.currentPage < 1) this.currentPage = 1;
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
