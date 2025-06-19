@@ -13,7 +13,7 @@ import { Achievement } from '../../../models/achievement.model';
     <header class="app-header">
       <nav class="nav-container">
         <div class="nav-brand">
-          <a routerLink="/" class="brand-link">GlobeTales</a>
+          <a class="brand-link" (click)="onBrandClick($event)">GlobeTales</a>
           <span
             *ngIf="isAuthenticated()"
             class="user-status"
@@ -348,6 +348,15 @@ export class HeaderComponent implements OnInit {
       this.statusIcon = 'fa-compass';
       this.statusTooltip = '0+ points';
       this.pointsToNext = 20 - this.points;
+    }
+  }
+
+  onBrandClick(event: Event) {
+    event.preventDefault();
+    if (this.isAuthenticated()) {
+      this.router.navigate(['/dashboard']);
+    } else {
+      this.router.navigate(['/']);
     }
   }
 }
