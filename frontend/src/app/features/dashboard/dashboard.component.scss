@@ -1,19 +1,40 @@
 .dashboard-container {
     display: flex;
+    flex-direction: row;
+    align-items: stretch;
     height: calc(100vh - 64px);
     margin-top: 64px;
     background-color: #f5f5f5;
+    gap: 32px;
+}
+
+.map-section,
+.places-panel {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 600px;
+    max-height: 800px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
 }
 
 .map-section {
-    flex: 1;
     position: relative;
     background-color: #e5e5e5;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 .map-container {
     width: 100%;
     height: 100%;
+    min-height: 600px;
+    max-height: 800px;
+    border-radius: 18px;
+    overflow: hidden;
 }
 
 .location-controls {
@@ -151,12 +172,16 @@
 }
 
 .places-panel {
-    width: 350px;
     background-color: white;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    border-radius: 18px;
+    overflow: hidden;
+    min-height: 600px;
+    max-height: 800px;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
 }
 
 .search-section {
@@ -317,6 +342,52 @@
     }
 }
 
+@media (max-width: 1100px) {
+    .dashboard-container {
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .map-section,
+    .places-panel {
+        min-height: 350px;
+        max-height: 500px;
+    }
+
+    .map-container {
+        min-height: 350px;
+        max-height: 500px;
+    }
+
+    .places-panel {
+        min-height: 350px;
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 600px) {
+    .dashboard-container {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .map-section,
+    .places-panel {
+        min-height: 220px;
+        max-height: 320px;
+    }
+
+    .map-container {
+        min-height: 220px;
+        max-height: 320px;
+    }
+
+    .places-panel {
+        min-height: 220px;
+        max-height: 320px;
+    }
+}
+
 @media (max-width: 768px) {
     .dashboard-container {
         flex-direction: column;
@@ -338,4 +409,20 @@
         transform: none;
         width: calc(100% - 20px);
     }
+}
+
+.custom-fa-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #e74c3c;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.custom-fa-marker.user-location {
+    color: #357ab8;
+    font-size: 2.2rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+    filter: drop-shadow(0 0 6px #357ab8aa);
 }

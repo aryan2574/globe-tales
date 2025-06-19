@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,7 +28,7 @@ type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
     DurationPipe,
   ],
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   places: Place[] = [];
   selectedPlace: Place | null = null;
   selectedType: string = '';
@@ -39,6 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   routeInfo: RouteInfo | null = null;
   transportMode: TransportMode = 'driving-car';
   private subscriptions: Subscription[] = [];
+  private pendingMapInit = false;
 
   constructor(
     private mapService: MapService,
@@ -49,11 +50,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {
     this.locationService.hasLocation$.subscribe((hasLocation) => {
       this.hasLocation = hasLocation;
+      if (hasLocation) {
+        setTimeout(() => {
+          this.initializeMap();
+        });
+      } else {
+        this.mapService.destroyMap();
+      }
     });
   }
 
-  ngOnInit(): void {
-    this.initializeMap();
+  ngOnInit(): void {}
+
+  ngAfterViewInit(): void {
+    if (this.hasLocation) {
+      setTimeout(() => {
+        this.initializeMap();
+      });
+    }
   }
 
   ngOnDestroy(): void {
@@ -61,9 +75,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.mapService.destroyMap();
   }
 
-  private initializeMap(): void {
+  private async initializeMap(): Promise<void> {
     try {
-      this.mapService.initializeMap('map');
+      let coordinates: [number, number] | undefined = undefined;
+      if (this.hasLocation) {
+        try {
+          coordinates = await this.locationService.getCurrentLocation();
+        } catch {}
+      }
+      this.mapService.initializeMap('map', coordinates);
+      if (coordinates) {
+        this.mapService.showUserLocationMarker(coordinates);
+      }
     } catch (error) {
       this.error = 'Failed to initialize map. Please refresh the page.';
       console.error('Map initialization error:', error);
@@ -75,17 +98,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.error = null;
 
     try {
-      this.places = await this.placesService.searchNearbyPlaces(
-        coordinates,
-        this.searchRadius,
-        this.selectedType
-      );
-      this.mapService.displayPlaces(this.places);
+      const [lat, lng] = coordinates;
+      this.mapService
+        .searchPlaces(lat, lng, this.searchRadius, this.selectedType)
+        .subscribe({
+          next: (places) => {
+            this.places = places;
+            this.mapService.displayPlaces(this.places);
+          },
+          error: (error) => {
+            this.error = 'Failed to load places. Please try again.';
+            console.error('Error searching places:', error);
+          },
+          complete: () => {
+            this.loading = false;
+          },
+        });
     } catch (error) {
       this.error = 'Failed to load places. Please try again.';
       console.error('Error searching places:', error);
-    } finally {
-      this.loading = false;
     }
   }
 

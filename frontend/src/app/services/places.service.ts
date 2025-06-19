@@ -17,10 +17,10 @@ export class PlacesService {
     radius: number,
     type?: string
   ): Promise<Place[]> {
-    const [lat, lng] = coordinates;
+    const [latitude, longitude] = coordinates;
     const params: any = {
-      lat,
-      lng,
+      latitude,
+      longitude,
       radius,
     };
 

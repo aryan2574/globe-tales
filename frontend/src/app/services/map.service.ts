@@ -22,13 +22,22 @@ export class MapService implements OnDestroy {
     this.destroyMap();
   }
 
-  initializeMap(elementId: string): void {
+  initializeMap(elementId: string, coordinates?: [number, number]): void {
     if (this.map) {
       this.destroyMap();
     }
 
     try {
-      this.map = L.map(elementId).setView([0, 0], 2);
+      const isValidCoords =
+        Array.isArray(coordinates) &&
+        coordinates.length === 2 &&
+        typeof coordinates[0] === 'number' &&
+        typeof coordinates[1] === 'number';
+      const center: [number, number] = isValidCoords
+        ? [coordinates[0], coordinates[1]]
+        : [0, 0];
+      const zoom = isValidCoords ? 14 : 2;
+      this.map = L.map(elementId).setView(center, zoom);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
       }).addTo(this.map);
@@ -73,13 +82,54 @@ export class MapService implements OnDestroy {
 
     this.clearMarkers();
     places.forEach((place) => {
-      const marker = L.marker(place.coordinates).bindPopup(`
+      const iconClass = this.getIconClassForPlace(place.type);
+      const iconHtml = `<i class="fas ${iconClass}"></i>`;
+      const marker = L.marker(place.coordinates, {
+        icon: L.divIcon({
+          className: 'custom-fa-marker',
+          html: iconHtml,
+          iconSize: [32, 32],
+          iconAnchor: [16, 32],
+        }),
+      }).bindPopup(`
           <strong>${place.name}</strong><br>
           ${place.description || ''}
         `);
       marker.addTo(this.map!);
       this.markers.push(marker);
     });
+  }
+
+  // Helper to get Font Awesome icon class for a place type
+  private getIconClassForPlace(type: string): string {
+    switch (type) {
+      case 'hotel':
+        return 'fa-hotel';
+      case 'attraction':
+        return 'fa-landmark';
+      case 'museum':
+        return 'fa-university';
+      case 'restaurant':
+        return 'fa-utensils';
+      case 'viewpoint':
+        return 'fa-mountain';
+      default:
+        return 'fa-map-marker-alt';
+    }
+  }
+
+  // Call this after map is initialized to show user location
+  public showUserLocationMarker(coordinates: [number, number]): void {
+    if (!this.map) return;
+    const userMarker = L.marker(coordinates, {
+      icon: L.divIcon({
+        className: 'custom-fa-marker user-location',
+        html: '<i class="fas fa-location-arrow"></i>',
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+      }),
+    }).addTo(this.map!);
+    this.markers.push(userMarker);
   }
 
   displayRoute(geometry: {
@@ -179,13 +229,20 @@ export class MapService implements OnDestroy {
     }
 
     return data.elements
-      .filter((element: any) => element.tags && element.tags.name)
+      .filter(
+        (element: any) =>
+          element.tags &&
+          element.tags.name &&
+          typeof element.lat === 'number' &&
+          typeof element.lon === 'number'
+      )
       .map((element: any) => ({
         id: element.id,
         name: element.tags.name,
         description: element.tags.description || '',
-        coordinates: [element.lat, element.lon],
+        coordinates: [element.lat, element.lon] as [number, number],
         type: element.tags.tourism || 'unknown',
+        tags: element.tags || {},
       }));
   }
 

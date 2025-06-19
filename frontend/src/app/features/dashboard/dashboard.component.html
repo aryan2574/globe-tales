@@ -1,88 +1,94 @@
 <div class="dashboard-container">
-    <div class="map-section">
-        <div class="map-container" id="map"></div>
-        <div class="location-controls">
-            <app-location-button *ngIf="!hasLocation"></app-location-button>
-            <button *ngIf="hasLocation" class="current-location-btn" (click)="goToCurrentLocation()">
-                <i class="fas fa-crosshairs"></i>
-            </button>
+    <ng-container *ngIf="!hasLocation">
+        <div class="location-controls"
+            style="width:100%;display:flex;justify-content:center;align-items:center;height:80vh;">
+            <app-location-button></app-location-button>
         </div>
-        <div class="route-controls" *ngIf="selectedPlace">
-            <div class="route-info" *ngIf="routeInfo">
-                <div class="info-item">
-                    <i class="fas fa-road"></i>
-                    <span>{{ routeInfo.distance | distance }}</span>
-                </div>
-                <div class="info-item">
-                    <i class="fas fa-clock"></i>
-                    <span>{{ routeInfo.duration | duration }}</span>
-                </div>
-            </div>
-            <div class="transport-modes">
-                <button class="transport-btn" [class.active]="transportMode === 'driving-car'"
-                    (click)="getRoute('driving-car')">
-                    <i class="fas fa-car"></i>
-                </button>
-                <button class="transport-btn" [class.active]="transportMode === 'foot-walking'"
-                    (click)="getRoute('foot-walking')">
-                    <i class="fas fa-walking"></i>
-                </button>
-                <button class="transport-btn" [class.active]="transportMode === 'cycling-regular'"
-                    (click)="getRoute('cycling-regular')">
-                    <i class="fas fa-bicycle"></i>
+    </ng-container>
+    <ng-container *ngIf="hasLocation">
+        <div class="map-section">
+            <div class="map-container" id="map"></div>
+            <div class="location-controls">
+                <button class="current-location-btn" (click)="goToCurrentLocation()">
+                    <i class="fas fa-crosshairs"></i>
                 </button>
             </div>
-            <button class="clear-route-btn" (click)="clearRoute()">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="places-panel">
-        <div class="search-section">
-            <h2><i class="fas fa-map-marker-alt"></i> Nearby Places</h2>
-            <div class="filter-controls">
-                <select [(ngModel)]="selectedType" (change)="onTypeChange()">
-                    <option value="">All Types</option>
-                    <option value="hotel"><i class="fas fa-hotel"></i> Hotels</option>
-                    <option value="attraction">
-                        <i class="fas fa-landmark"></i> Attractions
-                    </option>
-                    <option value="museum">
-                        <i class="fas fa-university"></i> Museums
-                    </option>
-                    <option value="restaurant">
-                        <i class="fas fa-utensils"></i> Restaurants
-                    </option>
-                    <option value="viewpoint">
-                        <i class="fas fa-mountain"></i> Viewpoints
-                    </option>
-                </select>
-                <div class="radius-control">
-                    <i class="fas fa-circle-notch"></i>
-                    <input type="range" [(ngModel)]="searchRadius" min="500" max="5000" step="500"
-                        (change)="onRadiusChange()" />
-                    <span>{{ searchRadius }}m</span>
+            <div class="route-controls" *ngIf="selectedPlace">
+                <div class="route-info" *ngIf="routeInfo">
+                    <div class="info-item">
+                        <i class="fas fa-road"></i>
+                        <span>{{ routeInfo.distance | distance }}</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <span>{{ routeInfo.duration | duration }}</span>
+                    </div>
                 </div>
+                <div class="transport-modes">
+                    <button class="transport-btn" [class.active]="transportMode === 'driving-car'"
+                        (click)="getRoute('driving-car')">
+                        <i class="fas fa-car"></i>
+                    </button>
+                    <button class="transport-btn" [class.active]="transportMode === 'foot-walking'"
+                        (click)="getRoute('foot-walking')">
+                        <i class="fas fa-walking"></i>
+                    </button>
+                    <button class="transport-btn" [class.active]="transportMode === 'cycling-regular'"
+                        (click)="getRoute('cycling-regular')">
+                        <i class="fas fa-bicycle"></i>
+                    </button>
+                </div>
+                <button class="clear-route-btn" (click)="clearRoute()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
         </div>
 
-        <div class="places-list">
-            <div *ngIf="loading" class="loading">
-                <i class="fas fa-spinner fa-spin"></i> Loading places...
-            </div>
-            <div *ngIf="error" class="error">
-                <i class="fas fa-exclamation-circle"></i> {{ error }}
+        <div class="places-panel">
+            <div class="search-section">
+                <h2><i class="fas fa-map-marker-alt"></i> Nearby Places</h2>
+                <div class="filter-controls">
+                    <select [(ngModel)]="selectedType" (change)="onTypeChange()">
+                        <option value="">All Types</option>
+                        <option value="hotel"><i class="fas fa-hotel"></i> Hotels</option>
+                        <option value="attraction">
+                            <i class="fas fa-landmark"></i> Attractions
+                        </option>
+                        <option value="museum">
+                            <i class="fas fa-university"></i> Museums
+                        </option>
+                        <option value="restaurant">
+                            <i class="fas fa-utensils"></i> Restaurants
+                        </option>
+                        <option value="viewpoint">
+                            <i class="fas fa-mountain"></i> Viewpoints
+                        </option>
+                    </select>
+                    <div class="radius-control">
+                        <i class="fas fa-circle-notch"></i>
+                        <input type="range" [(ngModel)]="searchRadius" min="500" max="5000" step="500"
+                            (change)="onRadiusChange()" />
+                        <span>{{ searchRadius }}m</span>
+                    </div>
+                </div>
             </div>
 
-            <div *ngIf="!loading && !error && places.length === 0" class="no-places">
-                <i class="fas fa-search"></i> No places found in this area
-            </div>
+            <div class="places-list">
+                <div *ngIf="loading" class="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Loading places...
+                </div>
+                <div *ngIf="error" class="error">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
 
-            <div *ngFor="let place of places" class="place-card" [class.selected]="place === selectedPlace"
-                (click)="selectPlace(place)">
-                <h3>
-                    <i class="fas" [ngClass]="{
+                <div *ngIf="!loading && !error && places.length === 0" class="no-places">
+                    <i class="fas fa-search"></i> No places found in this area
+                </div>
+
+                <div *ngFor="let place of places" class="place-card" [class.selected]="place === selectedPlace"
+                    (click)="selectPlace(place)">
+                    <h3>
+                        <i class="fas" [ngClass]="{
               'fa-hotel': place.type === 'hotel',
               'fa-landmark': place.type === 'attraction',
               'fa-university': place.type === 'museum',
@@ -96,13 +102,14 @@
                 'viewpoint'
               ].includes(place.type)
             }"></i>
-                    {{ place.name }}
-                </h3>
-                <p class="place-type">{{ place.type }}</p>
-                <p *ngIf="place.tags['description']" class="place-description">
-                    {{ place.tags['description'] }}
-                </p>
+                        {{ place.name }}
+                    </h3>
+                    <p class="place-type">{{ place.type }}</p>
+                    <p *ngIf="place.tags['description']" class="place-description">
+                        {{ place.tags['description'] }}
+                    </p>
+                </div>
             </div>
         </div>
-    </div>
+    </ng-container>
 </div>

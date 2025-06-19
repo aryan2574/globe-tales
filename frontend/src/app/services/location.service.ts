@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { BehaviorSubject } from 'rxjs';
 
 export interface Location {
   latitude: number;
@@ -12,48 +10,50 @@ export interface Location {
   providedIn: 'root',
 })
 export class LocationService {
-  private apiUrl = `${environment.apiUrl}/users`;
+  private static readonly LOCAL_STORAGE_KEY = 'user_location';
   private hasLocationSubject = new BehaviorSubject<boolean>(false);
   hasLocation$ = this.hasLocationSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor() {
     this.checkLocation();
   }
 
-  private async checkLocation(): Promise<void> {
-    try {
-      const response = await this.http
-        .get<any>(`${this.apiUrl}/location`)
-        .toPromise();
-      this.hasLocationSubject.next(!!response);
-    } catch (error) {
-      this.hasLocationSubject.next(false);
-    }
+  private checkLocation(): void {
+    const location = localStorage.getItem(LocationService.LOCAL_STORAGE_KEY);
+    this.hasLocationSubject.next(!!location);
   }
 
   async getCurrentLocation(): Promise<[number, number]> {
+    const location = localStorage.getItem(LocationService.LOCAL_STORAGE_KEY);
+    if (location) {
+      const { latitude, longitude } = JSON.parse(location);
+      return [latitude, longitude];
+    }
+    throw new Error('Location not available');
+  }
+
+  async requestAndSaveLocation(): Promise<[number, number]> {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by your browser'));
         return;
       }
-
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        (position) => {
           const coordinates: [number, number] = [
             position.coords.latitude,
             position.coords.longitude,
           ];
-
-          try {
-            await this.http
-              .post(`${this.apiUrl}/location`, { coordinates })
-              .toPromise();
-            this.hasLocationSubject.next(true);
-            resolve(coordinates);
-          } catch (error) {
-            reject(error);
-          }
+          // Save to localStorage
+          localStorage.setItem(
+            LocationService.LOCAL_STORAGE_KEY,
+            JSON.stringify({
+              latitude: coordinates[0],
+              longitude: coordinates[1],
+            })
+          );
+          this.hasLocationSubject.next(true);
+          resolve(coordinates);
         },
         (error) => {
           reject(error);
@@ -62,13 +62,8 @@ export class LocationService {
     });
   }
 
-  async requestAndSaveLocation(): Promise<[number, number]> {
-    try {
-      const coordinates = await this.getCurrentLocation();
-      return coordinates;
-    } catch (error) {
-      console.error('Error requesting and saving location:', error);
-      throw error;
-    }
+  clearLocation(): void {
+    localStorage.removeItem(LocationService.LOCAL_STORAGE_KEY);
+    this.hasLocationSubject.next(false);
   }
 }
