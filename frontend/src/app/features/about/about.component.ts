@@ -23,23 +23,6 @@ import { CommonModule } from '@angular/common';
       </p>
     </div>
   `,
-  styles: [
-    `
-      .about-container {
-        max-width: 800px;
-        margin: 2rem auto;
-        padding: 0 1rem;
-      }
-      h1 {
-        color: #2c3e50;
-        margin-bottom: 1.5rem;
-      }
-      p {
-        line-height: 1.6;
-        margin-bottom: 1rem;
-        color: #34495e;
-      }
-    `,
-  ],
+  styleUrls: ['./about.component.scss'],
 })
 export class AboutComponent {}

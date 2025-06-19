@@ -12,36 +12,7 @@ import { LocationService } from '../../../services/location.service';
       Share Location
     </button>
   `,
-  styles: [
-    `
-      .location-btn {
-        background-color: #4a90e2;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 16px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 14px;
-        transition: all 0.2s ease;
-
-        &:hover {
-          background-color: #357abd;
-          transform: translateY(-1px);
-        }
-
-        &:active {
-          transform: translateY(0);
-        }
-
-        i {
-          font-size: 16px;
-        }
-      }
-    `,
-  ],
+  styleUrls: ['./location-button.component.scss'],
 })
 export class LocationButtonComponent {
   constructor(private locationService: LocationService) {}
