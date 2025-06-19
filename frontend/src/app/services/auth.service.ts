@@ -1,13 +1,6 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import {
-  BehaviorSubject,
-  Observable,
-  throwError,
-  tap,
-  Subject,
-  takeUntil,
-} from 'rxjs';
+import { BehaviorSubject, Observable, throwError, tap } from 'rxjs';
 import {
   AuthResponse,
   LoginRequest,
@@ -20,25 +13,14 @@ import { catchError } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService implements OnDestroy {
-  private readonly TOKEN_KEY = 'auth_token';
-  private readonly REFRESH_TOKEN_KEY = 'refresh_token';
+export class AuthService {
   private readonly USER_KEY = 'current_user';
-  private destroy$ = new Subject<void>();
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  private cachedToken: string | null = null;
-
   constructor(private http: HttpClient) {
     this.loadStoredUser();
-    this.cachedToken = localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   private loadStoredUser(): void {
@@ -56,62 +38,28 @@ export class AuthService implements OnDestroy {
 
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/register`, request)
+      .post<AuthResponse>(`${environment.apiUrl}/register`, request)
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
-        catchError(this.handleError),
-        takeUntil(this.destroy$)
+        catchError(this.handleError)
       );
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/authenticate`, request)
+      .post<AuthResponse>(`${environment.apiUrl}/login`, request)
       .pipe(
         tap((response) => this.handleAuthResponse(response)),
-        catchError(this.handleError),
-        takeUntil(this.destroy$)
+        catchError(this.handleError)
       );
   }
 
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-    localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
-    this.cachedToken = null;
-  }
-
-  refreshToken(): Observable<AuthResponse> {
-    const refreshToken = localStorage.getItem(this.REFRESH_TOKEN_KEY);
-    if (!refreshToken) {
-      this.logout();
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/auth/refresh-token`, null, {
-        headers: { Authorization: `Bearer ${refreshToken}` },
-      })
-      .pipe(
-        tap((response) => this.handleAuthResponse(response)),
-        catchError((error) => {
-          this.logout();
-          return this.handleError(error);
-        }),
-        takeUntil(this.destroy$)
-      );
-  }
-
-  getToken(): string | null {
-    if (!this.cachedToken) {
-      this.cachedToken = localStorage.getItem(this.TOKEN_KEY);
-    }
-    return this.cachedToken;
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return !!this.currentUserSubject.value;
   }
 
   getCurrentUser(): User | null {
@@ -119,16 +67,13 @@ export class AuthService implements OnDestroy {
   }
 
   private handleAuthResponse(response: AuthResponse): void {
-    if (!response.token || !response.refreshToken) {
-      throw new Error('Invalid auth response: missing tokens');
+    if (!response.user) {
+      throw new Error('Invalid auth response: missing user');
     }
 
     try {
-      localStorage.setItem(this.TOKEN_KEY, response.token);
-      localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
       localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
       this.currentUserSubject.next(response.user);
-      this.cachedToken = response.token;
     } catch (error) {
       console.error('Error storing auth data:', error);
       this.logout();

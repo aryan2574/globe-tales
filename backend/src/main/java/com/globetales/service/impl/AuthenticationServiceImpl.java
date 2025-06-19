@@ -9,7 +9,6 @@ import com.globetales.exception.BusinessException;
 import com.globetales.exception.ResourceNotFoundException;
 import com.globetales.mapper.UserMapper;
 import com.globetales.repository.UserRepository;
-import com.globetales.security.JwtService;
 import com.globetales.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +26,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -52,12 +50,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         userRepository.save(user);
         var userDTO = userMapper.toDTO(user);
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
 
         return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .refreshToken(refreshToken)
                 .user(userDTO)
                 .build();
     }
@@ -78,39 +72,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.getEmail()));
         var userDTO = userMapper.toDTO(user);
-        var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
 
         return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .refreshToken(refreshToken)
-                .user(userDTO)
-                .build();
-    }
-
-    @Override
-    public AuthenticationResponse refreshToken(String refreshToken) {
-        if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
-            throw new BusinessException("Invalid refresh token format");
-        }
-
-        String token = refreshToken.substring(7);
-        String userEmail = jwtService.extractUsername(token);
-        
-        var user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", userEmail));
-        
-        if (!jwtService.isTokenValid(token, user)) {
-            throw new BusinessException("Invalid refresh token");
-        }
-
-        var userDTO = userMapper.toDTO(user);
-        var jwtToken = jwtService.generateToken(user);
-        var newRefreshToken = jwtService.generateRefreshToken(user);
-
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .refreshToken(newRefreshToken)
                 .user(userDTO)
                 .build();
     }
