@@ -40,6 +40,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   transportMode: TransportMode = 'driving-car';
   private subscriptions: Subscription[] = [];
   private pendingMapInit = false;
+  savedIds: Set<number> = new Set();
+  visitedIds: Set<number> = new Set();
 
   constructor(
     private mapService: MapService,
@@ -60,7 +62,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadSavedVisited();
+  }
 
   ngAfterViewInit(): void {
     if (this.hasLocation) {
@@ -202,5 +206,48 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         this.searchNearbyPlaces(coordinates);
       });
     }
+  }
+
+  loadSavedVisited(): void {
+    const favs = localStorage.getItem('favorites');
+    this.savedIds = new Set(
+      (favs ? JSON.parse(favs) : []).map((p: any) => p.id)
+    );
+    const visited = localStorage.getItem('visited');
+    this.visitedIds = new Set(
+      (visited ? JSON.parse(visited) : []).map((p: any) => p.id)
+    );
+  }
+
+  saveToFavorites(place: Place): void {
+    const stored = localStorage.getItem('favorites');
+    let favorites: Place[] = stored ? JSON.parse(stored) : [];
+    if (!favorites.some((fav) => fav.id === place.id)) {
+      favorites.push(place);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      this.savedIds.add(place.id);
+    }
+  }
+
+  markAsVisited(place: Place): void {
+    const stored = localStorage.getItem('visited');
+    let visited: any[] = stored ? JSON.parse(stored) : [];
+    if (!visited.some((v) => v.id === place.id)) {
+      visited.push({
+        ...place,
+        visitDate: new Date().toISOString(),
+        rating: 0,
+      });
+      localStorage.setItem('visited', JSON.stringify(visited));
+      this.visitedIds.add(place.id);
+    }
+  }
+
+  isPlaceSaved(place: Place): boolean {
+    return this.savedIds.has(place.id);
+  }
+
+  isPlaceVisited(place: Place): boolean {
+    return this.visitedIds.has(place.id);
   }
 }

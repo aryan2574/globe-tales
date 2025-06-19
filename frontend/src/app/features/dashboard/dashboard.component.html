@@ -108,6 +108,20 @@
                     <p *ngIf="place.tags['description']" class="place-description">
                         {{ place.tags['description'] }}
                     </p>
+                    <div class="place-actions">
+                        <button class="btn-small" [ngClass]="{'saved': isPlaceSaved(place)}"
+                            (click)="saveToFavorites(place); $event.stopPropagation();">
+                            <i class="fas" [ngClass]="isPlaceSaved(place) ? 'fa-heart' : 'fa-heart'"
+                                style="margin-right:4px;"></i>
+                            {{ isPlaceSaved(place) ? 'Saved' : 'Save' }}
+                        </button>
+                        <button class="btn-small" [ngClass]="{'visited': isPlaceVisited(place)}"
+                            (click)="markAsVisited(place); $event.stopPropagation();">
+                            <i class="fas" [ngClass]="isPlaceVisited(place) ? 'fa-check' : 'fa-check'"
+                                style="margin-right:4px;"></i>
+                            {{ isPlaceVisited(place) ? 'Visited' : 'Visit' }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

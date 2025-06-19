@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface FavoritePlace {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  iconClass?: string;
-}
+import { Place } from '../../../models/place.model';
 
 @Component({
   selector: 'app-favorites',
@@ -31,13 +24,15 @@ interface FavoritePlace {
         <div *ngFor="let place of favorites" class="favorite-card">
           <div class="favorite-image">
             <i
-              [class]="place.iconClass || 'fas fa-map-marker-alt'"
+              class="fas fa-map-marker-alt"
               style="font-size:3rem;color:#e67e22;"
             ></i>
           </div>
           <div class="favorite-content">
             <h3>{{ place.name }}</h3>
-            <p class="location">{{ place.location }}</p>
+            <p class="location">
+              {{ place.coordinates[0] }}, {{ place.coordinates[1] }}
+            </p>
             <p class="description">{{ place.description }}</p>
             <div class="favorite-actions">
               <button class="btn-remove" (click)="removeFavorite(place.id)">
@@ -146,7 +141,7 @@ interface FavoritePlace {
   ],
 })
 export class FavoritesComponent implements OnInit {
-  favorites: FavoritePlace[] = [];
+  favorites: Place[] = [];
   loading = false;
   error: string | null = null;
 
@@ -158,29 +153,13 @@ export class FavoritesComponent implements OnInit {
 
   private loadFavorites() {
     this.loading = true;
-    // TODO: Implement loading favorites from the backend
-    // For now, using mock data
-    this.favorites = [
-      {
-        id: '1',
-        name: 'Eiffel Tower',
-        description: 'Iconic iron lattice tower on the Champ de Mars in Paris.',
-        location: 'Paris, France',
-        iconClass: 'fas fa-landmark',
-      },
-      {
-        id: '2',
-        name: 'Taj Mahal',
-        description: 'White marble mausoleum in Agra, India.',
-        location: 'Agra, India',
-        iconClass: 'fas fa-archway',
-      },
-    ];
+    const stored = localStorage.getItem('favorites');
+    this.favorites = stored ? JSON.parse(stored) : [];
     this.loading = false;
   }
 
-  removeFavorite(id: string) {
-    // TODO: Implement removing favorite from the backend
+  removeFavorite(id: number) {
     this.favorites = this.favorites.filter((place) => place.id !== id);
+    localStorage.setItem('favorites', JSON.stringify(this.favorites));
   }
 }

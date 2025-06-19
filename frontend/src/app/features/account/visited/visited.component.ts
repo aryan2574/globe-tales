@@ -1,16 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
-interface VisitedPlace {
-  id: string;
-  name: string;
-  description: string;
-  location: string;
-  visitDate: Date;
-  rating: number;
-  iconClass?: string;
-}
+import { Place } from '../../../models/place.model';
 
 @Component({
   selector: 'app-visited',
@@ -33,13 +24,15 @@ interface VisitedPlace {
         <div *ngFor="let place of visitedPlaces" class="visited-card">
           <div class="visited-image">
             <i
-              [class]="place.iconClass || 'fas fa-map-marker-alt'"
+              class="fas fa-map-marker-alt"
               style="font-size:3rem;color:#4a90e2;"
             ></i>
           </div>
           <div class="visited-content">
             <h3>{{ place.name }}</h3>
-            <p class="location">{{ place.location }}</p>
+            <p class="location">
+              {{ place.coordinates[0] }}, {{ place.coordinates[1] }}
+            </p>
             <p class="description">{{ place.description }}</p>
             <div class="visit-info">
               <span class="visit-date"
@@ -187,7 +180,7 @@ interface VisitedPlace {
   ],
 })
 export class VisitedComponent implements OnInit {
-  visitedPlaces: VisitedPlace[] = [];
+  visitedPlaces: (Place & { visitDate: string; rating: number })[] = [];
   loading = false;
   error: string | null = null;
 
@@ -199,32 +192,12 @@ export class VisitedComponent implements OnInit {
 
   private loadVisitedPlaces() {
     this.loading = true;
-    // TODO: Implement loading visited places from the backend
-    // For now, using mock data
-    this.visitedPlaces = [
-      {
-        id: '1',
-        name: 'Eiffel Tower',
-        description: 'Iconic iron lattice tower on the Champ de Mars in Paris.',
-        location: 'Paris, France',
-        visitDate: new Date('2024-01-15'),
-        rating: 5,
-        iconClass: 'fas fa-landmark',
-      },
-      {
-        id: '2',
-        name: 'Taj Mahal',
-        description: 'White marble mausoleum in Agra, India.',
-        location: 'Agra, India',
-        visitDate: new Date('2024-02-01'),
-        rating: 4,
-        iconClass: 'fas fa-archway',
-      },
-    ];
+    const stored = localStorage.getItem('visited');
+    this.visitedPlaces = stored ? JSON.parse(stored) : [];
     this.loading = false;
   }
 
-  writeReview(id: string) {
+  writeReview(id: number) {
     // TODO: Implement writing a review
     console.log('Writing review for place:', id);
   }
