@@ -21,13 +21,17 @@ import { RouterModule } from '@angular/router';
         </div>
         <div class="footer-section">
           <h3>Connect</h3>
-          <a href="#" target="_blank">Twitter</a>
-          <a href="#" target="_blank">Facebook</a>
-          <a href="#" target="_blank">Instagram</a>
+          <a href="#" target="_blank"><i class="fab fa-twitter"></i> Twitter</a>
+          <a href="#" target="_blank"
+            ><i class="fab fa-facebook"></i> Facebook</a
+          >
+          <a href="#" target="_blank"
+            ><i class="fab fa-instagram"></i> Instagram</a
+          >
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2024 GlobeTales. All rights reserved.</p>
+        <p>&copy; 2025 GlobeTales. All rights reserved.</p>
       </div>
     </footer>
   `,
