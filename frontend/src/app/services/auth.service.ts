@@ -15,6 +15,7 @@ import { catchError } from 'rxjs/operators';
 })
 export class AuthService {
   private readonly USER_KEY = 'current_user';
+  private readonly CREDENTIALS_KEY = 'auth_credentials';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -40,22 +41,33 @@ export class AuthService {
     return this.http
       .post<AuthResponse>(`${environment.apiUrl}/register`, request)
       .pipe(
-        tap((response) => this.handleAuthResponse(response)),
+        tap((response) => {
+          this.handleAuthResponse(response);
+          this.storeCredentials(request.email, request.password);
+        }),
         catchError(this.handleError)
       );
   }
 
-  login(request: LoginRequest): Observable<AuthResponse> {
+  login(email: string, password: string): Observable<User> {
     return this.http
-      .post<AuthResponse>(`${environment.apiUrl}/login`, request)
+      .get<User>(`${environment.apiUrl}/users/current`, {
+        headers: this.createAuthHeaders(email, password),
+        withCredentials: true,
+      })
       .pipe(
-        tap((response) => this.handleAuthResponse(response)),
+        tap((user) => {
+          this.storeCredentials(email, password);
+          this.handleAuthResponse({ user });
+        }),
         catchError(this.handleError)
       );
   }
 
   logout(): void {
     this.currentUserSubject.next(null);
+    localStorage.removeItem(this.CREDENTIALS_KEY);
+    localStorage.removeItem(this.USER_KEY);
   }
 
   isAuthenticated(): boolean {
@@ -64,6 +76,23 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  getCredentials(): { email: string; password: string } | null {
+    const creds = localStorage.getItem(this.CREDENTIALS_KEY);
+    if (!creds) return null;
+    try {
+      return JSON.parse(creds);
+    } catch {
+      return null;
+    }
+  }
+
+  private storeCredentials(email: string, password: string) {
+    localStorage.setItem(
+      this.CREDENTIALS_KEY,
+      JSON.stringify({ email, password })
+    );
   }
 
   private handleAuthResponse(response: AuthResponse): void {
@@ -94,5 +123,10 @@ export class AuthService {
     }
 
     return throwError(() => new Error(errorMessage));
+  }
+
+  private createAuthHeaders(email: string, password: string) {
+    const credentials = btoa(`${email}:${password}`);
+    return { Authorization: `Basic ${credentials}` };
   }
 }

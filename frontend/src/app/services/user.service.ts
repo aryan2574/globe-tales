@@ -9,12 +9,16 @@ import { User } from '../models/user.model';
 export class UserService {
   constructor(private apiService: ApiService) {}
 
-  getCurrentUser(): Observable<User> {
-    return this.apiService.get<User>('/users/current');
+  getCurrentUser(username?: string, password?: string): Observable<User> {
+    return this.apiService.get<User>('/users/current', username, password);
   }
 
-  getUserById(id: string): Observable<User> {
-    return this.apiService.get<User>(`/users/${id}`);
+  getUserById(
+    id: string,
+    username?: string,
+    password?: string
+  ): Observable<User> {
+    return this.apiService.get<User>(`/users/${id}`, username, password);
   }
 
   createUser(user: User, password: string): Observable<User> {
@@ -32,11 +36,18 @@ export class UserService {
   updateUserLocation(
     id: string,
     latitude: number,
-    longitude: number
+    longitude: number,
+    email?: string,
+    password?: string
   ): Observable<void> {
-    return this.apiService.put<void>(
-      `/users/${id}/location?latitude=${latitude}&longitude=${longitude}`,
-      {}
+    return this.apiService.post<void>(
+      `/users/${id}/location`,
+      {
+        latitude,
+        longitude,
+      },
+      email,
+      password
     );
   }
 

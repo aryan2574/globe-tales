@@ -15,7 +15,8 @@ public class UserPlaceDTO {
     private Long siteId;
     private String name;
     private String description;
-    private PointDTO location;
+    private Double latitude;
+    private Double longitude;
     private OffsetDateTime visitedAt;
     private CulturalSiteDTO site;
 

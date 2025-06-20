@@ -1,7 +1,6 @@
 package com.globetales.entity;
 
 import jakarta.persistence.*;
-import org.locationtech.jts.geom.Point;
 import java.util.Set;
 
 @Entity
@@ -17,8 +16,11 @@ public class CulturalSite {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "location", columnDefinition = "geography(Point,4326)")
-    private Point location;
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @Column(name = "site_type")
     private String siteType;
@@ -63,12 +65,20 @@ public class CulturalSite {
         this.description = description;
     }
 
-    public Point getLocation() {
-        return location;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setLocation(Point location) {
-        this.location = location;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public String getSiteType() {

@@ -30,7 +30,6 @@
 		<java.version>17</java.version>
 		<lombok.version>1.18.30</lombok.version>
 		<jwt.version>0.11.5</jwt.version>
-		<postgis.version>2.5.0</postgis.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 	</properties>
 	<dependencies>
@@ -54,11 +53,6 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.postgis</groupId>
-			<artifactId>postgis-jdbc</artifactId>
-			<version>${postgis.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -97,11 +91,6 @@
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.locationtech.jts</groupId>
-			<artifactId>jts-core</artifactId>
-			<version>1.19.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>

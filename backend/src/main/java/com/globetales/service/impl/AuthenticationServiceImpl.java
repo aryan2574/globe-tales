@@ -55,26 +55,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .user(userDTO)
                 .build();
     }
-
-    @Override
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(),
-                            request.getPassword()
-                    )
-            );
-        } catch (BadCredentialsException e) {
-            throw new BusinessException("Invalid email or password");
-        }
-
-        var user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.getEmail()));
-        var userDTO = userMapper.toDTO(user);
-
-        return AuthenticationResponse.builder()
-                .user(userDTO)
-                .build();
-    }
 } 

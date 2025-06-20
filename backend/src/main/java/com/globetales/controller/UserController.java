@@ -1,6 +1,7 @@
 package com.globetales.controller;
 
 import com.globetales.dto.UserDTO;
+import com.globetales.dto.LocationDTO;
 import com.globetales.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -69,5 +70,27 @@ public class UserController {
     @GetMapping("/check/username")
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam String username) {
         return ResponseEntity.ok(userService.existsByUsername(username));
+    }
+
+    @GetMapping("/{id}/location")
+    public ResponseEntity<LocationDTO> getUserLocation(@PathVariable UUID id) {
+        return userService.findById(id)
+            .map(user -> {
+                if (user.getLatitude() != null && user.getLongitude() != null) {
+                    return ResponseEntity.ok(new LocationDTO(
+                        user.getLatitude(),
+                        user.getLongitude()
+                    ));
+                } else {
+                    return ResponseEntity.noContent().<LocationDTO>build();
+                }
+            })
+            .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{id}/location")
+    public ResponseEntity<Void> setUserLocation(@PathVariable UUID id, @RequestBody LocationDTO location) {
+        userService.updateUserLocation(id, location.getLatitude(), location.getLongitude());
+        return ResponseEntity.noContent().build();
     }
 } 

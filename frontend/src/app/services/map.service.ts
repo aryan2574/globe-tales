@@ -23,10 +23,19 @@ export class MapService implements OnDestroy {
   }
 
   initializeMap(elementId: string, coordinates?: [number, number]): void {
+    // Always destroy any previous map instance attached to this element
     if (this.map) {
       this.destroyMap();
     }
-
+    // Ensure the container is properly sized and not leaking styles
+    const container = document.getElementById(elementId);
+    if (container) {
+      container.style.height = '250px';
+      container.style.width = '100%';
+      container.style.maxWidth = '100%';
+      container.style.borderRadius = '12px';
+      container.style.overflow = 'hidden';
+    }
     try {
       const isValidCoords =
         Array.isArray(coordinates) &&
@@ -37,7 +46,10 @@ export class MapService implements OnDestroy {
         ? [coordinates[0], coordinates[1]]
         : [0, 0];
       const zoom = isValidCoords ? 14 : 2;
-      this.map = L.map(elementId).setView(center, zoom);
+      this.map = L.map(elementId, {
+        zoomControl: true,
+        attributionControl: true,
+      }).setView(center, zoom);
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
       }).addTo(this.map);
@@ -82,21 +94,28 @@ export class MapService implements OnDestroy {
     }
     this.clearMarkers();
     places.forEach((place) => {
-      const iconClass = this.getIconClassForPlace(place.type);
-      const iconHtml = `<i class="fas ${iconClass}"></i>`;
-      const marker = L.marker(place.coordinates, {
-        icon: L.divIcon({
-          className: 'custom-fa-marker',
-          html: iconHtml,
-          iconSize: [32, 32],
-          iconAnchor: [16, 32],
-        }),
-      }).bindPopup(`
-          <strong>${place.name}</strong><br>
-          ${place.description || ''}
-        `);
-      marker.addTo(this.map!);
-      this.markers.push(marker);
+      if (
+        typeof place.latitude === 'number' &&
+        typeof place.longitude === 'number' &&
+        !isNaN(place.latitude) &&
+        !isNaN(place.longitude)
+      ) {
+        const iconClass = this.getIconClassForPlace(place.type);
+        const iconHtml = `<i class=\"fas ${iconClass}\"></i>`;
+        const marker = L.marker([place.latitude, place.longitude], {
+          icon: L.divIcon({
+            className: 'custom-fa-marker',
+            html: iconHtml,
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+          }),
+        }).bindPopup(`
+            <strong>${place.name}</strong><br>
+            ${place.description || ''}
+          `);
+        marker.addTo(this.map!);
+        this.markers.push(marker);
+      }
     });
   }
 

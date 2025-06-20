@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,8 +38,11 @@ public class User implements UserDetails {
     @Column(name = "display_name")
     private String displayName;
 
-    @Column(name = "current_location", columnDefinition = "geography(Point,4326)")
-    private Point currentLocation;
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @ElementCollection
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
@@ -128,12 +129,20 @@ public class User implements UserDetails {
         this.displayName = displayName;
     }
 
-    public Point getCurrentLocation() {
-        return currentLocation;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public void setCurrentLocation(Point currentLocation) {
-        this.currentLocation = currentLocation;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
     public Set<String> getRoles() {

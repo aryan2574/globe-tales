@@ -105,7 +105,7 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.errorMessage = '';
       const { email, password } = this.loginForm.value;
-      this.authService.login({ email, password }).subscribe({
+      this.authService.login(email, password).subscribe({
         next: () => {
           this.router.navigate(['/account']);
         },

@@ -19,7 +19,8 @@ public class CulturalSiteDTO {
     @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
 
-    private PointDTO location;
+    private Double latitude;
+    private Double longitude;
 
     @NotBlank(message = "Site type is required")
     private String siteType;

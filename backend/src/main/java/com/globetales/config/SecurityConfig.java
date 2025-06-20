@@ -33,22 +33,12 @@ public class SecurityConfig {
         http
             .cors()
             .and()
-            .csrf().disable() // For APIs; enable in production!
+            .csrf().disable()
             .authorizeHttpRequests()
-                .requestMatchers("/login", "/register", "/logout").permitAll()
+                .requestMatchers("/api/register").permitAll()
                 .anyRequest().authenticated()
             .and()
-            .formLogin()
-                .loginProcessingUrl("/login")
-                .successHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
-                .failureHandler((req, res, ex) -> res.setStatus(HttpServletResponse.SC_UNAUTHORIZED))
-            .and()
-            .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessHandler((req, res, auth) -> res.setStatus(HttpServletResponse.SC_OK))
-            .and()
-            .sessionManagement()
-                .maximumSessions(1);
+            .httpBasic(); // Enable HTTP Basic Auth
         return http.build();
     }
 

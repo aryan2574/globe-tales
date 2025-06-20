@@ -1,11 +1,8 @@
 package com.globetales.controller;
 
 import com.globetales.dto.CulturalSiteDTO;
-import com.globetales.dto.PointDTO;
-import com.globetales.mapper.PointMapper;
 import com.globetales.service.CulturalSiteService;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +14,6 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class CulturalSiteController extends BaseController {
     private final CulturalSiteService siteService;
-    private final PointMapper pointMapper;
 
     @GetMapping
     public ResponseEntity<List<CulturalSiteDTO>> getAllSites() {
@@ -53,9 +49,7 @@ public class CulturalSiteController extends BaseController {
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double radius) {
-        PointDTO location = new PointDTO(latitude, longitude);
-        Point point = pointMapper.toEntity(location);
-        return ok(siteService.findNearbySites(point, radius));
+        return ok(siteService.findNearbySites(latitude, longitude, radius));
     }
 
     @GetMapping("/type/{siteType}")
@@ -69,9 +63,7 @@ public class CulturalSiteController extends BaseController {
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double radius) {
-        PointDTO location = new PointDTO(latitude, longitude);
-        Point point = pointMapper.toEntity(location);
-        return ok(siteService.findNearbyByType(point, radius, siteType));
+        return ok(siteService.findNearbyByType(latitude, longitude, radius, siteType));
     }
 
     @GetMapping("/search")

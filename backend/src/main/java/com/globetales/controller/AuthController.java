@@ -7,9 +7,11 @@ import com.globetales.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:4200")
 public class AuthController {
     private final AuthenticationService authenticationService;
@@ -19,12 +21,5 @@ public class AuthController {
             @RequestBody RegisterRequest request
     ) {
         return ResponseEntity.ok(authenticationService.register(request));
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(
-            @RequestBody AuthenticationRequest request
-    ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 } 

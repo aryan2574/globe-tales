@@ -36,7 +36,8 @@ export class PlacesService {
             id: place.id,
             name: place.name,
             type: place.type,
-            coordinates: [place.lat, place.lon] as [number, number],
+            latitude: place.latitude,
+            longitude: place.longitude,
             tags: place.tags || {},
           }))
         )

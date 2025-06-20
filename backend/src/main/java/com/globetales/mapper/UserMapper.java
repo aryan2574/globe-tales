@@ -6,14 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {PointMapper.class})
+@Mapper(componentModel = "spring")
 public interface UserMapper {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "username", source = "username")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "displayName", source = "displayName")
     @Mapping(target = "roles", source = "roles")
-    @Mapping(target = "currentLocation", source = "currentLocation")
+    @Mapping(target = "latitude", source = "latitude")
+    @Mapping(target = "longitude", source = "longitude")
     UserDTO toDTO(User user);
 
     @Mapping(target = "id", ignore = true)
@@ -24,6 +25,8 @@ public interface UserMapper {
     @Mapping(target = "achievements", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "latitude", source = "latitude")
+    @Mapping(target = "longitude", source = "longitude")
     User toEntity(UserDTO userDTO);
 
     @Mapping(target = "id", ignore = true)
@@ -34,5 +37,7 @@ public interface UserMapper {
     @Mapping(target = "achievements", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "latitude", source = "latitude")
+    @Mapping(target = "longitude", source = "longitude")
     void updateEntityFromDTO(UserDTO userDTO, @MappingTarget User user);
 } 

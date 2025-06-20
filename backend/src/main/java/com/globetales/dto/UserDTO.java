@@ -28,7 +28,8 @@ public class UserDTO {
     private String displayName;
 
     private Set<String> roles;
-    private PointDTO currentLocation;
+    private Double latitude;
+    private Double longitude;
 
     public void setId(UUID id) {
         this.id = id;

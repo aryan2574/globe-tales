@@ -6,16 +6,15 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {CulturalSiteMapper.class, PointMapper.class})
+@Mapper(componentModel = "spring", uses = {CulturalSiteMapper.class})
 public interface UserPlaceMapper {
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "siteId", source = "site.id")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "site.name")
     @Mapping(target = "description", source = "site.description")
-    @Mapping(target = "location", source = "site.location")
-    @Mapping(target = "location.latitude", source = "site.location.y")
-    @Mapping(target = "location.longitude", source = "site.location.x")
+    @Mapping(target = "latitude", source = "site.latitude")
+    @Mapping(target = "longitude", source = "site.longitude")
     UserPlaceDTO toDTO(UserPlace userPlace);
 
     @Mapping(target = "id", ignore = true)

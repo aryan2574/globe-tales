@@ -8,7 +8,8 @@ CREATE TABLE users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     display_name VARCHAR(255),
-    current_location geography(Point, 4326),
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
     created_at TIMESTAMP WITH TIME ZONE,
     deleted_at TIMESTAMP WITH TIME ZONE,
     is_deleted BOOLEAN DEFAULT FALSE
@@ -27,7 +28,8 @@ CREATE TABLE cultural_sites (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    location geography(Point, 4326),
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
     site_type VARCHAR(100),
     opening_hours VARCHAR(255),
     contact_info VARCHAR(255),
@@ -79,8 +81,6 @@ CREATE TABLE user_achievements (
 -- Create indexes
 CREATE INDEX idx_users_username ON users(username);
 CREATE INDEX idx_users_email ON users(email);
-CREATE INDEX idx_cultural_sites_location ON cultural_sites USING GIST(location);
-CREATE INDEX idx_users_current_location ON users USING GIST(current_location);
 CREATE INDEX idx_user_favourites_user_id ON user_favourites(user_id);
 CREATE INDEX idx_user_favourites_site_id ON user_favourites(site_id);
 CREATE INDEX idx_user_places_user_id ON user_places(user_id);

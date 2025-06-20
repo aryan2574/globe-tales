@@ -19,10 +19,8 @@ export interface User {
   email: string;
   firstName?: string;
   lastName?: string;
-  location?: {
-    latitude: number;
-    longitude: number;
-  };
+  latitude?: number | null;
+  longitude?: number | null;
   createdAt: Date;
   updatedAt: Date;
   role: string;

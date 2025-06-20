@@ -7,8 +7,6 @@ import com.globetales.mapper.UserMapper;
 import com.globetales.repository.UserRepository;
 import com.globetales.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final GeometryFactory geometryFactory;
 
     @Override
     @Transactional(readOnly = true)
@@ -98,9 +95,8 @@ public class UserServiceImpl implements UserService {
     public void updateUserLocation(UUID userId, double latitude, double longitude) {
         User user = userRepository.findActiveById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        
-        Point point = geometryFactory.createPoint(new org.locationtech.jts.geom.Coordinate(longitude, latitude));
-        user.setCurrentLocation(point);
+        user.setLatitude(latitude);
+        user.setLongitude(longitude);
         userRepository.save(user);
     }
 
@@ -116,8 +112,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDTO getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        return findByUsername(username)
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        return findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Current user not found"));
     }
 } 

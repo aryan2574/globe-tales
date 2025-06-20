@@ -10,10 +10,8 @@ interface Site {
   name: string;
   type: string;
   description: string;
-  location: {
-    lat: number;
-    lng: number;
-  };
+  latitude: number;
+  longitude: number;
   rating: number;
   iconClass?: string;
 }
@@ -170,7 +168,8 @@ export class SiteListComponent implements OnInit {
                 el.tags?.amenity ||
                 'cultural',
               description: el.tags?.description || '',
-              location: { lat: el.lat, lng: el.lon },
+              latitude: el.lat,
+              longitude: el.lon,
               rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // Fake rating for demo
               iconClass: this.getIconClass(
                 el.tags?.tourism ||

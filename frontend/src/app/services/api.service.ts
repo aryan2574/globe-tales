@@ -1,5 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -22,27 +26,68 @@ export class ApiService {
     return throwError(() => new Error(errorMessage));
   }
 
-  get<T>(path: string): Observable<T> {
+  // Helper to create Basic Auth headers
+  private createAuthHeaders(username: string, password: string): HttpHeaders {
+    const credentials = btoa(`${username}:${password}`);
+    return new HttpHeaders({
+      Authorization: `Basic ${credentials}`,
+    });
+  }
+
+  get<T>(path: string, username?: string, password?: string): Observable<T> {
+    const headers =
+      username && password
+        ? this.createAuthHeaders(username, password)
+        : undefined;
     return this.http
-      .get<T>(`${this.apiUrl}${path}`)
+      .get<T>(`${this.apiUrl}${path}`, { headers, withCredentials: true })
       .pipe(catchError(this.handleError));
   }
 
-  post<T>(path: string, body: any): Observable<T> {
+  post<T>(
+    path: string,
+    body: any,
+    username?: string,
+    password?: string
+  ): Observable<T> {
+    const headers =
+      username && password
+        ? this.createAuthHeaders(username, password)
+        : undefined;
     return this.http
-      .post<T>(`${this.apiUrl}${path}`, body)
+      .post<T>(`${this.apiUrl}${path}`, body, {
+        headers,
+        withCredentials: true,
+      })
       .pipe(catchError(this.handleError));
   }
 
-  put<T>(path: string, body: any): Observable<T> {
+  put<T>(
+    path: string,
+    body: any,
+    username?: string,
+    password?: string
+  ): Observable<T> {
+    const headers =
+      username && password
+        ? this.createAuthHeaders(username, password)
+        : undefined;
     return this.http
-      .put<T>(`${this.apiUrl}${path}`, body)
+      .put<T>(`${this.apiUrl}${path}`, body, { headers, withCredentials: true })
       .pipe(catchError(this.handleError));
   }
 
-  delete(path: string): Observable<void> {
+  delete<T = void>(
+    path: string,
+    username?: string,
+    password?: string
+  ): Observable<T> {
+    const headers =
+      username && password
+        ? this.createAuthHeaders(username, password)
+        : undefined;
     return this.http
-      .delete<void>(`${this.apiUrl}${path}`)
+      .delete<T>(`${this.apiUrl}${path}`, { headers, withCredentials: true })
       .pipe(catchError(this.handleError));
   }
 }

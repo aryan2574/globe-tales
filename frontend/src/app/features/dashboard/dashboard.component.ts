@@ -127,7 +127,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
 
   selectPlace(place: Place): void {
     this.selectedPlace = place;
-    this.mapService.flyTo(place.coordinates);
+    this.mapService.flyTo([place.latitude, place.longitude]);
   }
 
   async getRoute(transportMode: TransportMode): Promise<void> {
@@ -145,7 +145,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       const subscription = this.routeService
         .getRoute(
           currentLocation,
-          this.selectedPlace.coordinates,
+          [this.selectedPlace.latitude, this.selectedPlace.longitude],
           transportMode
         )
         .subscribe({
