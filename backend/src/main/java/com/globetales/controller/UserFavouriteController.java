@@ -29,8 +29,8 @@ public class UserFavouriteController {
         return ResponseEntity.ok(userFavouriteService.save(userFavouriteDTO));
     }
 
-    @DeleteMapping("/{userId}/{siteId}")
-    public ResponseEntity<Void> deleteFavourite(
+    @DeleteMapping("/user/{userId}/site/{siteId}")
+    public ResponseEntity<Void> deleteFavouriteByUserAndSite(
             @PathVariable UUID userId,
             @PathVariable Long siteId) {
         UserFavouriteId id = new UserFavouriteId(userId, siteId);

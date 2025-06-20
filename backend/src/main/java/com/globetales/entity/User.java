@@ -58,12 +58,6 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<UserFavourite> favourites;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserPlace> visitedPlaces;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<UserAchievement> achievements;
-
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
@@ -175,21 +169,5 @@ public class User implements UserDetails {
 
     public void setFavourites(Set<UserFavourite> favourites) {
         this.favourites = favourites;
-    }
-
-    public Set<UserPlace> getVisitedPlaces() {
-        return visitedPlaces;
-    }
-
-    public void setVisitedPlaces(Set<UserPlace> visitedPlaces) {
-        this.visitedPlaces = visitedPlaces;
-    }
-
-    public Set<UserAchievement> getAchievements() {
-        return achievements;
-    }
-
-    public void setAchievements(Set<UserAchievement> achievements) {
-        this.achievements = achievements;
     }
 } 

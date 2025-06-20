@@ -7,7 +7,6 @@ import com.globetales.repository.UserFavouriteRepository;
 import com.globetales.service.UserFavouriteService;
 import com.globetales.mapper.UserFavouriteMapper;
 import com.globetales.repository.UserRepository;
-import com.globetales.repository.CulturalSiteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +21,13 @@ public class UserFavouriteServiceImpl implements UserFavouriteService {
     private final UserFavouriteRepository userFavouriteRepository;
     private final UserFavouriteMapper userFavouriteMapper;
     private final UserRepository userRepository;
-    private final CulturalSiteRepository culturalSiteRepository;
 
     public UserFavouriteServiceImpl(UserFavouriteRepository userFavouriteRepository,
                                   UserFavouriteMapper userFavouriteMapper,
-                                  UserRepository userRepository,
-                                  CulturalSiteRepository culturalSiteRepository) {
+                                  UserRepository userRepository) {
         this.userFavouriteRepository = userFavouriteRepository;
         this.userFavouriteMapper = userFavouriteMapper;
         this.userRepository = userRepository;
-        this.culturalSiteRepository = culturalSiteRepository;
     }
 
     @Override
@@ -44,7 +40,10 @@ public class UserFavouriteServiceImpl implements UserFavouriteService {
 
     @Override
     public UserFavouriteDTO save(UserFavouriteDTO userFavouriteDTO) {
-        UserFavourite userFavourite = userFavouriteMapper.toEntity(userFavouriteDTO);
+        UserFavourite userFavourite = userFavouriteMapper.toEntityWithId(userFavouriteDTO);
+        // Set the User entity
+        userFavourite.setUser(userRepository.findById(userFavouriteDTO.getUserId())
+            .orElseThrow(() -> new RuntimeException("User not found: " + userFavouriteDTO.getUserId())));
         UserFavourite savedFavourite = userFavouriteRepository.save(userFavourite);
         return userFavouriteMapper.toDTO(savedFavourite);
     }
@@ -56,7 +55,7 @@ public class UserFavouriteServiceImpl implements UserFavouriteService {
 
     @Override
     public List<UserFavouriteDTO> findByUserIdAndSiteType(UUID userId, String siteType) {
-        return userFavouriteRepository.findByUser_IdAndSiteType(userId, siteType)
+        return userFavouriteRepository.findByUserIdAndSiteType(userId, siteType)
                 .stream()
                 .map(userFavouriteMapper::toDTO)
                 .collect(Collectors.toList());

@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Place } from '../../../models/place.model';
+import { UserFavourite } from '../../../models/user-favourite.model';
+import { UserFavouriteService } from '../../../services/user-favourite.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-favorites',
@@ -18,7 +20,7 @@ import { Place } from '../../../models/place.model';
           *ngIf="!loading && !error && favorites.length === 0"
           class="no-favorites"
         >
-          You haven't added any places to your favorites yet.
+          Currently you have no favourite places
         </div>
 
         <div *ngFor="let place of favorites" class="favorite-card">
@@ -29,13 +31,13 @@ import { Place } from '../../../models/place.model';
             ></i>
           </div>
           <div class="favorite-content">
-            <h3>{{ place.name }}</h3>
-            <p class="location">
-              {{ place.coordinates[0] }}, {{ place.coordinates[1] }}
+            <h3>Site ID: {{ place.siteId }}</h3>
+            <p class="site-type">Type: {{ place.siteType }}</p>
+            <p class="saved-at">
+              Saved at: {{ place.savedAt | date : 'medium' }}
             </p>
-            <p class="description">{{ place.description }}</p>
             <div class="favorite-actions">
-              <button class="btn-remove" (click)="removeFavorite(place.id)">
+              <button class="btn-remove" (click)="removeFavorite(place.siteId)">
                 Remove from Favorites
               </button>
             </div>
@@ -47,25 +49,51 @@ import { Place } from '../../../models/place.model';
   styleUrls: ['./favorites.component.scss'],
 })
 export class FavoritesComponent implements OnInit {
-  favorites: Place[] = [];
+  favorites: UserFavourite[] = [];
   loading = false;
   error: string | null = null;
+  user: any = null;
 
-  constructor() {}
+  constructor(
+    private userFavouriteService: UserFavouriteService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
-    this.loadFavorites();
+    this.authService.currentUser$.subscribe((user) => {
+      if (user) {
+        this.user = user;
+        this.loadFavorites();
+      }
+    });
   }
 
   private loadFavorites() {
+    if (!this.user) return;
     this.loading = true;
-    const stored = localStorage.getItem('favorites');
-    this.favorites = stored ? JSON.parse(stored) : [];
-    this.loading = false;
+    const creds = this.authService.getCredentials();
+    this.userFavouriteService
+      .getFavouritesByUser(this.user.id, creds?.email, creds?.password)
+      .subscribe({
+        next: (favs) => {
+          this.favorites = favs;
+          this.loading = false;
+        },
+        error: () => {
+          this.error = 'Failed to load favorites';
+          this.loading = false;
+        },
+      });
   }
 
-  removeFavorite(id: number) {
-    this.favorites = this.favorites.filter((place) => place.id !== id);
-    localStorage.setItem('favorites', JSON.stringify(this.favorites));
+  removeFavorite(siteId: number) {
+    if (!this.user) return;
+    const creds = this.authService.getCredentials();
+    this.userFavouriteService
+      .removeFavourite(this.user.id, siteId, creds?.email, creds?.password)
+      .subscribe({
+        next: () => this.loadFavorites(),
+        error: () => (this.error = 'Failed to remove favorite'),
+      });
   }
 }

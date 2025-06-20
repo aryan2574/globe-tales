@@ -11,8 +11,8 @@ import java.util.UUID;
 @Repository
 public interface UserFavouriteRepository extends JpaRepository<UserFavourite, UserFavouriteId> {
     List<UserFavourite> findByUser_Id(UUID userId);
-    void deleteByUser_IdAndSite_Id(UUID userId, Long siteId);
-    List<UserFavourite> findByUser_IdAndSiteType(UUID userId, String siteType);
-    boolean existsByUser_IdAndSite_Id(UUID userId, Long siteId);
     List<UserFavourite> findByUserId(UUID userId);
+    List<UserFavourite> findByUserIdAndSiteType(UUID userId, String siteType);
+    void deleteById(UserFavouriteId id);
+    boolean existsById(UserFavouriteId id);
 } 

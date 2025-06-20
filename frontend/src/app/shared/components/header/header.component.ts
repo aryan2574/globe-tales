@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { AchievementService } from '../../../services/achievement.service';
-import { Achievement } from '../../../models/achievement.model';
 
 @Component({
   selector: 'app-header',
@@ -72,11 +70,7 @@ export class HeaderComponent implements OnInit {
   points: number = 0;
   nextStatus: string | null = null;
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private achievementService: AchievementService
-  ) {
+  constructor(private authService: AuthService, private router: Router) {
     this.checkScreenSize();
     window.addEventListener('resize', () => this.checkScreenSize());
   }

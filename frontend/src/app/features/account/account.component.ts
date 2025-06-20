@@ -16,9 +16,6 @@ import { RouterModule } from '@angular/router';
           <a routerLink="favorites" routerLinkActive="active"
             ><i class="fas fa-star"></i> Favorites</a
           >
-          <a routerLink="visited" routerLinkActive="active"
-            ><i class="fas fa-map-marked-alt"></i> Visited Places</a
-          >
           <a routerLink="achievements" routerLinkActive="active"
             ><i class="fas fa-award"></i> Achievements</a
           >

@@ -4,17 +4,22 @@ import com.globetales.dto.UserFavouriteDTO;
 import com.globetales.entity.UserFavourite;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = {CulturalSiteMapper.class})
+@Mapper(componentModel = "spring")
 public interface UserFavouriteMapper {
-    @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "siteId", source = "site.id")
+    @Mapping(target = "userId", source = "id.userId")
+    @Mapping(target = "siteId", source = "id.siteId")
+    @Mapping(target = "siteType", source = "siteType")
+    @Mapping(target = "savedAt", source = "savedAt")
     UserFavouriteDTO toDTO(UserFavourite userFavourite);
 
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "site", ignore = true)
+    @Mapping(target = "id", ignore = true)
     UserFavourite toEntity(UserFavouriteDTO userFavouriteDTO);
 
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "site", ignore = true)
-    void updateEntityFromDTO(UserFavouriteDTO favouriteDTO, @MappingTarget UserFavourite favourite);
+    default UserFavourite toEntityWithId(UserFavouriteDTO dto) {
+        if (dto == null) return null;
+        UserFavourite entity = toEntity(dto);
+        entity.setId(new com.globetales.entity.UserFavouriteId(dto.getUserId(), dto.getSiteId()));
+        return entity;
+    }
 } 

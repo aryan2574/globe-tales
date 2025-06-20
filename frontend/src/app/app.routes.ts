@@ -51,13 +51,6 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'visited',
-        loadComponent: () =>
-          import('./features/account/visited/visited.component').then(
-            (m) => m.VisitedComponent
-          ),
-      },
-      {
         path: 'achievements',
         loadComponent: () =>
           import('./features/account/achievements/achievements.component').then(

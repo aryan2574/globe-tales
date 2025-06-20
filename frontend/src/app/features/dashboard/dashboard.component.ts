@@ -12,6 +12,8 @@ import { PlacesService } from '../../services/places.service';
 import { RouteService } from '../../services/route.service';
 import { Place } from '../../models/place.model';
 import { RouteInfo } from '../../models/route.model';
+import { UserFavouriteService } from '../../services/user-favourite.service';
+import { AuthService } from '../../services/auth.service';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -42,13 +44,17 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   private pendingMapInit = false;
   savedIds: Set<number> = new Set();
   visitedIds: Set<number> = new Set();
+  savingFavouriteId: number | null = null;
+  savingVisitedId: number | null = null;
 
   constructor(
     private mapService: MapService,
     private locationService: LocationService,
     private placesService: PlacesService,
     private routeService: RouteService,
-    private router: Router
+    private router: Router,
+    private userFavouriteService: UserFavouriteService,
+    private authService: AuthService
   ) {
     this.locationService.hasLocation$.subscribe((hasLocation) => {
       this.hasLocation = hasLocation;
@@ -210,38 +216,34 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   loadSavedVisited(): void {
-    const favs = localStorage.getItem('favorites');
-    this.savedIds = new Set(
-      (favs ? JSON.parse(favs) : []).map((p: any) => p.id)
-    );
-    const visited = localStorage.getItem('visited');
-    this.visitedIds = new Set(
-      (visited ? JSON.parse(visited) : []).map((p: any) => p.id)
-    );
+    this.savedIds.clear();
+    this.visitedIds.clear();
   }
 
   saveToFavorites(place: Place): void {
-    const stored = localStorage.getItem('favorites');
-    let favorites: Place[] = stored ? JSON.parse(stored) : [];
-    if (!favorites.some((fav) => fav.id === place.id)) {
-      favorites.push(place);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      this.savedIds.add(place.id);
-    }
-  }
-
-  markAsVisited(place: Place): void {
-    const stored = localStorage.getItem('visited');
-    let visited: any[] = stored ? JSON.parse(stored) : [];
-    if (!visited.some((v) => v.id === place.id)) {
-      visited.push({
-        ...place,
-        visitDate: new Date().toISOString(),
-        rating: 0,
+    if (this.savingFavouriteId === place.id || this.isPlaceSaved(place)) return;
+    const user = this.authService.getCurrentUser();
+    const creds = this.authService.getCredentials();
+    if (!user || !creds) return;
+    this.savingFavouriteId = place.id;
+    const payload = {
+      userId: user.id,
+      siteId: place.id,
+      siteType: place.type,
+    };
+    this.userFavouriteService
+      .createFavourite(payload, creds.email, creds.password)
+      .subscribe({
+        next: () => {
+          this.savedIds.add(place.id);
+        },
+        error: (err) => {
+          console.error('Failed to save favourite', err);
+        },
+        complete: () => {
+          this.savingFavouriteId = null;
+        },
       });
-      localStorage.setItem('visited', JSON.stringify(visited));
-      this.visitedIds.add(place.id);
-    }
   }
 
   isPlaceSaved(place: Place): boolean {

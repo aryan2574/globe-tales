@@ -22,11 +22,6 @@ public class UserFavourite {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("siteId")
-    @JoinColumn(name = "site_id")
-    private CulturalSite site;
-
     @Column(name = "site_type")
     private String siteType;
 
