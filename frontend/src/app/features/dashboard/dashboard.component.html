@@ -7,12 +7,8 @@
     </ng-container>
     <ng-container *ngIf="hasLocation">
         <div class="map-section">
-            <div class="map-container" id="map"></div>
-            <div class="location-controls">
-                <button class="current-location-btn" (click)="goToCurrentLocation()">
-                    <i class="fas fa-crosshairs"></i>
-                </button>
-            </div>
+            <app-map [latitude]="currentLatitude" [longitude]="currentLongitude" [places]="places"
+                [selectedPlace]="selectedPlace" [routeGeometry]="routeInfo?.geometry"></app-map>
             <div class="route-controls" *ngIf="selectedPlace">
                 <div class="route-info" *ngIf="routeInfo">
                     <div class="info-item">

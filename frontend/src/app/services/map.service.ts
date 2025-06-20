@@ -13,6 +13,7 @@ import * as L from 'leaflet';
 export class MapService implements OnDestroy {
   private map: L.Map | null = null;
   private markers: L.Marker[] = [];
+  private userLocationMarker: L.Marker | null = null;
   private routeLayer: L.Polyline | null = null;
   private readonly OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 
@@ -27,15 +28,7 @@ export class MapService implements OnDestroy {
     if (this.map) {
       this.destroyMap();
     }
-    // Ensure the container is properly sized and not leaking styles
-    const container = document.getElementById(elementId);
-    if (container) {
-      container.style.height = '250px';
-      container.style.width = '100%';
-      container.style.maxWidth = '100%';
-      container.style.borderRadius = '12px';
-      container.style.overflow = 'hidden';
-    }
+    // The container should be styled by CSS, not inline styles here.
     try {
       const isValidCoords =
         Array.isArray(coordinates) &&
@@ -53,11 +46,7 @@ export class MapService implements OnDestroy {
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
       }).addTo(this.map);
-      setTimeout(() => {
-        if (this.map) {
-          this.map.invalidateSize();
-        }
-      }, 0);
+      // invalidateSize will be called from the component
     } catch (error) {
       console.error('Error initializing map:', error);
       throw new Error('Failed to initialize map');
@@ -65,9 +54,13 @@ export class MapService implements OnDestroy {
   }
 
   destroyMap(): void {
+    this.clearMarkers();
+    this.clearRoute();
+    if (this.userLocationMarker) {
+      this.userLocationMarker.remove();
+      this.userLocationMarker = null;
+    }
     if (this.map) {
-      this.clearMarkers();
-      this.clearRoute();
       this.map.remove();
       this.map = null;
     }
@@ -145,15 +138,18 @@ export class MapService implements OnDestroy {
   // Call this after map is initialized to show user location
   public showUserLocationMarker(coordinates: [number, number]): void {
     if (!this.map) return;
-    const userMarker = L.marker(coordinates, {
-      icon: L.divIcon({
-        className: 'custom-fa-marker user-location',
-        html: '<i class="fas fa-location-arrow"></i>',
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-      }),
-    }).addTo(this.map!);
-    this.markers.push(userMarker);
+    if (this.userLocationMarker) {
+      this.userLocationMarker.setLatLng(coordinates);
+    } else {
+      this.userLocationMarker = L.marker(coordinates, {
+        icon: L.divIcon({
+          className: 'custom-fa-marker user-location',
+          html: '<i class="fas fa-location-arrow"></i>',
+          iconSize: [36, 36],
+          iconAnchor: [18, 36],
+        }),
+      }).addTo(this.map!);
+    }
   }
 
   displayRoute(geometry: {

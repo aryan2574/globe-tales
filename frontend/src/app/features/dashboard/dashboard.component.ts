@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { Place } from '../../models/place.model';
 import { RouteInfo } from '../../models/route.model';
 import { UserFavouriteService } from '../../services/user-favourite.service';
 import { AuthService } from '../../services/auth.service';
+import { MapComponent } from '../../shared/components/map/map.component';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -28,9 +29,10 @@ type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
     LocationButtonComponent,
     DistancePipe,
     DurationPipe,
+    MapComponent,
   ],
 })
-export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   places: Place[] = [];
   selectedPlace: Place | null = null;
   selectedType: string = '';
@@ -46,6 +48,8 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   visitedIds: Set<number> = new Set();
   savingFavouriteId: number | null = null;
   savingVisitedId: number | null = null;
+  currentLatitude: number = 0;
+  currentLongitude: number = 0;
 
   constructor(
     private mapService: MapService,
@@ -59,8 +63,10 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.locationService.hasLocation$.subscribe((hasLocation) => {
       this.hasLocation = hasLocation;
       if (hasLocation) {
-        setTimeout(() => {
-          this.initializeMap();
+        this.locationService.getCurrentLocation().then(([lat, lng]) => {
+          this.currentLatitude = lat;
+          this.currentLongitude = lng;
+          this.searchNearbyPlaces([lat, lng]);
         });
       } else {
         this.mapService.destroyMap();
@@ -72,36 +78,9 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadSavedVisited();
   }
 
-  ngAfterViewInit(): void {
-    if (this.hasLocation) {
-      setTimeout(() => {
-        this.initializeMap();
-      });
-    }
-  }
-
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
     this.mapService.destroyMap();
-  }
-
-  private async initializeMap(): Promise<void> {
-    try {
-      let coordinates: [number, number] | undefined = undefined;
-      if (this.hasLocation) {
-        try {
-          coordinates = await this.locationService.getCurrentLocation();
-        } catch {}
-      }
-      this.mapService.initializeMap('map', coordinates);
-      if (coordinates) {
-        this.mapService.showUserLocationMarker(coordinates);
-        await this.searchNearbyPlaces(coordinates);
-      }
-    } catch (error) {
-      this.error = 'Failed to initialize map. Please refresh the page.';
-      console.error('Map initialization error:', error);
-    }
   }
 
   async searchNearbyPlaces(coordinates: [number, number]): Promise<void> {
@@ -115,7 +94,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
         .subscribe({
           next: (places) => {
             this.places = places;
-            this.mapService.displayPlaces(this.places);
           },
           error: (error) => {
             this.error = 'Failed to load places. Please try again.';
@@ -143,7 +121,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       return;
     }
     this.selectedPlace = place;
-    this.mapService.flyTo([place.latitude, place.longitude]);
     try {
       const currentLocation = await this.locationService.getCurrentLocation();
       const creds = this.authService.getCredentials();
@@ -221,7 +198,6 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     try {
       const coordinates = await this.locationService.getCurrentLocation();
       this.hasLocation = true;
-      this.mapService.flyTo(coordinates);
       await this.searchNearbyPlaces(coordinates);
     } catch (error) {
       console.error('Error getting current location:', error);

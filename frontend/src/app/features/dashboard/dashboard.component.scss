@@ -36,13 +36,17 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+
+    app-map {
+        flex: 1 1 auto;
+        position: relative;
+        min-height: 0;
+    }
 }
 
 .map-container {
     width: 100%;
-    height: 400px;
-    min-height: 300px;
-    max-height: 600px;
+    height: 100%;
     border-radius: 22px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(74, 144, 226, 0.10);
