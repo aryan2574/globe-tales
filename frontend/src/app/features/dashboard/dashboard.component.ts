@@ -131,9 +131,46 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  selectPlace(place: Place): void {
+  async selectPlace(place: Place): Promise<void> {
+    // Check for valid coordinates FIRST
+    if (
+      place.latitude == null ||
+      place.longitude == null ||
+      isNaN(place.latitude) ||
+      isNaN(place.longitude)
+    ) {
+      this.error = 'Selected place has invalid coordinates.';
+      return;
+    }
     this.selectedPlace = place;
     this.mapService.flyTo([place.latitude, place.longitude]);
+    try {
+      const currentLocation = await this.locationService.getCurrentLocation();
+      const creds = this.authService.getCredentials();
+      this.routeService
+        .getRoute(
+          currentLocation,
+          [place.latitude, place.longitude],
+          this.transportMode,
+          creds?.email,
+          creds?.password
+        )
+        .subscribe({
+          next: (routeInfo) => {
+            this.routeInfo = routeInfo;
+            if (routeInfo.geometry) {
+              this.mapService.displayRoute(routeInfo.geometry);
+            }
+          },
+          error: (error) => {
+            console.error('Error getting route:', error);
+            this.error = 'Failed to get route. Please try again.';
+          },
+        });
+    } catch (error) {
+      console.error('Error getting current location:', error);
+      this.error = 'Failed to get current location. Please try again.';
+    }
   }
 
   async getRoute(transportMode: TransportMode): Promise<void> {

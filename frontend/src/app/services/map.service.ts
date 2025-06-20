@@ -53,6 +53,11 @@ export class MapService implements OnDestroy {
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
       }).addTo(this.map);
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      }, 0);
     } catch (error) {
       console.error('Error initializing map:', error);
       throw new Error('Failed to initialize map');
@@ -259,7 +264,8 @@ export class MapService implements OnDestroy {
         id: element.id,
         name: element.tags.name,
         description: element.tags.description || '',
-        coordinates: [element.lat, element.lon] as [number, number],
+        latitude: element.lat,
+        longitude: element.lon,
         type: element.tags.tourism || 'unknown',
         tags: element.tags || {},
       }));

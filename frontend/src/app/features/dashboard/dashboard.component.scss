@@ -40,10 +40,9 @@
 
 .map-container {
     width: 100%;
-    flex: 1 1 0;
-    height: auto;
-    min-height: 0;
-    max-height: none;
+    height: 400px;
+    min-height: 300px;
+    max-height: 600px;
     border-radius: 22px;
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(74, 144, 226, 0.10);

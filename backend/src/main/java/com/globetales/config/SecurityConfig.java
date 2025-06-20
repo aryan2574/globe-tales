@@ -36,6 +36,7 @@ public class SecurityConfig {
             .csrf().disable()
             .authorizeHttpRequests()
                 .requestMatchers("/api/register").permitAll()
+                .requestMatchers("/api/routes").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic(); // Enable HTTP Basic Auth
