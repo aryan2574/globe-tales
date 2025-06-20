@@ -218,6 +218,19 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
   loadSavedVisited(): void {
     this.savedIds.clear();
     this.visitedIds.clear();
+    const user = this.authService.getCurrentUser();
+    const creds = this.authService.getCredentials();
+    if (!user || !creds) return;
+    this.userFavouriteService
+      .getFavouritesByUser(user.id, creds.email, creds.password)
+      .subscribe({
+        next: (favs) => {
+          favs.forEach((fav) => this.savedIds.add(fav.siteId));
+        },
+        error: (err) => {
+          console.error('Failed to load favourites from database', err);
+        },
+      });
   }
 
   saveToFavorites(place: Place): void {
@@ -235,7 +248,7 @@ export class DashboardComponent implements OnInit, OnDestroy, AfterViewInit {
       .createFavourite(payload, creds.email, creds.password)
       .subscribe({
         next: () => {
-          this.savedIds.add(place.id);
+          this.loadSavedVisited();
         },
         error: (err) => {
           console.error('Failed to save favourite', err);
