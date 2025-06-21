@@ -11,7 +11,10 @@ import { AuthService } from '../../../services/auth.service';
     <header class="app-header">
       <nav class="nav-container">
         <div class="nav-brand">
-          <a class="brand-link" (click)="onBrandClick($event)">GlobeTales</a>
+          <div class="brand-container">
+            <a class="brand-link" (click)="onBrandClick($event)">GlobeTales</a>
+            <span class="tagline">Every place has a story</span>
+          </div>
           <span
             *ngIf="isAuthenticated()"
             class="user-status"
