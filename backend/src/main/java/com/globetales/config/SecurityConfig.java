@@ -37,6 +37,9 @@ public class SecurityConfig {
             .authorizeHttpRequests()
                 .requestMatchers("/api/register").permitAll()
                 .requestMatchers("/api/routes").permitAll()
+                .requestMatchers("/api/weather").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/chat/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic(); // Enable HTTP Basic Auth

@@ -1,0 +1,9 @@
+<div *ngIf="weather" class="weather-widget">
+    <div class="weather-icon">
+        <i [class]="weatherIconClass"></i>
+    </div>
+    <div class="weather-info">
+        <p class="temperature">{{ weather.current.temperature_2m }}°C</p>
+        <p class="description">{{ weatherDescription }}</p>
+    </div>
+</div>

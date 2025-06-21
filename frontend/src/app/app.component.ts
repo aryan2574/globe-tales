@@ -3,11 +3,18 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
+import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HeaderComponent, FooterComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    HeaderComponent,
+    FooterComponent,
+    ChatbotComponent,
+  ],
   template: `
     <div class="app-container">
       <app-header></app-header>
@@ -15,6 +22,7 @@ import { FooterComponent } from './shared/components/footer/footer.component';
         <router-outlet></router-outlet>
       </main>
       <app-footer></app-footer>
+      <app-chatbot></app-chatbot>
     </div>
   `,
   styles: [

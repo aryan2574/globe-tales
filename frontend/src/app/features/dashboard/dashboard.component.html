@@ -7,7 +7,8 @@
     </ng-container>
     <ng-container *ngIf="hasLocation">
         <div class="map-section">
-            <app-map [latitude]="currentLatitude" [longitude]="currentLongitude" [places]="places"
+            <app-weather-widget class="weather-widget-overlay"></app-weather-widget>
+            <app-map *ngIf="hasLocation" [latitude]="currentLatitude!" [longitude]="currentLongitude!" [places]="places"
                 [selectedPlace]="selectedPlace" [routeGeometry]="routeInfo?.geometry"></app-map>
             <div class="route-controls" *ngIf="selectedPlace">
                 <div class="route-info" *ngIf="routeInfo">
@@ -66,6 +67,9 @@
                             (change)="onRadiusChange()" />
                         <span>{{ searchRadius }}m</span>
                     </div>
+                    <button class="update-location-btn" (click)="updateLocation()">
+                        <i class="fas fa-sync-alt"></i> Update Location
+                    </button>
                 </div>
             </div>
 

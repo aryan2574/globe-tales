@@ -93,8 +93,18 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserLocation(UUID userId, double latitude, double longitude) {
-        User user = userRepository.findActiveById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id " + userId));
+        user.setLatitude(latitude);
+        user.setLongitude(longitude);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void updateCurrentUserLocation(double latitude, double longitude) {
+        UserDTO currentUserDTO = getCurrentUser();
+        User user = userRepository.findById(currentUserDTO.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id ".concat(currentUserDTO.getId().toString())));
         user.setLatitude(latitude);
         user.setLongitude(longitude);
         userRepository.save(user);

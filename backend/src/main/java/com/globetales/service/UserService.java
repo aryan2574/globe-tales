@@ -12,6 +12,7 @@ public interface UserService extends BaseService<UserDTO, UUID> {
     boolean existsByUsername(String username);
     UserDTO createUser(UserDTO userDTO, String password);
     void updateUserLocation(UUID userId, double latitude, double longitude);
+    void updateCurrentUserLocation(double latitude, double longitude);
     void softDelete(UUID userId);
     UserDTO getCurrentUser();
 } 

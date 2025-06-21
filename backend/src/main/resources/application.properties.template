@@ -1,1 +1,5 @@
 openrouteservice.api.key=YOUR_OPENROUTESERVICE_API_KEY
+
+#OpenAI Configuration
+openai.api.key=<YOUR_OPENAI_API_KEY>
+openai.chatbot.system-message=You are a helpful assistant for the GlobeTales application. You can answer questions about places and provide travel recommendations.

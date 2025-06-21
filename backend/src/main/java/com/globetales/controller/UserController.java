@@ -93,4 +93,10 @@ public class UserController {
         userService.updateUserLocation(id, location.getLatitude(), location.getLongitude());
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/location")
+    public ResponseEntity<Void> updateCurrentUserLocation(@RequestBody LocationDTO locationDTO) {
+        userService.updateCurrentUserLocation(locationDTO.getLatitude(), locationDTO.getLongitude());
+        return ResponseEntity.noContent().build();
+    }
 } 

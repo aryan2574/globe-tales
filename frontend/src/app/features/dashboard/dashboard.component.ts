@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { LocationButtonComponent } from '../../components/location-button/location-button.component';
+import { LocationButtonComponent } from '../../shared/components/location-button/location-button.component';
 import { DistancePipe } from '../../pipes/distance.pipe';
 import { DurationPipe } from '../../pipes/duration.pipe';
 import { MapService } from '../../services/map.service';
-import { LocationService } from '../../services/location.service';
+import { LocationService, Location } from '../../services/location.service';
 import { PlacesService } from '../../services/places.service';
 import { RouteService } from '../../services/route.service';
 import { Place } from '../../models/place.model';
@@ -15,6 +15,9 @@ import { RouteInfo } from '../../models/route.model';
 import { UserFavouriteService } from '../../services/user-favourite.service';
 import { AuthService } from '../../services/auth.service';
 import { MapComponent } from '../../shared/components/map/map.component';
+import { WeatherWidgetComponent } from '../../shared/components/weather-widget/weather-widget.component';
+import { User } from '../../models/user.model';
+import { UserService } from '../../services/user.service';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -30,13 +33,14 @@ type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
     DistancePipe,
     DurationPipe,
     MapComponent,
+    WeatherWidgetComponent,
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   places: Place[] = [];
   selectedPlace: Place | null = null;
-  selectedType: string = '';
-  searchRadius: number = 1000;
+  selectedType: string = 'attraction';
+  searchRadius: number = 2000;
   loading: boolean = false;
   error: string | null = null;
   hasLocation: boolean = false;
@@ -48,8 +52,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   visitedIds: Set<number> = new Set();
   savingFavouriteId: number | null = null;
   savingVisitedId: number | null = null;
-  currentLatitude: number = 0;
-  currentLongitude: number = 0;
+  currentLatitude: number | null = null;
+  currentLongitude: number | null = null;
+  private locationSubscription!: Subscription;
+  private currentUser!: User;
 
   constructor(
     private mapService: MapService,
@@ -58,39 +64,122 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private routeService: RouteService,
     private router: Router,
     private userFavouriteService: UserFavouriteService,
-    private authService: AuthService
-  ) {
-    this.locationService.hasLocation$.subscribe((hasLocation) => {
-      this.hasLocation = hasLocation;
-      if (hasLocation) {
-        this.locationService.getCurrentLocation().then(([lat, lng]) => {
-          this.currentLatitude = lat;
-          this.currentLongitude = lng;
-          this.searchNearbyPlaces([lat, lng]);
-        });
-      } else {
-        this.mapService.destroyMap();
-      }
-    });
-  }
+    private authService: AuthService,
+    private userService: UserService
+  ) {}
 
   ngOnInit(): void {
+    this.locationSubscription = this.locationService.location$.subscribe({
+      next: (location) => {
+        if (location) {
+          this.handleLocationSuccess(location);
+        } else {
+          // Location not available, try to get it
+          this.initializeDashboardLocation();
+        }
+      },
+      error: (err) => {
+        // This is unlikely to be called, but good practice
+        this.error =
+          'Could not determine your location. Please enable it in your browser settings.';
+        this.loading = false;
+        this.hasLocation = false;
+      },
+    });
+
     this.loadSavedVisited();
+  }
+
+  private initializeDashboardLocation(): void {
+    this.loading = true;
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+        if (user.latitude && user.longitude) {
+          this.locationService.setLocation({
+            latitude: user.latitude,
+            longitude: user.longitude,
+          });
+        } else {
+          // No user location in DB, prompt browser
+          this.locationService.requestAndSaveLocation().subscribe({
+            next: (location) => {
+              this.userService.updateCurrentUserLocation(location).subscribe(); // Fire and forget update
+            },
+            error: (err) => {
+              this.error =
+                'Could not determine your location. Please enable it in your browser settings.';
+              this.hasLocation = false;
+              this.loading = false;
+            },
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Failed to get user, trying anonymous location', err);
+        // Not logged in, just ask for location
+        this.locationService.requestAndSaveLocation().subscribe({
+          error: (err) => {
+            this.error =
+              'Could not determine your location. Please enable it in your browser settings.';
+            this.hasLocation = false;
+            this.loading = false;
+          },
+        });
+      },
+    });
   }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+    if (this.locationSubscription) {
+      this.locationSubscription.unsubscribe();
+    }
     this.mapService.destroyMap();
+    this.onTypeChange();
   }
 
-  async searchNearbyPlaces(coordinates: [number, number]): Promise<void> {
+  private handleLocationSuccess(location: Location): void {
+    this.currentLatitude = location.latitude;
+    this.currentLongitude = location.longitude;
+    this.hasLocation = true;
+    this.loading = false; // Location is now loaded
+    this.onTypeChange();
+  }
+
+  updateLocation(): void {
+    this.loading = true;
+    this.locationService.requestAndSaveLocation().subscribe({
+      next: (location) => {
+        this.userService.updateCurrentUserLocation(location).subscribe(() => {
+          this.loading = false;
+        });
+      },
+      error: (err: any) => {
+        this.error = err.message;
+        this.loading = false;
+      },
+    });
+  }
+
+  async searchNearbyPlaces(): Promise<void> {
     this.loading = true;
     this.error = null;
 
+    if (this.currentLatitude === null || this.currentLongitude === null) {
+      this.error = 'Location not available.';
+      this.loading = false;
+      return;
+    }
+
     try {
-      const [lat, lng] = coordinates;
       this.mapService
-        .searchPlaces(lat, lng, this.searchRadius, this.selectedType)
+        .searchPlaces(
+          this.currentLatitude,
+          this.currentLongitude,
+          this.searchRadius,
+          this.selectedType
+        )
         .subscribe({
           next: (places) => {
             this.places = places;
@@ -110,23 +199,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   async selectPlace(place: Place): Promise<void> {
-    // Check for valid coordinates FIRST
-    if (
-      place.latitude == null ||
-      place.longitude == null ||
-      isNaN(place.latitude) ||
-      isNaN(place.longitude)
-    ) {
-      this.error = 'Selected place has invalid coordinates.';
+    if (this.currentLatitude == null || this.currentLongitude == null) {
+      this.error = 'Your location is not available. Cannot calculate route.';
       return;
     }
+
     this.selectedPlace = place;
     try {
-      const currentLocation = await this.locationService.getCurrentLocation();
       const creds = this.authService.getCredentials();
       this.routeService
         .getRoute(
-          currentLocation,
+          [this.currentLatitude, this.currentLongitude],
           [place.latitude, place.longitude],
           this.transportMode,
           creds?.email,
@@ -160,50 +243,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.error = null;
 
-    try {
-      const currentLocation = await this.locationService.getCurrentLocation();
-      const subscription = this.routeService
-        .getRoute(
-          currentLocation,
-          [this.selectedPlace.latitude, this.selectedPlace.longitude],
-          transportMode
-        )
-        .subscribe({
-          next: (routeInfo) => {
-            this.routeInfo = routeInfo;
-            if (routeInfo.geometry) {
-              this.mapService.displayRoute(routeInfo.geometry);
-            }
-          },
-          error: (error) => {
-            console.error('Error getting route:', error);
-            this.error = 'Failed to get route. Please try again.';
-          },
-          complete: () => {
-            this.loading = false;
-          },
-        });
-      this.subscriptions.push(subscription);
-    } catch (error) {
-      console.error('Error getting current location:', error);
-      this.error = 'Failed to get current location. Please try again.';
+    if (this.currentLatitude === null || this.currentLongitude === null) {
+      this.error = 'Current location not available.';
       this.loading = false;
+      return;
     }
+
+    const subscription = this.routeService
+      .getRoute(
+        [this.currentLatitude, this.currentLongitude],
+        [this.selectedPlace.latitude, this.selectedPlace.longitude],
+        transportMode
+      )
+      .subscribe({
+        next: (routeInfo) => {
+          this.routeInfo = routeInfo;
+          if (routeInfo.geometry) {
+            this.mapService.displayRoute(routeInfo.geometry);
+          }
+        },
+        error: (error) => {
+          console.error('Error getting route:', error);
+          this.error = 'Failed to get route. Please try again.';
+        },
+        complete: () => {
+          this.loading = false;
+        },
+      });
+    this.subscriptions.push(subscription);
   }
 
   async goToCurrentLocation(): Promise<void> {
-    this.loading = true;
-    this.error = null;
-
-    try {
-      const coordinates = await this.locationService.getCurrentLocation();
-      this.hasLocation = true;
-      await this.searchNearbyPlaces(coordinates);
-    } catch (error) {
-      console.error('Error getting current location:', error);
-      this.error = 'Failed to get current location. Please try again.';
-    } finally {
-      this.loading = false;
+    if (this.currentLatitude && this.currentLongitude) {
+      this.mapService.flyTo([this.currentLatitude, this.currentLongitude]);
+    } else {
+      this.error = 'Your location is not available.';
     }
   }
 
@@ -214,17 +288,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   onTypeChange(): void {
     if (this.hasLocation) {
-      this.locationService.getCurrentLocation().then((coordinates) => {
-        this.searchNearbyPlaces(coordinates);
-      });
+      this.searchNearbyPlaces();
     }
   }
 
   onRadiusChange(): void {
     if (this.hasLocation) {
-      this.locationService.getCurrentLocation().then((coordinates) => {
-        this.searchNearbyPlaces(coordinates);
-      });
+      this.searchNearbyPlaces();
     }
   }
 

@@ -63,6 +63,19 @@ import { User } from '../../../models/user.model';
               >
                 Lat: {{ user.latitude }}, Lng: {{ user.longitude }}
               </div>
+              <button
+                type="button"
+                class="btn-set-location"
+                (click)="updateLocation()"
+                [disabled]="updatingLocation"
+              >
+                <span *ngIf="!updatingLocation"
+                  ><i class="fas fa-sync-alt"></i> Update Location</span
+                >
+                <span *ngIf="updatingLocation"
+                  ><i class="fas fa-spinner fa-spin"></i> Updating...</span
+                >
+              </button>
             </ng-container>
             <ng-template #noLocation>
               <button
@@ -94,6 +107,7 @@ export class ProfileComponent implements OnInit {
   loadingLocation = false;
   user: User | null = null;
   locationChecked = false;
+  updatingLocation = false;
 
   constructor(
     private fb: FormBuilder,
@@ -112,7 +126,7 @@ export class ProfileComponent implements OnInit {
     // Always fetch latest user from backend for location
     const creds = this.authService.getCredentials();
     if (creds) {
-      this.userService.getCurrentUser(creds.email, creds.password).subscribe({
+      this.userService.getCurrentUser().subscribe({
         next: (user) => {
           this.user = user;
           this.profileForm.patchValue({
@@ -134,51 +148,93 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  updateLocation(): void {
+    if (!this.user) return;
+    this.updatingLocation = true;
+
+    new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject);
+    })
+      .then((position) => {
+        const { latitude, longitude } = position.coords;
+        this.userService
+          .updateCurrentUserLocation({ latitude, longitude })
+          .subscribe({
+            next: () => {
+              if (this.user) {
+                this.user.latitude = latitude;
+                this.user.longitude = longitude;
+              }
+              this.updatingLocation = false;
+            },
+            error: () => {
+              this.updatingLocation = false;
+              // You could add some user-facing error feedback here
+            },
+          });
+      })
+      .catch((error) => {
+        this.updatingLocation = false;
+        // Handle error getting location
+      });
+  }
+
   async setLocation() {
     if (!this.user) return;
     this.loadingLocation = true;
     try {
-      const pos = await new Promise<{ lat: number; lng: number }>(
+      const position = await new Promise<GeolocationPosition>(
         (resolve, reject) => {
-          if (!navigator.geolocation) {
-            reject('Geolocation not supported');
-          }
-          navigator.geolocation.getCurrentPosition(
-            (position) =>
-              resolve({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              }),
-            (err) => reject(err)
-          );
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+          });
         }
       );
-      const creds = this.authService.getCredentials();
-      if (!creds) throw new Error('No credentials');
-      await this.userService
-        .updateUserLocation(
-          this.user.id,
-          pos.lat,
-          pos.lng,
-          creds.email,
-          creds.password
-        )
-        .toPromise();
-      // Reload user info
-      this.user.latitude = pos.lat;
-      this.user.longitude = pos.lng;
-      this.profileForm.patchValue({ location: `${pos.lat}, ${pos.lng}` });
+
+      const { latitude, longitude } = position.coords;
+
+      this.userService
+        .updateCurrentUserLocation({ latitude, longitude })
+        .subscribe({
+          next: () => {
+            if (this.user) {
+              this.user.latitude = latitude;
+              this.user.longitude = longitude;
+              this.profileForm.patchValue({
+                location: `${latitude}, ${longitude}`,
+              });
+            }
+            this.loadingLocation = false;
+          },
+          error: (err) => {
+            console.error('Failed to save location', err);
+            alert('Failed to save location');
+            this.loadingLocation = false;
+          },
+        });
     } catch (e) {
-      alert('Failed to get or save location');
-    } finally {
+      alert('Failed to get location');
       this.loadingLocation = false;
     }
   }
 
   onSubmit() {
-    if (this.profileForm.valid) {
-      // Update user profile
-      console.log('Profile update:', this.profileForm.value);
+    if (this.profileForm.valid && this.user) {
+      const updatedUser: Partial<User> = {
+        displayName: this.profileForm.value.username,
+      };
+
+      this.userService.updateUser(this.user.id, updatedUser as User).subscribe({
+        next: (user) => {
+          this.user = user;
+          this.authService.updateCurrentUser(user);
+          alert('Profile updated successfully!');
+        },
+        error: (err) => {
+          console.error('Failed to update profile', err);
+          alert('Failed to update profile');
+        },
+      });
     }
   }
 }

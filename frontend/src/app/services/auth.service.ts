@@ -78,6 +78,10 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  updateCurrentUser(user: User): void {
+    this.handleAuthResponse({ user });
+  }
+
   getCredentials(): { email: string; password: string } | null {
     const creds = localStorage.getItem(this.CREDENTIALS_KEY);
     if (!creds) return null;
