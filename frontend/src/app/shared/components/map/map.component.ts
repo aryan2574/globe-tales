@@ -49,21 +49,36 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   ngAfterViewInit(): void {
     this.mapId = 'map-' + Math.random().toString(36).substring(2, 10);
     this.mapContainer.nativeElement.id = this.mapId;
+
+    // Attempt to initialize the map
     this.mapService.initializeMap(this.mapId, [this.latitude, this.longitude]);
     this.lastCenter = [this.latitude, this.longitude];
     this.updateMap();
+
+    // Aggressively check and invalidate size until the map is properly rendered
+    const map = this.mapService.getMap();
+    if (map) {
+      const interval = setInterval(() => {
+        const mapSize = map.getSize();
+        if (mapSize.x > 0 && mapSize.y > 0) {
+          map.invalidateSize();
+          clearInterval(interval); // Stop checking once the map is sized
+        }
+      }, 50);
+
+      // Failsafe to stop the interval after a few seconds
+      setTimeout(() => clearInterval(interval), 2000);
+    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     const map = this.mapService.getMap();
     if (this.mapId && map) {
+      // If coordinates change, update the center
       if (changes['latitude'] || changes['longitude']) {
         this.lastCenter = [this.latitude, this.longitude];
       }
       this.updateMap();
-      setTimeout(() => {
-        map.invalidateSize();
-      }, 0);
     }
   }
 
