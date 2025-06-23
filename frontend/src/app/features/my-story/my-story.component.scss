@@ -1,58 +1,246 @@
+// Variables
+$primary-color: #2c3e50;
+$secondary-color: #3498db;
+$accent-color: #e74c3c;
+$background-color: #f8f9fa;
+$text-color: #2c3e50;
+$border-color: #e0e0e0;
+
+// Hero Section
+.hero-section {
+    background: linear-gradient(135deg, $primary-color, $secondary-color);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+    margin-bottom: 2rem;
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        font-style: italic;
+        opacity: 0.9;
+    }
+}
+
+// Container
 .my-story-container {
     display: flex;
-    height: calc(100vh - 200px);
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 2rem;
+    padding: 0 1rem;
+    min-height: calc(100vh - 400px);
 }
 
+// Story List Panel
 .story-list-panel {
     width: 30%;
-    padding: 20px;
-    border-right: 1px solid #ccc;
-    background: #f9f9f9;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .panel-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid $border-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: $primary-color;
+
+            i {
+                margin-right: 0.5rem;
+                color: $secondary-color;
+            }
+        }
+    }
 }
 
-.story-list-panel h2 {
-    margin-top: 0;
-}
-
-.story-list-panel ul {
+// Story List
+.story-list {
     list-style: none;
     padding: 0;
-    margin: 20px 0 0 0;
+    margin: 0;
+
+    li {
+        border-bottom: 1px solid $border-color;
+        transition: all 0.3s ease;
+
+        &:hover,
+        &.active {
+            background-color: rgba($secondary-color, 0.1);
+        }
+    }
+
+    .story-item {
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+
+        .story-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            i {
+                color: $secondary-color;
+            }
+        }
+    }
 }
 
-.story-list-panel li {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-.story-list-panel li:hover {
-    background: #efefef;
-}
-
+// Story Detail Panel
 .story-detail-panel {
-    width: 70%;
-    padding: 20px;
+    flex: 1;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+
+    h3 {
+        margin: 0 0 1.5rem 0;
+        color: $primary-color;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: $secondary-color;
+        }
+    }
 }
 
-.story-detail-panel h3 {
-    margin-top: 0;
+// Form Elements
+.form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: $primary-color;
+        font-weight: 500;
+
+        i {
+            margin-right: 0.5rem;
+            color: $secondary-color;
+        }
+    }
+
+    input,
+    textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid $border-color;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+            outline: none;
+            border-color: $secondary-color;
+        }
+    }
+
+    textarea {
+        height: 300px;
+        resize: vertical;
+    }
 }
 
-.story-detail-panel input,
-.story-detail-panel textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+// Buttons
+button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+        font-size: 1rem;
+    }
 }
 
-.story-detail-panel textarea {
-    height: 300px;
-    resize: vertical;
+.btn-new {
+    background-color: $secondary-color;
+    color: white;
+
+    &:hover {
+        background-color: darken($secondary-color, 10%);
+    }
 }
 
-.story-detail-panel button {
-    margin-right: 10px;
+.btn-save {
+    background-color: $secondary-color;
+    color: white;
+
+    &:hover {
+        background-color: darken($secondary-color, 10%);
+    }
+}
+
+.btn-delete {
+    background-color: $accent-color;
+    color: white;
+
+    &:hover {
+        background-color: darken($accent-color, 10%);
+    }
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    color: $secondary-color;
+
+    &:hover {
+        color: darken($secondary-color, 10%);
+    }
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+// Please Login State
+.please-login {
+    text-align: center;
+    padding: 3rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 2rem auto;
+
+    i {
+        color: $secondary-color;
+        margin-bottom: 1rem;
+    }
+
+    h2 {
+        color: $primary-color;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: $text-color;
+        opacity: 0.8;
+    }
 }

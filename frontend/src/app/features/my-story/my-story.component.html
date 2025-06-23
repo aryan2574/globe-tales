@@ -1,34 +1,79 @@
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Write Your Story</h1>
+    <p class="subtitle">"Every place has a story, and every story has a place. Share yours with the world."</p>
+</div>
+
 <div class="my-story-container" *ngIf="isLoggedIn$ | async; else pleaseLogin">
     <div class="story-list-panel">
-        <h2>My Stories</h2>
-        <button (click)="createNewStory()">+ New Story</button>
-        <ul>
+        <div class="panel-header">
+            <h2><i class="fas fa-book"></i> My Stories</h2>
+            <button class="btn-new" (click)="createNewStory()">
+                <i class="fas fa-plus"></i> New Story
+            </button>
+        </div>
+        <ul class="story-list">
             <li *ngFor="let story of stories" (click)="selectStory(story)"
-                style="display: flex; align-items: center; justify-content: space-between;">
-                <span>{{ story.title }}</span>
-                <button (click)="downloadStory(story); $event.stopPropagation();">Download</button>
+                [class.active]="selectedStory?.id === story.id">
+                <div class="story-item">
+                    <span class="story-title">
+                        <i class="fas fa-feather-alt"></i>
+                        {{ story.title }}
+                    </span>
+                    <div class="story-actions">
+                        <button class="btn-icon" (click)="downloadStory(story); $event.stopPropagation();"
+                            title="Download Story">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
             </li>
         </ul>
     </div>
+
     <div class="story-detail-panel">
-        <div *ngIf="selectedStory">
-            <h3>Edit Story</h3>
-            <input [(ngModel)]="selectedStory.title" placeholder="Title">
-            <textarea [(ngModel)]="selectedStory.content" placeholder="Content"></textarea>
-            <button (click)="saveStory()">Save</button>
-            <button (click)="deleteStory(selectedStory.id!)">Delete</button>
+        <div *ngIf="selectedStory" class="story-editor">
+            <h3><i class="fas fa-edit"></i> Edit Story</h3>
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Title</label>
+                <input [(ngModel)]="selectedStory.title" placeholder="Enter story title">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-paragraph"></i> Content</label>
+                <textarea [(ngModel)]="selectedStory.content" placeholder="Write your story here..."></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn-save" (click)="saveStory()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn-delete" (click)="deleteStory(selectedStory.id!)">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
         </div>
-        <div *ngIf="!selectedStory">
-            <h3>New Story</h3>
-            <input [(ngModel)]="newStory.title" placeholder="Title">
-            <textarea [(ngModel)]="newStory.content" placeholder="Content"></textarea>
-            <button (click)="saveStory()">Create</button>
+
+        <div *ngIf="!selectedStory" class="story-editor">
+            <h3><i class="fas fa-plus-circle"></i> New Story</h3>
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Title</label>
+                <input [(ngModel)]="newStory.title" placeholder="Enter story title">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-paragraph"></i> Content</label>
+                <textarea [(ngModel)]="newStory.content" placeholder="Write your story here..."></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn-save" (click)="saveStory()">
+                    <i class="fas fa-save"></i> Create
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
 <ng-template #pleaseLogin>
     <div class="please-login">
+        <i class="fas fa-lock fa-3x"></i>
         <h2>My Stories</h2>
         <p>Please log in to create and view your stories.</p>
     </div>
