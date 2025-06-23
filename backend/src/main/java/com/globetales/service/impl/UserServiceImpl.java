@@ -76,8 +76,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO save(UserDTO userDTO) {
-        User user = userMapper.toEntity(userDTO);
-        return userMapper.toDTO(userRepository.save(user));
+        User existing = userRepository.findById(userDTO.getId())
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        // Only update fields that are not null in userDTO
+        if (userDTO.getDisplayName() != null) existing.setDisplayName(userDTO.getDisplayName());
+        if (userDTO.getUsername() != null) existing.setUsername(userDTO.getUsername());
+        if (userDTO.getEmail() != null) existing.setEmail(userDTO.getEmail());
+        if (userDTO.getLatitude() != null) existing.setLatitude(userDTO.getLatitude());
+        if (userDTO.getLongitude() != null) existing.setLongitude(userDTO.getLongitude());
+        // Add more fields as needed
+        return userMapper.toDTO(userRepository.save(existing));
     }
 
     @Override
