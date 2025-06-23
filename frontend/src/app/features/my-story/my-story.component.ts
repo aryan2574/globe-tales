@@ -5,6 +5,8 @@ import { UserStoryService } from '../../services/user-story.service';
 import { UserStory } from '../../models/user-story.model';
 import { AuthService } from '../../services/auth.service';
 import { Observable } from 'rxjs';
+import { PlacesService } from '../../services/places.service';
+import { Place } from '../../models/place.model';
 
 @Component({
   selector: 'app-my-story',
@@ -19,10 +21,13 @@ export class MyStoryComponent implements OnInit {
   newStory: Partial<UserStory> = { title: '', content: '' };
   isLoggedIn$: Observable<boolean>;
   visitedStories: UserStory[] = [];
+  visitedSites: { name: string; visitDate?: Date }[] = [];
+  allPlaces: Place[] = [];
 
   constructor(
     private userStoryService: UserStoryService,
-    private authService: AuthService
+    private authService: AuthService,
+    private placesService: PlacesService
   ) {
     this.isLoggedIn$ = this.authService.isLoggedIn$;
   }
@@ -32,10 +37,20 @@ export class MyStoryComponent implements OnInit {
       if (loggedIn) {
         this.loadStories();
         this.loadVisitedSites();
+        this.loadAllPlaces();
       } else {
         this.stories = [];
         this.visitedStories = [];
+        this.visitedSites = [];
+        this.allPlaces = [];
       }
+    });
+  }
+
+  loadAllPlaces(): void {
+    this.placesService.getAllPlaces().subscribe((places) => {
+      this.allPlaces = places;
+      this.updateVisitedSites();
     });
   }
 
@@ -48,6 +63,23 @@ export class MyStoryComponent implements OnInit {
   loadVisitedSites(): void {
     this.userStoryService.getVisitedSites().subscribe((stories) => {
       this.visitedStories = stories;
+      this.updateVisitedSites();
+    });
+  }
+
+  updateVisitedSites(): void {
+    if (!this.visitedStories || !this.allPlaces) {
+      this.visitedSites = [];
+      return;
+    }
+    this.visitedSites = this.visitedStories.map((story) => {
+      const place = this.allPlaces.find(
+        (p) => p.id.toString() === story.placeId
+      );
+      return {
+        name: place ? place.name : story.placeId || 'Unknown',
+        visitDate: story.visitDate,
+      };
     });
   }
 

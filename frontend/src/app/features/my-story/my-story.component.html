@@ -37,15 +37,21 @@
 
     <div class="visited-section">
         <h2><i class="fas fa-check-circle"></i> Visited Sites</h2>
-        <div *ngIf="visitedStories.length === 0" class="no-visited">
+        <div *ngIf="visitedSites.length === 0" class="no-visited">
             <i class="fas fa-info-circle"></i> You haven't marked any sites as visited yet.
         </div>
-        <ul *ngIf="visitedStories.length > 0">
-            <li *ngFor="let story of visitedStories">
-                <span>{{ story.title || story.placeId }}</span>
-                <span *ngIf="story.visitDate"> (Visited: {{ story.visitDate | date:'short' }})</span>
-            </li>
-        </ul>
+        <div *ngIf="visitedSites.length > 0" class="visited-cards-grid">
+            <div class="visited-card" *ngFor="let site of visitedSites">
+                <div class="visited-card-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="visited-place-name">{{ site.name }}</span>
+                </div>
+                <div class="visited-card-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ site.visitDate | date:'medium' }}</span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="story-detail-panel">
@@ -53,14 +59,16 @@
             <h3><i class="fas fa-edit"></i> Edit Story</h3>
             <div class="form-group">
                 <label><i class="fas fa-heading"></i> Title</label>
-                <input [(ngModel)]="selectedStory.title" placeholder="Enter story title">
+                <input [(ngModel)]="selectedStory.title" placeholder="Enter story title" required>
             </div>
             <div class="form-group">
                 <label><i class="fas fa-paragraph"></i> Content</label>
-                <textarea [(ngModel)]="selectedStory.content" placeholder="Write your story here..."></textarea>
+                <textarea [(ngModel)]="selectedStory.content" placeholder="Write your story here..."
+                    required></textarea>
             </div>
             <div class="button-group">
-                <button class="btn-save" (click)="saveStory()">
+                <button class="btn-save" (click)="saveStory()"
+                    [disabled]="!selectedStory.title || !selectedStory.content">
                     <i class="fas fa-save"></i> Save
                 </button>
                 <button class="btn-delete" (click)="deleteStory(selectedStory.id!)">
@@ -73,14 +81,14 @@
             <h3><i class="fas fa-plus-circle"></i> New Story</h3>
             <div class="form-group">
                 <label><i class="fas fa-heading"></i> Title</label>
-                <input [(ngModel)]="newStory.title" placeholder="Enter story title">
+                <input [(ngModel)]="newStory.title" placeholder="Enter story title" required>
             </div>
             <div class="form-group">
                 <label><i class="fas fa-paragraph"></i> Content</label>
-                <textarea [(ngModel)]="newStory.content" placeholder="Write your story here..."></textarea>
+                <textarea [(ngModel)]="newStory.content" placeholder="Write your story here..." required></textarea>
             </div>
             <div class="button-group">
-                <button class="btn-save" (click)="saveStory()">
+                <button class="btn-save" (click)="saveStory()" [disabled]="!newStory.title || !newStory.content">
                     <i class="fas fa-save"></i> Create
                 </button>
             </div>

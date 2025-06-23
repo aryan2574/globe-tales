@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, map, firstValueFrom } from 'rxjs';
 import { Place } from '../models/place.model';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ import { environment } from '../../environments/environment';
 export class PlacesService {
   private apiUrl = `${environment.apiUrl}/places`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   async searchNearbyPlaces(
     coordinates: [number, number],
@@ -53,10 +54,22 @@ export class PlacesService {
     east: number
   ): Observable<any> {
     const bbox = `${south},${west},${north},${east}`;
-    return this.http.post(`${this.apiUrl}/fetch`, null, { params: { bbox } });
+    const creds = this.authService.getCredentials();
+    let headers = undefined;
+    if (creds) {
+      const basicAuth = 'Basic ' + btoa(creds.email + ':' + creds.password);
+      headers = { Authorization: basicAuth };
+    }
+    return this.http.post(`${this.apiUrl}/fetch`, null, { params: { bbox }, headers });
   }
 
   getAllPlaces(): Observable<Place[]> {
-    return this.http.get<Place[]>(this.apiUrl);
+    const creds = this.authService.getCredentials();
+    let headers = undefined;
+    if (creds) {
+      const basicAuth = 'Basic ' + btoa(creds.email + ':' + creds.password);
+      headers = { Authorization: basicAuth };
+    }
+    return this.http.get<Place[]>(this.apiUrl, { headers });
   }
 }

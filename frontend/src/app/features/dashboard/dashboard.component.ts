@@ -187,8 +187,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
       },
       error: (err) => {
-        this.error = 'Failed to fetch places for your area.';
-        this.loading = false;
+        // Even if fetch fails, try to load places from backend
+        this.placesService.getAllPlaces().subscribe({
+          next: (places) => {
+            const uniquePlaces = new Map<number, Place>();
+            for (const place of places) {
+              if (!uniquePlaces.has(place.id)) {
+                uniquePlaces.set(place.id, place);
+              }
+            }
+            this.places = Array.from(uniquePlaces.values());
+            this.loading = false;
+          },
+          error: (err) => {
+            this.error = 'Failed to load places from backend.';
+            this.loading = false;
+          },
+        });
       },
     });
   }
