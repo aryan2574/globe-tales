@@ -1,4 +1,10 @@
-import { Component, OnDestroy } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+  AfterViewChecked,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -19,11 +25,13 @@ interface Message {
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.scss'],
 })
-export class ChatbotComponent implements OnDestroy {
+export class ChatbotComponent implements OnDestroy, AfterViewChecked {
   isChatOpen = false;
   userMessage = '';
   messages: Message[] = [];
   private locationSubscription: Subscription | null = null;
+  @ViewChild('chatBody') chatBody!: ElementRef;
+  @ViewChild('scrollAnchor') scrollAnchor!: ElementRef;
 
   constructor(
     private chatbotService: ChatbotService,
@@ -88,6 +96,16 @@ export class ChatbotComponent implements OnDestroy {
   ngOnDestroy() {
     if (this.locationSubscription) {
       this.locationSubscription.unsubscribe();
+    }
+  }
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom() {
+    if (this.scrollAnchor) {
+      this.scrollAnchor.nativeElement.scrollIntoView({ behavior: 'smooth' });
     }
   }
 }

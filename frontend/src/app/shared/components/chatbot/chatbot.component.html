@@ -10,11 +10,12 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <div class="chat-body">
+        <div class="chat-body" #chatBody>
             <div *ngFor="let msg of messages" class="message"
                 [ngClass]="{'user-message': msg.isUser, 'bot-message': !msg.isUser}">
                 <p>{{ msg.text }}</p>
             </div>
+            <div #scrollAnchor></div>
         </div>
         <div class="chat-footer">
             <input type="text" [(ngModel)]="userMessage" (keyup.enter)="sendMessage()" placeholder="Ask something..." />
