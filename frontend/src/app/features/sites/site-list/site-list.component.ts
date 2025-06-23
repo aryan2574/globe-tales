@@ -130,7 +130,58 @@ export class SiteListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.checkAndUpdateSitesForUserLocation();
     this.loadSites();
+  }
+
+  private isOutsideChemnitz(lat: number, lon: number): boolean {
+    // Chemnitz bounding box
+    const south = 50.786,
+      west = 12.803,
+      north = 50.9,
+      east = 12.983;
+    return lat < south || lat > north || lon < west || lon > east;
+  }
+
+  private checkAndUpdateSitesForUserLocation() {
+    this.locationService
+      .getCurrentLocation()
+      .subscribe((coords: { latitude: number; longitude: number }) => {
+        if (
+          coords &&
+          this.isOutsideChemnitz(coords.latitude, coords.longitude)
+        ) {
+          // User is outside Chemnitz, trigger update
+          this.loading = true;
+          this.error = null;
+          // Use a 0.1 degree buffer around user location
+          const south = coords.latitude - 0.05;
+          const west = coords.longitude - 0.05;
+          const north = coords.latitude + 0.05;
+          const east = coords.longitude + 0.05;
+          this.placesService
+            .updateSitesForArea(south, west, north, east)
+            .subscribe({
+              next: (res) => {
+                this.loading = false;
+                this.showNotification('Updated sites for your area.');
+                this.loadSites();
+              },
+              error: (err) => {
+                this.loading = false;
+                this.showNotification(
+                  'Failed to update sites for your area.',
+                  true
+                );
+              },
+            });
+        }
+      });
+  }
+
+  showNotification(message: string, isError = false) {
+    // Simple notification, can be replaced with a better UI
+    window.alert(message);
   }
 
   private loadSites() {

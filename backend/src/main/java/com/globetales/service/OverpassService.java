@@ -11,10 +11,17 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
+import org.springframework.scheduling.annotation.Scheduled;
 
 @Service
 public class OverpassService {
     private final PlaceRepository placeRepository;
+
+    // Chemnitz bounding box
+    private static final double CHEMNITZ_SOUTH = 50.786;
+    private static final double CHEMNITZ_WEST = 12.803;
+    private static final double CHEMNITZ_NORTH = 50.900;
+    private static final double CHEMNITZ_EAST = 12.983;
 
     public OverpassService(PlaceRepository placeRepository) {
         this.placeRepository = placeRepository;
@@ -73,5 +80,25 @@ public class OverpassService {
 
     public boolean hasPlacesInArea(double south, double west, double north, double east) {
         return placeRepository.countByBoundingBox(south, west, north, east) > 0;
+    }
+
+    /**
+     * Scheduled job to update Chemnitz sites every 3 days
+     */
+    @Scheduled(cron = "0 0 0 */3 * *") // Every 3 days at midnight
+    public void scheduledUpdateChemnitzSites() {
+        try {
+            fetchAndStorePlaces(CHEMNITZ_SOUTH, CHEMNITZ_WEST, CHEMNITZ_NORTH, CHEMNITZ_EAST);
+            System.out.println("[Scheduler] Chemnitz sites updated from Overpass API.");
+        } catch (Exception e) {
+            System.err.println("[Scheduler] Failed to update Chemnitz sites: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Update sites for a given bounding box (can be called when user is outside Chemnitz)
+     */
+    public void updateSitesForArea(double south, double west, double north, double east) throws Exception {
+        fetchAndStorePlaces(south, west, north, east);
     }
 } 
