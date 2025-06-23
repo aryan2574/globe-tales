@@ -35,11 +35,13 @@ public class SecurityConfig {
             .and()
             .csrf().disable()
             .authorizeHttpRequests()
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/register").permitAll()
                 .requestMatchers("/api/routes").permitAll()
                 .requestMatchers("/api/weather").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/chat/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/stories", "/api/stories/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic(); // Enable HTTP Basic Auth

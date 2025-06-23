@@ -1,0 +1,58 @@
+.my-story-container {
+    display: flex;
+    height: calc(100vh - 200px);
+}
+
+.story-list-panel {
+    width: 30%;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+    background: #f9f9f9;
+}
+
+.story-list-panel h2 {
+    margin-top: 0;
+}
+
+.story-list-panel ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 0 0;
+}
+
+.story-list-panel li {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.story-list-panel li:hover {
+    background: #efefef;
+}
+
+.story-detail-panel {
+    width: 70%;
+    padding: 20px;
+}
+
+.story-detail-panel h3 {
+    margin-top: 0;
+}
+
+.story-detail-panel input,
+.story-detail-panel textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.story-detail-panel textarea {
+    height: 300px;
+    resize: vertical;
+}
+
+.story-detail-panel button {
+    margin-right: 10px;
+}

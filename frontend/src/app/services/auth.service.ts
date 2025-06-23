@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, tap } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, tap, map } from 'rxjs';
 import {
   AuthResponse,
   LoginRequest,
@@ -19,6 +19,9 @@ export class AuthService {
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  public isLoggedIn$: Observable<boolean> = this.currentUser$.pipe(
+    map((user) => !!user)
+  );
 
   constructor(private http: HttpClient) {
     this.loadStoredUser();
@@ -76,6 +79,11 @@ export class AuthService {
 
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  getUserId(): string | null {
+    const user = this.getCurrentUser();
+    return user ? user.id : null;
   }
 
   updateCurrentUser(user: User): void {

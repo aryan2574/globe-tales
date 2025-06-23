@@ -41,6 +41,7 @@ import { AuthService } from '../../../services/auth.service';
           <ng-container *ngIf="isAuthenticated()">
             <a routerLink="/dashboard" class="nav-link">Dashboard</a>
             <a routerLink="/sites" class="nav-link">Cultural Sites</a>
+            <a routerLink="/my-story" class="nav-link">My Story</a>
             <a routerLink="/account" class="nav-link">My Journey</a>
           </ng-container>
         </div>

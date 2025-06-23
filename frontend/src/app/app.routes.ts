@@ -24,6 +24,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'my-story',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/my-story/my-story.component').then(
+        (m) => m.MyStoryComponent
+      ),
+  },
+  {
     path: 'account',
     canActivate: [authGuard],
     loadComponent: () =>

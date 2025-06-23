@@ -48,4 +48,20 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_user_favourites_user_id ON user_favourites(user_id);
 CREATE INDEX idx_user_favourites_site_id ON user_favourites(site_id);
 CREATE INDEX idx_user_achievements_user_id ON user_achievements(user_id);
-CREATE INDEX idx_user_achievements_achievement_code ON user_achievements(achievement_code); 
+CREATE INDEX idx_user_achievements_achievement_code ON user_achievements(achievement_code);
+
+-- Create user_story table
+CREATE TABLE user_story (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    place_id VARCHAR(255),
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Create indexes for user_story table
+CREATE INDEX idx_user_story_user_id ON user_story(user_id);
+CREATE INDEX idx_user_story_place_id ON user_story(place_id); 

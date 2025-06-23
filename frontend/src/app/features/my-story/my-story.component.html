@@ -1,0 +1,33 @@
+<div class="my-story-container" *ngIf="isLoggedIn$ | async; else pleaseLogin">
+    <div class="story-list-panel">
+        <h2>My Stories</h2>
+        <button (click)="createNewStory()">+ New Story</button>
+        <ul>
+            <li *ngFor="let story of stories" (click)="selectStory(story)">
+                {{ story.title }}
+            </li>
+        </ul>
+    </div>
+    <div class="story-detail-panel">
+        <div *ngIf="selectedStory">
+            <h3>Edit Story</h3>
+            <input [(ngModel)]="selectedStory.title" placeholder="Title">
+            <textarea [(ngModel)]="selectedStory.content" placeholder="Content"></textarea>
+            <button (click)="saveStory()">Save</button>
+            <button (click)="deleteStory(selectedStory.id!)">Delete</button>
+        </div>
+        <div *ngIf="!selectedStory">
+            <h3>New Story</h3>
+            <input [(ngModel)]="newStory.title" placeholder="Title">
+            <textarea [(ngModel)]="newStory.content" placeholder="Content"></textarea>
+            <button (click)="saveStory()">Create</button>
+        </div>
+    </div>
+</div>
+
+<ng-template #pleaseLogin>
+    <div class="please-login">
+        <h2>My Stories</h2>
+        <p>Please log in to create and view your stories.</p>
+    </div>
+</ng-template>
