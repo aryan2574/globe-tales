@@ -25,6 +25,10 @@
                             title="Download Story">
                             <i class="fas fa-download"></i>
                         </button>
+                        <button class="btn-icon btn-delete" (click)="deleteStory(story.id!); $event.stopPropagation();"
+                            title="Delete Story">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
                 </div>
             </li>
