@@ -130,23 +130,10 @@ export class SiteListComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.locationService.location$.subscribe({
-      next: (location) => {
-        if (location) {
-          this.loadSites(location);
-        } else {
-          this.error = 'Location not available. Please enable it.';
-          this.loading = false;
-        }
-      },
-      error: () => {
-        this.error = 'Failed to get location.';
-        this.loading = false;
-      },
-    });
+    this.loadSites();
   }
 
-  private loadSites(location: { latitude: number; longitude: number }) {
+  private loadSites() {
     this.loading = true;
     this.error = null;
     this.placesService.getAllPlaces().subscribe({
@@ -162,6 +149,7 @@ export class SiteListComponent implements OnInit {
           'theatre',
           'attraction',
         ];
+        // Optionally filter for Chemnitz if place.tags['city'] === 'Chemnitz'
         this.sites = places
           .filter((place) => culturalTypes.includes(place.type))
           .map((place) => ({

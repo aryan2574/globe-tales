@@ -74,66 +74,28 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.locationSubscription = this.locationService.location$.subscribe({
-      next: (location) => {
-        if (location) {
-          this.handleLocationSuccess(location);
-        } else {
-          // Location not available, try to get it
-          this.initializeDashboardLocation();
-        }
-      },
-      error: (err) => {
-        // This is unlikely to be called, but good practice
-        this.error =
-          'Could not determine your location. Please enable it in your browser settings.';
-        this.loading = false;
-        this.hasLocation = false;
-      },
-    });
-
-    this.loadSavedVisited();
-    this.loadVisitedSites();
-  }
-
-  private initializeDashboardLocation(): void {
-    this.loading = true;
+    // On load, get user and use saved location
     this.userService.getCurrentUser().subscribe({
       next: (user) => {
         this.currentUser = user;
         if (user.latitude && user.longitude) {
-          this.locationService.setLocation({
-            latitude: user.latitude,
-            longitude: user.longitude,
-          });
+          this.currentLatitude = user.latitude;
+          this.currentLongitude = user.longitude;
+          this.hasLocation = true;
+          this.fetchAndLoadPlaces();
         } else {
-          // No user location in DB, prompt browser
-          this.locationService.requestAndSaveLocation().subscribe({
-            next: (location) => {
-              this.userService.updateCurrentUserLocation(location).subscribe(); // Fire and forget update
-            },
-            error: (err) => {
-              this.error =
-                'Could not determine your location. Please enable it in your browser settings.';
-              this.hasLocation = false;
-              this.loading = false;
-            },
-          });
+          this.hasLocation = false;
+          this.error =
+            'No saved location found. Please update your location in your profile.';
         }
       },
       error: (err) => {
-        console.error('Failed to get user, trying anonymous location', err);
-        // Not logged in, just ask for location
-        this.locationService.requestAndSaveLocation().subscribe({
-          error: (err) => {
-            this.error =
-              'Could not determine your location. Please enable it in your browser settings.';
-            this.hasLocation = false;
-            this.loading = false;
-          },
-        });
+        this.error = 'Failed to load user data.';
+        this.hasLocation = false;
       },
     });
+    this.loadSavedVisited();
+    this.loadVisitedSites();
   }
 
   ngOnDestroy(): void {
@@ -142,18 +104,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       this.locationSubscription.unsubscribe();
     }
     this.mapService.destroyMap();
-    this.onTypeChange();
-  }
-
-  private handleLocationSuccess(location: Location): void {
-    this.currentLatitude = location.latitude;
-    this.currentLongitude = location.longitude;
-    this.hasLocation = true;
-    this.loading = false; // Location is now loaded
-    if (!this.hasFetchedPlaces) {
-      this.fetchAndLoadPlaces();
-      this.hasFetchedPlaces = true;
-    }
     this.onTypeChange();
   }
 
@@ -209,10 +159,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   updateLocation(): void {
+    // Only use geolocation when user clicks update
     this.loading = true;
     this.locationService.requestAndSaveLocation().subscribe({
       next: (location) => {
         this.userService.updateCurrentUserLocation(location).subscribe(() => {
+          this.currentLatitude = location.latitude;
+          this.currentLongitude = location.longitude;
+          this.hasLocation = true;
+          this.fetchAndLoadPlaces();
           this.loading = false;
         });
       },
