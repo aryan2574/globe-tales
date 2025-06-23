@@ -84,4 +84,15 @@ export class MyStoryComponent implements OnInit {
       }
     });
   }
+
+  downloadStory(story: UserStory): void {
+    const text = `Title: ${story.title}\n\n${story.content}`;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${story.title || 'story'}.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
 }

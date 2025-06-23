@@ -3,8 +3,10 @@
         <h2>My Stories</h2>
         <button (click)="createNewStory()">+ New Story</button>
         <ul>
-            <li *ngFor="let story of stories" (click)="selectStory(story)">
-                {{ story.title }}
+            <li *ngFor="let story of stories" (click)="selectStory(story)"
+                style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{{ story.title }}</span>
+                <button (click)="downloadStory(story); $event.stopPropagation();">Download</button>
             </li>
         </ul>
     </div>
