@@ -5,4 +5,5 @@ export interface UserFavourite {
   siteId: number;
   siteType?: string;
   savedAt?: Date;
+  placeName?: string;
 }

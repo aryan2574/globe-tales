@@ -8,6 +8,7 @@ public class UserFavouriteDTO {
     private Long siteId;
     private String siteType;
     private LocalDateTime savedAt;
+    private String placeName;
 
     public UUID getUserId() {
         return userId;
@@ -39,5 +40,13 @@ public class UserFavouriteDTO {
 
     public void setSavedAt(LocalDateTime savedAt) {
         this.savedAt = savedAt;
+    }
+
+    public String getPlaceName() {
+        return placeName;
+    }
+
+    public void setPlaceName(String placeName) {
+        this.placeName = placeName;
     }
 } 

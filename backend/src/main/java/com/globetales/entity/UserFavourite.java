@@ -28,6 +28,9 @@ public class UserFavourite {
     @Column(name = "saved_at")
     private LocalDateTime savedAt;
 
+    @Column(name = "place_name")
+    private String placeName;
+
     @PrePersist
     protected void onCreate() {
         savedAt = LocalDateTime.now();

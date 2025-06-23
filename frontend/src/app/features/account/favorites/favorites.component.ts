@@ -31,7 +31,7 @@ import { AuthService } from '../../../services/auth.service';
             ></i>
           </div>
           <div class="favorite-content">
-            <h3>Site ID: {{ place.siteId }}</h3>
+            <h3>{{ place.placeName || 'Site ID: ' + place.siteId }}</h3>
             <p class="site-type">Type: {{ place.siteType }}</p>
             <p class="saved-at">
               Saved at: {{ place.savedAt | date : 'medium' }}

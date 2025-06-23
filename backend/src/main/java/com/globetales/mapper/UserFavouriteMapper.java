@@ -10,10 +10,12 @@ public interface UserFavouriteMapper {
     @Mapping(target = "siteId", source = "id.siteId")
     @Mapping(target = "siteType", source = "siteType")
     @Mapping(target = "savedAt", source = "savedAt")
+    @Mapping(target = "placeName", source = "placeName")
     UserFavouriteDTO toDTO(UserFavourite userFavourite);
 
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "placeName", source = "placeName")
     UserFavourite toEntity(UserFavouriteDTO userFavouriteDTO);
 
     default UserFavourite toEntityWithId(UserFavouriteDTO dto) {

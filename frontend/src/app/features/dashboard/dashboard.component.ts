@@ -340,6 +340,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       userId: user.id,
       siteId: place.id,
       siteType: place.type,
+      placeName: place.name,
     };
     this.userFavouriteService
       .createFavourite(payload, creds.email, creds.password)

@@ -27,6 +27,7 @@ CREATE TABLE user_roles (
 CREATE TABLE user_favourites (
     user_id UUID NOT NULL,
     site_id BIGINT NOT NULL,
+    place_name VARCHAR(255),
     saved_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     site_type VARCHAR(100) NOT NULL,
     PRIMARY KEY (user_id, site_id),
