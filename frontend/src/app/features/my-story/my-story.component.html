@@ -44,11 +44,11 @@
             <div class="visited-card" *ngFor="let site of visitedSites">
                 <div class="visited-card-header">
                     <i class="fas fa-map-marker-alt"></i>
-                    <span class="visited-place-name">{{ site.name }}</span>
+                    <span class="visited-place-name">{{ site.placeName }}</span>
                 </div>
                 <div class="visited-card-date">
                     <i class="fas fa-calendar-alt"></i>
-                    <span>{{ site.visitDate | date:'medium' }}</span>
+                    <span>{{ site.visitedAt | date:'medium' }}</span>
                 </div>
             </div>
         </div>

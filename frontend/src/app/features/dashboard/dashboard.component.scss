@@ -584,3 +584,35 @@
     left: 15px;
     z-index: 1000;
 }
+
+.no-location-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 4rem auto 0 auto;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+    border: none;
+    color: #2c3e50;
+    max-width: 420px;
+
+    i {
+        color: #e74c3c;
+        margin-bottom: 1rem;
+    }
+
+    h2 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    p {
+        font-size: 1.1rem;
+        color: #555;
+        text-align: center;
+        margin: 0;
+    }
+}

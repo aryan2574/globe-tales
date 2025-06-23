@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { LocationButtonComponent } from '../../shared/components/location-button/location-button.component';
 import { DistancePipe } from '../../pipes/distance.pipe';
 import { DurationPipe } from '../../pipes/duration.pipe';
 import { MapService } from '../../services/map.service';
@@ -18,8 +17,8 @@ import { MapComponent } from '../../shared/components/map/map.component';
 import { WeatherWidgetComponent } from '../../shared/components/weather-widget/weather-widget.component';
 import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
-import { UserStoryService } from '../../services/user-story.service';
-import { UserStory } from '../../models/user-story.model';
+import { VisitedSiteService } from '../../services/visited-site.service';
+import { VisitedSite } from '../../models/visited-site.model';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -31,7 +30,6 @@ type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
   imports: [
     CommonModule,
     FormsModule,
-    LocationButtonComponent,
     DistancePipe,
     DurationPipe,
     MapComponent,
@@ -52,7 +50,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private pendingMapInit = false;
   savedIds: Set<number> = new Set();
   visitedIds: Set<string> = new Set();
-  visitedStories: UserStory[] = [];
   savingFavouriteId: number | null = null;
   savingVisitedId: number | null = null;
   currentLatitude: number | null = null;
@@ -60,6 +57,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private locationSubscription!: Subscription;
   private currentUser!: User;
   private hasFetchedPlaces = false;
+  private visitedSites: VisitedSite[] = [];
 
   constructor(
     private mapService: MapService,
@@ -70,7 +68,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private userFavouriteService: UserFavouriteService,
     private authService: AuthService,
     private userService: UserService,
-    private userStoryService: UserStoryService
+    private visitedSiteService: VisitedSiteService
   ) {}
 
   ngOnInit(): void {
@@ -364,11 +362,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   loadVisitedSites(): void {
     this.visitedIds.clear();
-    this.userStoryService.getVisitedSites().subscribe({
-      next: (stories) => {
-        this.visitedStories = stories;
-        stories.forEach((story) => {
-          if (story.placeId) this.visitedIds.add(story.placeId);
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
+    this.visitedSiteService.getVisitedSitesByUser(user.id).subscribe({
+      next: (sites) => {
+        this.visitedSites = sites;
+        sites.forEach((site) => {
+          if (site.placeId) this.visitedIds.add(site.placeId.toString());
         });
       },
       error: (err) => {
@@ -379,10 +379,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   markAsVisited(place: Place): void {
     if (this.savingVisitedId === place.id || this.isPlaceVisited(place)) return;
+    const user = this.authService.getCurrentUser();
+    if (!user) return;
     this.savingVisitedId = place.id;
-    this.userStoryService.markSiteAsVisited(place.id.toString()).subscribe({
-      next: (story) => {
-        if (story.placeId) this.visitedIds.add(story.placeId);
+    const visitedSite: VisitedSite = {
+      userId: user.id,
+      placeId: place.id,
+      placeName: place.name,
+      latitude: place.latitude,
+      longitude: place.longitude,
+      visitedAt: new Date().toISOString(),
+    };
+    this.visitedSiteService.addVisitedSite(visitedSite).subscribe({
+      next: () => {
         this.loadVisitedSites();
       },
       error: (err) => {

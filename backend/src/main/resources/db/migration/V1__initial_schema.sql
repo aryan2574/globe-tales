@@ -77,4 +77,18 @@ CREATE TABLE places (
     longitude DOUBLE PRECISION,
     address TEXT,
     tags JSONB
-); 
+);
+
+-- Create visited_sites table
+CREATE TABLE visited_sites (
+    id BIGSERIAL PRIMARY KEY,
+    user_id VARCHAR(255) NOT NULL,
+    place_id BIGINT NOT NULL,
+    place_name VARCHAR(255),
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    visited_at TIMESTAMP NOT NULL
+);
+
+CREATE INDEX idx_visited_sites_user_id ON visited_sites(user_id);
+CREATE INDEX idx_visited_sites_place_id ON visited_sites(place_id); 
