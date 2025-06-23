@@ -18,6 +18,8 @@ import { MapComponent } from '../../shared/components/map/map.component';
 import { WeatherWidgetComponent } from '../../shared/components/weather-widget/weather-widget.component';
 import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
+import { UserStoryService } from '../../services/user-story.service';
+import { UserStory } from '../../models/user-story.model';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -49,7 +51,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
   private pendingMapInit = false;
   savedIds: Set<number> = new Set();
-  visitedIds: Set<number> = new Set();
+  visitedIds: Set<string> = new Set();
+  visitedStories: UserStory[] = [];
   savingFavouriteId: number | null = null;
   savingVisitedId: number | null = null;
   currentLatitude: number | null = null;
@@ -65,7 +68,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private router: Router,
     private userFavouriteService: UserFavouriteService,
     private authService: AuthService,
-    private userService: UserService
+    private userService: UserService,
+    private userStoryService: UserStoryService
   ) {}
 
   ngOnInit(): void {
@@ -88,6 +92,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
 
     this.loadSavedVisited();
+    this.loadVisitedSites();
   }
 
   private initializeDashboardLocation(): void {
@@ -346,7 +351,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.savedIds.has(place.id);
   }
 
+  loadVisitedSites(): void {
+    this.visitedIds.clear();
+    this.userStoryService.getVisitedSites().subscribe({
+      next: (stories) => {
+        this.visitedStories = stories;
+        stories.forEach((story) => {
+          if (story.placeId) this.visitedIds.add(story.placeId);
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load visited sites', err);
+      },
+    });
+  }
+
+  markAsVisited(place: Place): void {
+    if (this.savingVisitedId === place.id || this.isPlaceVisited(place)) return;
+    this.savingVisitedId = place.id;
+    this.userStoryService.markSiteAsVisited(place.id.toString()).subscribe({
+      next: (story) => {
+        if (story.placeId) this.visitedIds.add(story.placeId);
+        this.loadVisitedSites();
+      },
+      error: (err) => {
+        console.error('Failed to mark as visited', err);
+      },
+      complete: () => {
+        this.savingVisitedId = null;
+      },
+    });
+  }
+
   isPlaceVisited(place: Place): boolean {
-    return this.visitedIds.has(place.id);
+    return this.visitedIds.has(place.id.toString());
   }
 }

@@ -52,4 +52,16 @@ public class UserStoryController {
         userStoryService.deleteStory(id, authentication.getName());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/visit/{placeId}")
+    public ResponseEntity<UserStoryDTO> markSiteAsVisited(@PathVariable String placeId, Authentication authentication) {
+        UserStoryDTO visited = userStoryService.markSiteAsVisited(placeId, authentication.getName());
+        return ResponseEntity.ok(visited);
+    }
+
+    @GetMapping("/visited")
+    public ResponseEntity<List<UserStoryDTO>> getVisitedSitesForUser(Authentication authentication) {
+        List<UserStoryDTO> visited = userStoryService.getVisitedSitesForUser(authentication.getName());
+        return ResponseEntity.ok(visited);
+    }
 } 

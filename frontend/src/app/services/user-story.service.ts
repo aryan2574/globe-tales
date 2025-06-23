@@ -45,4 +45,18 @@ export class UserStoryService {
     const headers = this.getAuthHeaders();
     return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
   }
+
+  markSiteAsVisited(placeId: string): Observable<UserStory> {
+    const headers = this.getAuthHeaders();
+    return this.http.post<UserStory>(
+      `${this.apiUrl}/visit/${placeId}`,
+      {},
+      { headers }
+    );
+  }
+
+  getVisitedSites(): Observable<UserStory[]> {
+    const headers = this.getAuthHeaders();
+    return this.http.get<UserStory[]>(`${this.apiUrl}/visited`, { headers });
+  }
 }

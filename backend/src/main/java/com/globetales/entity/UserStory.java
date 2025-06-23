@@ -30,6 +30,9 @@ public class UserStory {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
+    @Column(name = "visit_date")
+    private ZonedDateTime visitDate;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private ZonedDateTime createdAt;

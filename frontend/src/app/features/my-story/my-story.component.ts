@@ -18,6 +18,7 @@ export class MyStoryComponent implements OnInit {
   selectedStory: UserStory | null = null;
   newStory: Partial<UserStory> = { title: '', content: '' };
   isLoggedIn$: Observable<boolean>;
+  visitedStories: UserStory[] = [];
 
   constructor(
     private userStoryService: UserStoryService,
@@ -30,8 +31,10 @@ export class MyStoryComponent implements OnInit {
     this.isLoggedIn$.subscribe((loggedIn) => {
       if (loggedIn) {
         this.loadStories();
+        this.loadVisitedSites();
       } else {
         this.stories = [];
+        this.visitedStories = [];
       }
     });
   }
@@ -39,6 +42,12 @@ export class MyStoryComponent implements OnInit {
   loadStories(): void {
     this.userStoryService.getStories().subscribe((stories) => {
       this.stories = stories;
+    });
+  }
+
+  loadVisitedSites(): void {
+    this.userStoryService.getVisitedSites().subscribe((stories) => {
+      this.visitedStories = stories;
     });
   }
 

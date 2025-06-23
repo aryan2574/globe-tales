@@ -6,4 +6,5 @@ export interface UserStory {
   content: string;
   createdAt?: Date;
   updatedAt?: Date;
+  visitDate?: Date;
 }

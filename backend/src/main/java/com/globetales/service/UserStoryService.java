@@ -10,4 +10,6 @@ public interface UserStoryService {
     UserStoryDTO getStoryById(UUID id, String username);
     UserStoryDTO updateStory(UUID id, UserStoryDTO userStoryDTO, String username);
     void deleteStory(UUID id, String username);
+    UserStoryDTO markSiteAsVisited(String placeId, String email);
+    List<UserStoryDTO> getVisitedSitesForUser(String email);
 } 

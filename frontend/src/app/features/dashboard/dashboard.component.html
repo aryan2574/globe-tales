@@ -118,6 +118,16 @@
                             {{ savingFavouriteId === place.id ? 'Saving...' : (isPlaceSaved(place) ? 'Saved' : 'Save')
                             }}
                         </button>
+                        <button class="btn-small" [ngClass]="{'visited': isPlaceVisited(place)}"
+                            (click)="markAsVisited(place); $event.stopPropagation();">
+                            <i *ngIf="savingVisitedId === place.id" class="fas fa-spinner fa-spin"
+                                style="margin-right:4px;"></i>
+                            <i *ngIf="savingVisitedId !== place.id" class="fas"
+                                [ngClass]="isPlaceVisited(place) ? 'fa-check-circle' : 'fa-check'"
+                                style="margin-right:4px;"></i>
+                            {{ savingVisitedId === place.id ? 'Visiting...' : (isPlaceVisited(place) ? 'Visited' : 'Mark
+                            as Visited') }}
+                        </button>
                     </div>
                 </div>
             </div>
