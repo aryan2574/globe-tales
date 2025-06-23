@@ -1,2 +1,0 @@
-ALTER TABLE user_story
-ADD COLUMN visit_date TIMESTAMP WITH TIME ZONE; 

@@ -45,4 +45,18 @@ export class PlacesService {
 
     return firstValueFrom(places$);
   }
+
+  fetchPlacesForArea(
+    south: number,
+    west: number,
+    north: number,
+    east: number
+  ): Observable<any> {
+    const bbox = `${south},${west},${north},${east}`;
+    return this.http.post(`${this.apiUrl}/fetch`, null, { params: { bbox } });
+  }
+
+  getAllPlaces(): Observable<Place[]> {
+    return this.http.get<Place[]>(this.apiUrl);
+  }
 }

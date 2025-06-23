@@ -23,7 +23,7 @@ CREATE TABLE user_roles (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Create user_favourites table (site_id is now just a BIGINT, no FK)
+-- Create user_favourites table
 CREATE TABLE user_favourites (
     user_id UUID NOT NULL,
     site_id BIGINT NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE user_favourites (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Create user_achievements table (achievement_code is now just a VARCHAR, no FK)
+-- Create user_achievements table
 CREATE TABLE user_achievements (
     user_id UUID NOT NULL,
     achievement_code VARCHAR(50) NOT NULL,
@@ -50,7 +50,7 @@ CREATE INDEX idx_user_favourites_site_id ON user_favourites(site_id);
 CREATE INDEX idx_user_achievements_user_id ON user_achievements(user_id);
 CREATE INDEX idx_user_achievements_achievement_code ON user_achievements(achievement_code);
 
--- Create user_story table
+-- Create user_story table (with visit_date)
 CREATE TABLE user_story (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
@@ -59,9 +59,22 @@ CREATE TABLE user_story (
     content TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    visit_date TIMESTAMP WITH TIME ZONE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Create indexes for user_story table
 CREATE INDEX idx_user_story_user_id ON user_story(user_id);
-CREATE INDEX idx_user_story_place_id ON user_story(place_id); 
+CREATE INDEX idx_user_story_place_id ON user_story(place_id);
+
+-- Create places table (with simple JSONB column)
+CREATE TABLE places (
+    id BIGSERIAL PRIMARY KEY,
+    osm_id BIGINT UNIQUE,
+    name VARCHAR(255),
+    type VARCHAR(100),
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    address TEXT,
+    tags JSONB
+); 

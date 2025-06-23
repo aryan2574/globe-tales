@@ -3,3 +3,11 @@ openrouteservice.api.key=YOUR_OPENROUTESERVICE_API_KEY
 #OpenAI Configuration
 openai.api.key=<YOUR_OPENAI_API_KEY>
 openai.chatbot.system-message=You are a helpful assistant for the GlobeTales application. You can answer questions about places and provide travel recommendations.
+
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.validator.apply_to_ddl=false
+spring.jpa.properties.hibernate.globally_quoted_identifiers=true
+spring.jpa.properties.hibernate.check_nullability=true
+spring.jpa.properties.hibernate.schema_validation.enabled=false

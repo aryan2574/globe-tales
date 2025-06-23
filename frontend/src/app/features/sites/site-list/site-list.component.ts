@@ -4,6 +4,8 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MapService } from '../../../services/map.service';
 import { LocationService } from '../../../services/location.service';
+import { PlacesService } from '../../../services/places.service';
+import { Place } from '../../../models/place.model';
 
 interface Site {
   id: string;
@@ -123,7 +125,8 @@ export class SiteListComponent implements OnInit {
 
   constructor(
     private mapService: MapService,
-    private locationService: LocationService
+    private locationService: LocationService,
+    private placesService: PlacesService
   ) {}
 
   ngOnInit() {
@@ -146,58 +149,39 @@ export class SiteListComponent implements OnInit {
   private loadSites(location: { latitude: number; longitude: number }) {
     this.loading = true;
     this.error = null;
-    const { latitude, longitude } = location;
-    // Overpass query for cultural sites (historic, museum, monument, religious, cultural)
-    const query = `[out:json][timeout:25];(
-        node["historic"](around:3000,${latitude},${longitude});
-        node["tourism"="museum"](around:3000,${latitude},${longitude});
-        node["tourism"="attraction"](around:3000,${latitude},${longitude});
-        node["historic"="monument"](around:3000,${latitude},${longitude});
-        node["amenity"="place_of_worship"](around:3000,${latitude},${longitude});
-        node["amenity"="cultural_centre"](around:3000,${latitude},${longitude});
-      );out body;`;
-    this.mapService['http']
-      .get('https://overpass-api.de/api/interpreter', {
-        params: { data: query },
-        responseType: 'text',
-      })
-      .subscribe({
-        next: (response: any) => {
-          let data;
-          try {
-            data = JSON.parse(response);
-          } catch {
-            this.error = 'Failed to parse Overpass API response.';
-            this.loading = false;
-            return;
-          }
-          this.sites = (data.elements || []).map((el: any) => ({
-            id: el.id,
-            name: el.tags?.name || 'Unknown',
-            type:
-              el.tags?.historic ||
-              el.tags?.tourism ||
-              el.tags?.amenity ||
-              'cultural',
-            description: el.tags?.description || '',
-            latitude: el.lat,
-            longitude: el.lon,
+    this.placesService.getAllPlaces().subscribe({
+      next: (places: Place[]) => {
+        // Filter for cultural types
+        const culturalTypes = [
+          'museum',
+          'monument',
+          'historic',
+          'religious',
+          'cultural',
+          'artwork',
+          'theatre',
+          'attraction',
+        ];
+        this.sites = places
+          .filter((place) => culturalTypes.includes(place.type))
+          .map((place) => ({
+            id: place.id.toString(),
+            name: place.name || 'Unknown',
+            type: place.type,
+            description: place.tags?.['description'] || '',
+            latitude: place.latitude,
+            longitude: place.longitude,
             rating: Math.round((Math.random() * 2 + 3) * 10) / 10, // Fake rating for demo
-            iconClass: this.getIconClass(
-              el.tags?.tourism ||
-                el.tags?.historic ||
-                el.tags?.amenity ||
-                'cultural'
-            ),
+            iconClass: this.getIconClass(place.type),
           }));
-          this.applyFiltersAndPagination();
-          this.loading = false;
-        },
-        error: (err: any) => {
-          this.error = 'Failed to load sites from Overpass API.';
-          this.loading = false;
-        },
-      });
+        this.applyFiltersAndPagination();
+        this.loading = false;
+      },
+      error: (err: any) => {
+        this.error = 'Failed to load sites from backend.';
+        this.loading = false;
+      },
+    });
   }
 
   private applyFiltersAndPagination() {
