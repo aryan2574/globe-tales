@@ -8,6 +8,7 @@ import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class ChatbotServiceImpl implements ChatbotService {
     }
 
     @Override
+    @Cacheable(value = "chatbot", key = "#chatbotRequest.message + '-' + #chatbotRequest.latitude + '-' + #chatbotRequest.longitude", cacheManager = "chatbotCacheManager")
     public ChatbotResponse chat(ChatbotRequest chatbotRequest) {
         String fullSystemMessage = systemMessage;
 

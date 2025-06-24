@@ -2,6 +2,7 @@ package com.globetales.service.impl;
 
 import com.globetales.dto.WeatherResponseDTO;
 import com.globetales.service.WeatherService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -18,6 +19,7 @@ public class WeatherServiceImpl implements WeatherService {
     }
 
     @Override
+    @Cacheable(value = "weather", key = "#latitude + ',' + #longitude", cacheManager = "weatherCacheManager")
     public WeatherResponseDTO getWeather(double latitude, double longitude) {
         String url = WEATHER_API_URL.replace("{lat}", String.valueOf(latitude)).replace("{lon}", String.valueOf(longitude));
         return restTemplate.getForObject(url, WeatherResponseDTO.class);

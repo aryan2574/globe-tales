@@ -1,0 +1,170 @@
+.recommendations-container {
+    padding: 20px;
+    background: #f4f7f6;
+    border-radius: 8px;
+    margin-top: 20px;
+
+    h3 {
+        margin-top: 0;
+        color: #333;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+
+        .transport-modes {
+            button {
+                padding: 10px 15px;
+                border: none;
+                background-color: #fff;
+                color: #555;
+                cursor: pointer;
+                border-radius: 20px;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+                &.active {
+                    background: linear-gradient(45deg, #007bff, #0056b3);
+                    color: white;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    transform: translateY(-2px);
+                }
+
+                &:hover:not(.active) {
+                    background-color: #e9ecef;
+                }
+
+                i {
+                    margin-right: 8px;
+                }
+            }
+        }
+
+        .distance-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #555;
+
+            input[type="range"] {
+                cursor: pointer;
+            }
+        }
+    }
+
+    .results {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .recommendation-card {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+        &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .rec-icon {
+            font-size: 2rem;
+            color: #007bff;
+            margin-right: 20px;
+            padding: 10px;
+        }
+
+        .rec-content {
+            p {
+                margin: 0;
+                color: #333;
+                font-size: 1rem;
+                line-height: 1.4;
+
+                strong {
+                    color: #0056b3;
+                }
+            }
+
+            small {
+                color: #777;
+                font-style: italic;
+            }
+        }
+    }
+
+    .loading-spinner,
+    .no-results {
+        text-align: center;
+        padding: 30px;
+        color: #777;
+        font-size: 1.1rem;
+    }
+
+    .show-more-container {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .btn-show-more {
+        padding: 12px 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(45deg, #28a745, #218838);
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    }
+
+    .btn-primary {
+        padding: 12px 25px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #fff;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 10px;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        &:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    }
+}

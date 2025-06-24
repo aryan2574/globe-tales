@@ -13,6 +13,14 @@ public class PointDTO {
     private double latitude;
     private double longitude;
 
+    @Override
+    public String toString() {
+        return "PointDTO{" +
+                "latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
+    }
+
     public double getLatitude() {
         return latitude;
     }

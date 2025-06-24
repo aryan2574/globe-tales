@@ -20,6 +20,10 @@ export class UserService {
     private http: HttpClient
   ) {}
 
+  refreshCurrentUser(): void {
+    this.getCurrentUser().subscribe();
+  }
+
   getCurrentUser(): Observable<User> {
     return this.http
       .get<User>(`${this.apiUrl}/me`)

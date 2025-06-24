@@ -1,7 +1,7 @@
 package com.globetales.service;
 
-import com.globetales.dto.LocationDTO;
 import com.globetales.dto.UserDTO;
+import com.globetales.entity.User;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +15,5 @@ public interface UserService extends BaseService<UserDTO, UUID> {
     void updateCurrentUserLocation(double latitude, double longitude);
     void softDelete(UUID userId);
     UserDTO getCurrentUser();
+    User getCurrentUserEntity();
 } 

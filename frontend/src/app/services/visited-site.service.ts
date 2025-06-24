@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { VisitedSite } from '../models/visited-site.model';
 import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 
 @Injectable({ providedIn: 'root' })
 export class VisitedSiteService {
   private apiUrl = '/api/visited-sites';
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    private userService: UserService
+  ) {}
 
   private getAuthHeaders(): HttpHeaders {
     const creds = this.authService.getCredentials();
@@ -18,9 +23,11 @@ export class VisitedSiteService {
   }
 
   addVisitedSite(site: VisitedSite): Observable<VisitedSite> {
-    return this.http.post<VisitedSite>(this.apiUrl, site, {
-      headers: this.getAuthHeaders(),
-    });
+    return this.http
+      .post<VisitedSite>(this.apiUrl, site, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(tap(() => this.userService.refreshCurrentUser()));
   }
 
   getVisitedSitesByUser(userId: string): Observable<VisitedSite[]> {

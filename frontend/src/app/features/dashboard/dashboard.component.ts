@@ -22,6 +22,7 @@ import { VisitedSite } from '../../models/visited-site.model';
 import { UserStoryService } from '../../services/user-story.service';
 import { PlaceReviewService } from '../../services/place-review.service';
 import { PlaceReview } from '../../models/place-review.model';
+import { RecommendationsComponent } from '../recommendations/recommendations.component';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -37,6 +38,7 @@ type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
     DurationPipe,
     MapComponent,
     WeatherWidgetComponent,
+    RecommendationsComponent,
   ],
   providers: [PlacesService],
 })

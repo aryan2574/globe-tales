@@ -7,10 +7,13 @@ import com.globetales.mapper.UserMapper;
 import com.globetales.repository.UserRepository;
 import com.globetales.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -68,6 +71,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO createUser(UserDTO userDTO, String password) {
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new AccessDeniedException("Email already exists");
+        }
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(password));
         user.setCreatedAt(OffsetDateTime.now());
@@ -130,8 +136,17 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public UserDTO getCurrentUser() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Current user not found"));
+        return userMapper.toDTO(getCurrentUserEntity());
+    }
+
+    @Override
+    public User getCurrentUserEntity() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || authentication.getPrincipal() instanceof String) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
+        String username = ((UserDetails) authentication.getPrincipal()).getUsername();
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 } 
