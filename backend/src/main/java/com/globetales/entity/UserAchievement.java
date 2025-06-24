@@ -2,24 +2,26 @@ package com.globetales.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @ToString
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "user_favourites")
-public class UserFavourite {
+@Table(name = "user_achievements")
+public class UserAchievement {
+
     @EmbeddedId
-    private UserFavouriteId id;
+    private UserAchievementId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
@@ -27,17 +29,11 @@ public class UserFavourite {
     @ToString.Exclude
     private User user;
 
-    @Column(name = "site_type")
-    private String siteType;
-
-    @Column(name = "saved_at")
-    private LocalDateTime savedAt;
-
-    @Column(name = "place_name")
-    private String placeName;
+    @Column(name = "achieved_at", nullable = false)
+    private OffsetDateTime achievedAt;
 
     @PrePersist
     protected void onCreate() {
-        savedAt = LocalDateTime.now();
+        achievedAt = OffsetDateTime.now();
     }
 } 

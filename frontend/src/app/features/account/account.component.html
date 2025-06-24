@@ -5,11 +5,19 @@
         <div class="profile-info" *ngIf="user">
             <div class="info-item">
                 <label>Name:</label>
-                <span>{{ user.name }}</span>
+                <span>{{ user.displayName }}</span>
             </div>
             <div class="info-item">
                 <label>Email:</label>
                 <span>{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+                <label>Level:</label>
+                <span>{{ user.level }}</span>
+            </div>
+            <div class="info-item">
+                <label>Experience Points:</label>
+                <span>{{ user.experiencePoints }}</span>
             </div>
             <div class="info-item" *ngIf="user.createdAt">
                 <label>Member Since:</label>

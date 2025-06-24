@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface PlaceReviewRepository extends JpaRepository<PlaceReview, UUID> {
     List<PlaceReview> findByPlaceId(String placeId);
     List<PlaceReview> findByUserId(UUID userId);
+    long countByUserId(UUID userId);
 } 

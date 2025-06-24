@@ -30,6 +30,8 @@ public class UserDTO {
     private Set<String> roles;
     private Double latitude;
     private Double longitude;
+    private int experiencePoints;
+    private String level;
 
     public void setId(UUID id) {
         this.id = id;

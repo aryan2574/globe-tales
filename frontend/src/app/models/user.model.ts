@@ -11,4 +11,6 @@ export interface User {
   updatedAt: Date;
   roles: string[];
   isDeleted: boolean;
+  experiencePoints?: number;
+  level?: string;
 }

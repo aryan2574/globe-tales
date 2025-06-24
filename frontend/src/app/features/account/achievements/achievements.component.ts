@@ -1,89 +1,34 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  progress: number;
-  total: number;
-  completed: boolean;
-  icon: string;
-}
+import { UserAchievementService } from '../../../services/user-achievement.service';
+import { UserAchievement } from '../../../models/user-achievement.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
-  selector: 'app-rewards',
+  selector: 'app-achievements',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
-    <div class="achievements-container">
-      <h2>My Rewards</h2>
-
-      <div class="achievements-grid">
-        <div *ngIf="loading" class="loading">Loading rewards...</div>
-        <div *ngIf="error" class="error">{{ error }}</div>
-
-        <div class="achievement-card" [class.completed]="rewards[0].completed">
-          <div class="achievement-icon">
-            <i class="fas fa-gift"></i>
-          </div>
-          <div class="achievement-content">
-            <h3>Visit 10 places to get 5 points</h3>
-            <p>Track your journey and earn rewards!</p>
-            <div class="progress-bar">
-              <div
-                class="progress"
-                [style.width.%]="
-                  ((rewards[0].progress || 0) / (rewards[0].total || 1)) * 100
-                "
-              ></div>
-            </div>
-            <span class="progress-text">
-              {{ rewards[0].progress || 0 }}/{{ rewards[0].total || 10 }}
-              <span
-                *ngIf="rewards[0].completed"
-                style="color:#27ae60;font-weight:600;"
-                >Completed!</span
-              >
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  `,
+  imports: [CommonModule],
+  templateUrl: './achievements.component.html',
   styleUrls: ['./achievements.component.scss'],
 })
-export class RewardsComponent implements OnInit {
-  rewards: { progress: number; total: number; completed: boolean }[] = [];
-  loading = false;
-  error: string | null = null;
+export class AchievementsComponent implements OnInit {
+  achievements: UserAchievement[] = [];
+  loading = true;
 
-  constructor() {}
+  constructor(
+    private userAchievementService: UserAchievementService,
+    private authService: AuthService
+  ) {}
 
-  ngOnInit() {
-    this.loadRewards();
-  }
-
-  private loadRewards() {
-    this.loading = true;
-    // Get visited places from localStorage
-    let visited: any[] = [];
-    try {
-      const stored = localStorage.getItem('visited');
-      visited = stored ? JSON.parse(stored) : [];
-    } catch (e) {
-      visited = [];
+  ngOnInit(): void {
+    const userId = this.authService.getUserId();
+    if (userId) {
+      this.userAchievementService
+        .getAchievementsForUser(userId)
+        .subscribe((data) => {
+          this.achievements = data;
+          this.loading = false;
+        });
     }
-    const progress = visited.length;
-    const total = 10;
-    this.rewards = [
-      {
-        progress,
-        total,
-        completed: progress >= total,
-      },
-    ];
-    this.loading = false;
   }
 }

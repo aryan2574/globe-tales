@@ -19,6 +19,20 @@ import { User } from '../../../models/user.model';
   template: `
     <div class="profile-container">
       <h2>Profile Information</h2>
+
+      <div class="gamification-stats" *ngIf="user">
+        <div class="stat-item">
+          <i class="fas fa-star"></i>
+          <label>Level</label>
+          <span>{{ user.level || 'Beginner' }}</span>
+        </div>
+        <div class="stat-item">
+          <i class="fas fa-gem"></i>
+          <label>Experience</label>
+          <span>{{ user.experiencePoints || 0 }} XP</span>
+        </div>
+      </div>
+
       <form
         [formGroup]="profileForm"
         (ngSubmit)="onSubmit()"

@@ -1,0 +1,21 @@
+<div class="achievements-container">
+    <h2>My Achievements</h2>
+    <div *ngIf="loading" class="loading">
+        <i class="fas fa-spinner fa-spin"></i> Loading achievements...
+    </div>
+    <div *ngIf="!loading && achievements.length === 0" class="no-achievements">
+        You haven't earned any achievements yet. Keep exploring!
+    </div>
+    <div class="achievements-grid" *ngIf="!loading && achievements.length > 0">
+        <div *ngFor="let achievement of achievements" class="achievement-card">
+            <div class="achievement-icon">
+                <i class="fas fa-award"></i>
+            </div>
+            <div class="achievement-details">
+                <h3>{{ achievement.displayName }}</h3>
+                <p>{{ achievement.description }}</p>
+                <span class="achieved-date">Achieved on: {{ achievement.achievedAt | date:'medium' }}</span>
+            </div>
+        </div>
+    </div>
+</div>

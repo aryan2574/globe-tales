@@ -7,6 +7,7 @@ import com.globetales.exception.ResourceNotFoundException;
 import com.globetales.repository.UserRepository;
 import com.globetales.repository.UserStoryRepository;
 import com.globetales.service.UserStoryService;
+import com.globetales.service.GamificationService;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +21,12 @@ public class UserStoryServiceImpl implements UserStoryService {
 
     private final UserStoryRepository userStoryRepository;
     private final UserRepository userRepository;
+    private final GamificationService gamificationService;
 
-    public UserStoryServiceImpl(UserStoryRepository userStoryRepository, UserRepository userRepository) {
+    public UserStoryServiceImpl(UserStoryRepository userStoryRepository, UserRepository userRepository, GamificationService gamificationService) {
         this.userStoryRepository = userStoryRepository;
         this.userRepository = userRepository;
+        this.gamificationService = gamificationService;
     }
 
     @Override
@@ -33,6 +36,9 @@ public class UserStoryServiceImpl implements UserStoryService {
         UserStory userStory = toEntity(userStoryDTO);
         userStory.setUser(user);
         UserStory savedStory = userStoryRepository.save(userStory);
+
+        gamificationService.awardPoints(user, 50);
+
         return toDTO(savedStory);
     }
 

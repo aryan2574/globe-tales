@@ -163,3 +163,35 @@
     overflow: hidden;
     margin-bottom: 1rem;
 }
+
+.gamification-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #f4f7f9;
+    border-radius: 8px;
+    justify-content: center;
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        i {
+            color: #3498db;
+            font-size: 1.5rem;
+        }
+
+        label {
+            font-weight: 500;
+            color: #555;
+        }
+
+        span {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #2c3e50;
+        }
+    }
+}

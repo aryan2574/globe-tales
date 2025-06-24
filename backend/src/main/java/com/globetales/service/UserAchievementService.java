@@ -1,14 +1,13 @@
 package com.globetales.service;
 
 import com.globetales.dto.UserAchievementDTO;
-import java.util.List;
-import java.util.UUID;
+import com.globetales.entity.User;
 import org.springframework.data.domain.Pageable;
 
-public interface UserAchievementService extends BaseService<UserAchievementDTO, UUID> {
+import java.util.List;
+import java.util.UUID;
+
+public interface UserAchievementService {
     List<UserAchievementDTO> findByUserId(UUID userId);
-    boolean existsByUserIdAndAchievementCode(UUID userId, String achievementCode);
-    void unlockAchievement(UUID userId, String achievementCode);
-    List<UserAchievementDTO> findRecentAchievements(UUID userId, Pageable pageable);
-    List<UserAchievementDTO> findAchievementsByCategory(UUID userId, String category);
+    void checkAndGrantAchievements(User user, String actionType);
 } 

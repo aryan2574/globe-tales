@@ -16,6 +16,13 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AuthController {
     private final AuthenticationService authenticationService;
 
+    @PostMapping("/auth/login")
+    public ResponseEntity<AuthenticationResponse> login(
+            @RequestBody AuthenticationRequest request
+    ) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @RequestBody RegisterRequest request

@@ -11,4 +11,5 @@ public interface VisitedSiteRepository extends JpaRepository<VisitedSite, Long> 
     List<VisitedSite> findByUserId(String userId);
     boolean existsByUserIdAndPlaceId(String userId, Long placeId);
     void deleteByUserIdAndPlaceId(String userId, Long placeId);
+    long countByUserId(String userId);
 } 

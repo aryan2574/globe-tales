@@ -1,7 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { UserService } from '../../../services/user.service';
+import { User } from '../../../models/user.model';
+import { Subscription } from 'rxjs';
+import { LEVEL_CONFIG, Level } from '../../../config/gamification.config';
 
 @Component({
   selector: 'app-header',
@@ -15,26 +19,18 @@ import { AuthService } from '../../../services/auth.service';
             <a class="brand-link" (click)="onBrandClick($event)">GlobeTales</a>
             <span class="tagline">Every place has a story</span>
           </div>
-          <span
-            *ngIf="isAuthenticated()"
-            class="user-status"
-            [title]="statusTooltip"
-          >
-            <i class="fas" [ngClass]="statusIcon" style="margin-right:4px;"></i>
-            <span class="status-name">{{ userStatus }}</span>
-            <ng-container *ngIf="pointsToNext !== null">
-              <div class="status-next">
-                Get {{ pointsToNext }} points to become {{ nextStatus }}
-              </div>
-            </ng-container>
-            <ng-container
-              *ngIf="pointsToNext === null && userStatus === 'Adventurer'"
-            >
-              <div class="status-next">
-                Congratulations - You are Adventurer
-              </div>
-            </ng-container>
-          </span>
+          <div *ngIf="isAuthenticated()" class="user-status-container">
+            <div class="user-level">
+              <i class="fas fa-star"></i>
+              <span>{{ user?.level || 'Beginner' }}</span>
+            </div>
+            <div class="xp-bar-container">
+              <div class="xp-bar" [style.width.%]="levelProgress"></div>
+            </div>
+            <div class="xp-text">
+              {{ user?.experiencePoints || 0 }} / {{ nextLevelThreshold }} XP
+            </div>
+          </div>
         </div>
 
         <div class="nav-links" [class.active]="isMenuOpen">
@@ -64,26 +60,72 @@ import { AuthService } from '../../../services/auth.service';
   `,
   styleUrls: ['./header.component.scss'],
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   isMobile = false;
-  userStatus: string = '';
-  statusIcon: string = 'fa-compass';
-  statusTooltip: string = '';
-  pointsToNext: number | null = null;
-  points: number = 0;
-  nextStatus: string | null = null;
+  user: User | null = null;
+  private userSubscription: Subscription | undefined;
 
-  constructor(private authService: AuthService, private router: Router) {
+  levelProgress = 0;
+  nextLevelThreshold = 100;
+
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private router: Router
+  ) {
     this.checkScreenSize();
     window.addEventListener('resize', () => this.checkScreenSize());
   }
 
   ngOnInit(): void {
-    console.log('Header ngOnInit, isAuthenticated:', this.isAuthenticated());
     if (this.isAuthenticated()) {
-      this.loadUserStatus();
+      this.userService.getCurrentUser().subscribe();
+      this.userSubscription = this.userService.currentUser.subscribe(
+        (user: User | null) => {
+          this.user = user;
+          this.updateGamificationStatus();
+        }
+      );
     }
+  }
+
+  ngOnDestroy(): void {
+    this.userSubscription?.unsubscribe();
+  }
+
+  private updateGamificationStatus(): void {
+    if (!this.user || !this.user.level) {
+      this.levelProgress = 0;
+      this.nextLevelThreshold = LEVEL_CONFIG.Beginner.threshold;
+      return;
+    }
+    const currentLevelKey = this.user.level as Level;
+    const levelConf = LEVEL_CONFIG[currentLevelKey];
+
+    if (levelConf && levelConf.nextLevel) {
+      const nextLevelConf = LEVEL_CONFIG[levelConf.nextLevel as Level];
+      const prevLevelThreshold =
+        currentLevelKey === 'Beginner'
+          ? 0
+          : LEVEL_CONFIG[this.getPreviousLevel(currentLevelKey)].threshold;
+
+      const totalPointsForLevel = nextLevelConf.threshold - prevLevelThreshold;
+      const pointsInCurrentLevel =
+        (this.user.experiencePoints || 0) - prevLevelThreshold;
+
+      this.levelProgress = (pointsInCurrentLevel / totalPointsForLevel) * 100;
+      this.nextLevelThreshold = nextLevelConf.threshold;
+    } else {
+      this.levelProgress = 100;
+      this.nextLevelThreshold = this.user.experiencePoints || 0;
+    }
+  }
+
+  private getPreviousLevel(level: Level): Level {
+    const levels = Object.keys(LEVEL_CONFIG) as Level[];
+    const currentIndex = levels.indexOf(level);
+    return currentIndex > 0 ? levels[currentIndex - 1] : 'Beginner';
   }
 
   private checkScreenSize(): void {
@@ -104,37 +146,6 @@ export class HeaderComponent implements OnInit {
 
   toggleMenu(): void {
     this.isMenuOpen = !this.isMenuOpen;
-  }
-
-  loadUserStatus(): void {
-    // Simulate unlocked achievements from localStorage
-    const unlocked = localStorage.getItem('unlockedAchievements');
-    let achievements: any[] = [];
-    try {
-      achievements = unlocked ? JSON.parse(unlocked) : [];
-    } catch (e) {
-      achievements = [];
-    }
-    this.points = (achievements?.length || 0) * 5;
-    if (this.points >= 40) {
-      this.userStatus = 'Adventurer';
-      this.statusIcon = 'fa-hiking';
-      this.statusTooltip = '40+ points';
-      this.pointsToNext = null;
-      this.nextStatus = null;
-    } else if (this.points >= 20) {
-      this.userStatus = 'Pro Explorer';
-      this.statusIcon = 'fa-map-marked-alt';
-      this.statusTooltip = '20+ points';
-      this.pointsToNext = 40 - this.points;
-      this.nextStatus = 'Adventurer';
-    } else {
-      this.userStatus = 'Explorer';
-      this.statusIcon = 'fa-compass';
-      this.statusTooltip = '0+ points';
-      this.pointsToNext = 20 - this.points;
-      this.nextStatus = 'Pro Explorer';
-    }
   }
 
   onBrandClick(event: Event) {

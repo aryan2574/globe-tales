@@ -9,6 +9,7 @@ import com.globetales.mapper.PlaceReviewMapper;
 import com.globetales.repository.PlaceReviewRepository;
 import com.globetales.repository.UserRepository;
 import com.globetales.service.PlaceReviewService;
+import com.globetales.service.GamificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class PlaceReviewServiceImpl implements PlaceReviewService {
     private final PlaceReviewRepository placeReviewRepository;
     private final PlaceReviewMapper placeReviewMapper;
     private final UserRepository userRepository;
+    private final GamificationService gamificationService;
 
     @Override
     public PlaceReviewDTO createReview(PlaceReviewDTO placeReviewDTO) {
@@ -33,6 +35,9 @@ public class PlaceReviewServiceImpl implements PlaceReviewService {
         PlaceReview placeReview = placeReviewMapper.toEntity(placeReviewDTO);
         placeReview.setUser(user);
         PlaceReview savedReview = placeReviewRepository.save(placeReview);
+
+        gamificationService.awardPoints(user, 25);
+
         return placeReviewMapper.toDto(savedReview);
     }
 

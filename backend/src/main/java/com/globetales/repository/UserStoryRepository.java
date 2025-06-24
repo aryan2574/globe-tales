@@ -24,4 +24,6 @@ public interface UserStoryRepository extends JpaRepository<UserStory, UUID> {
 
     @Query("SELECT new com.globetales.dto.UserStoryDTO(us.id, us.placeId, us.title, us.content, us.createdAt, us.updatedAt, us.visitDate, us.user.id) FROM UserStory us WHERE us.user.id = :userId")
     List<UserStoryDTO> findAllDTOByUserId(@Param("userId") UUID userId);
+
+    long countByUserId(UUID userId);
 } 

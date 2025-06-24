@@ -46,6 +46,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .createdAt(OffsetDateTime.now())
                 .roles(Set.of("USER"))
                 .isDeleted(false)
+                .level("Beginner")
+                .experiencePoints(0)
                 .build();
 
         userRepository.save(user);
@@ -54,5 +56,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .user(userDTO)
                 .build();
+    }
+
+    @Override
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
+        try {
+            authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                    request.getEmail(),
+                    request.getPassword()
+                )
+            );
+        } catch (BadCredentialsException e) {
+            throw new BusinessException("Invalid credentials");
+        }
+
+        var user = userRepository.findByEmail(request.getEmail())
+            .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        var userDTO = userMapper.toDTO(user);
+        return AuthenticationResponse.builder()
+            .user(userDTO)
+            .build();
     }
 } 

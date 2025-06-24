@@ -53,16 +53,21 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<User> {
+    const loginRequest: LoginRequest = { email, password };
     return this.http
-      .get<User>(`${environment.apiUrl}/users/current`, {
-        withCredentials: true,
-      })
+      .post<AuthResponse>(`${environment.apiUrl}/auth/login`, loginRequest)
       .pipe(
-        tap((user) => {
+        tap((response) => {
           this.storeCredentials(email, password);
-          this.handleAuthResponse({ user });
+          this.handleAuthResponse(response);
         }),
-        catchError(this.handleError)
+        map((response) => response.user),
+        catchError((error: HttpErrorResponse) => {
+          const errorMessage =
+            error.error?.message ||
+            'Login failed due to an unknown error. Please try again.';
+          return throwError(() => new Error(errorMessage));
+        })
       );
   }
 
