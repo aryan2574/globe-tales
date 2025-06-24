@@ -24,6 +24,8 @@ public interface UserMapper {
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "latitude", source = "latitude")
     @Mapping(target = "longitude", source = "longitude")
+    @Mapping(target = "favourites", ignore = true)
+    @Mapping(target = "isDeleted", ignore = true)
     User toEntity(UserDTO userDTO);
 
     @Mapping(target = "id", ignore = true)
@@ -33,5 +35,7 @@ public interface UserMapper {
     @Mapping(target = "roles", ignore = true)
     @Mapping(target = "latitude", source = "latitude")
     @Mapping(target = "longitude", source = "longitude")
+    @Mapping(target = "favourites", ignore = true)
+    @Mapping(target = "authorities", ignore = true)
     void updateEntityFromDTO(UserDTO userDTO, @MappingTarget User user);
 } 

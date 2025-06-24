@@ -65,6 +65,13 @@ export const routes: Routes = [
             (m) => m.RewardsComponent
           ),
       },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('./features/account/reviews/reviews.component').then(
+            (m) => m.ReviewsComponent
+          ),
+      },
     ],
   },
   {

@@ -5,11 +5,9 @@ import { Place } from '../models/place.model';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PlacesService {
-  private apiUrl = `${environment.apiUrl}/places`;
+  private apiUrl = '/api/places';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -96,5 +94,9 @@ export class PlacesService {
       params: { bbox },
       headers,
     });
+  }
+
+  getPlaceById(id: string): Observable<Place> {
+    return this.http.get<Place>(`${this.apiUrl}/${id}`);
   }
 }

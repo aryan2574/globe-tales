@@ -109,6 +109,7 @@ interface Site {
     </div>
   `,
   styleUrls: ['./site-list.component.scss'],
+  providers: [PlacesService],
 })
 export class SiteListComponent implements OnInit {
   sites: Site[] = [];

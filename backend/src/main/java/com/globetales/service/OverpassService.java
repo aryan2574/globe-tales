@@ -11,7 +11,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.Map;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.stereotype.Component;
 
 @Service
 public class OverpassService {
@@ -83,15 +86,24 @@ public class OverpassService {
     }
 
     /**
-     * Scheduled job to update Chemnitz sites every 3 days
+     * Quartz Job for updating Chemnitz sites every 3 days
      */
-    @Scheduled(cron = "0 0 0 */3 * *") // Every 3 days at midnight
-    public void scheduledUpdateChemnitzSites() {
-        try {
-            fetchAndStorePlaces(CHEMNITZ_SOUTH, CHEMNITZ_WEST, CHEMNITZ_NORTH, CHEMNITZ_EAST);
-            System.out.println("[Scheduler] Chemnitz sites updated from Overpass API.");
-        } catch (Exception e) {
-            System.err.println("[Scheduler] Failed to update Chemnitz sites: " + e.getMessage());
+    @Component
+    public static class ChemnitzSitesUpdateJob implements Job {
+        private final OverpassService overpassService;
+
+        public ChemnitzSitesUpdateJob(OverpassService overpassService) {
+            this.overpassService = overpassService;
+        }
+
+        @Override
+        public void execute(JobExecutionContext context) throws JobExecutionException {
+            try {
+                overpassService.fetchAndStorePlaces(50.786, 12.803, 50.900, 12.983);
+                System.out.println("[Quartz] Chemnitz sites updated from Overpass API.");
+            } catch (Exception e) {
+                System.err.println("[Quartz] Failed to update Chemnitz sites: " + e.getMessage());
+            }
         }
     }
 

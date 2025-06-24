@@ -19,6 +19,9 @@ import { RouterModule } from '@angular/router';
           <a routerLink="achievements" routerLinkActive="active"
             ><i class="fas fa-award"></i> Achievements</a
           >
+          <a routerLink="reviews" routerLinkActive="active"
+            ><i class="fas fa-star-half-alt"></i> Reviews</a
+          >
         </nav>
       </div>
       <div class="account-content">

@@ -123,12 +123,14 @@ public class UserStoryServiceImpl implements UserStoryService {
     }
 
     private UserStory toEntity(UserStoryDTO dto) {
-        UserStory userStory = new UserStory();
-        userStory.setId(dto.getId());
-        userStory.setPlaceId(dto.getPlaceId());
-        userStory.setTitle(dto.getTitle());
-        userStory.setContent(dto.getContent());
-        userStory.setVisitDate(dto.getVisitDate());
-        return userStory;
+        UserStory entity = new UserStory();
+        entity.setId(dto.getId());
+        entity.setPlaceId(dto.getPlaceId());
+        entity.setTitle(dto.getTitle());
+        entity.setContent(dto.getContent());
+        entity.setCreatedAt(dto.getCreatedAt());
+        entity.setUpdatedAt(dto.getUpdatedAt());
+        entity.setVisitDate(dto.getVisitDate());
+        return entity;
     }
 } 

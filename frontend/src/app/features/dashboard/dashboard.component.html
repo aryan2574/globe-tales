@@ -1,15 +1,5 @@
-<div class="dashboard-container">
-    <ng-container *ngIf="!hasLocation">
-        <div class="no-location-message">
-            <i class="fas fa-map-marker-alt fa-2x"></i>
-            <h2>Location is not provided</h2>
-            <p>
-                We need live location to show nearby places.<br>
-                You can set your current location in <b>My Journey / Profile</b> section.
-            </p>
-        </div>
-    </ng-container>
-    <ng-container *ngIf="hasLocation">
+<div class="dashboard-background">
+    <div class="dashboard-container">
         <div class="map-section">
             <app-weather-widget class="weather-widget-overlay"></app-weather-widget>
             <app-map *ngIf="hasLocation" [latitude]="currentLatitude!" [longitude]="currentLongitude!" [places]="places"
@@ -44,68 +34,61 @@
                 </button>
             </div>
         </div>
-
         <div class="places-panel">
             <div class="search-section">
                 <h2><i class="fas fa-map-marker-alt"></i> Nearby Places</h2>
                 <div class="filter-controls">
-                    <select [(ngModel)]="selectedType" (change)="onTypeChange()">
+                    <select *ngIf="hasLocation" [(ngModel)]="selectedType" (change)="onTypeChange()">
                         <option value="">All Types</option>
                         <option value="hotel"><i class="fas fa-hotel"></i> Hotels</option>
-                        <option value="attraction">
-                            <i class="fas fa-landmark"></i> Attractions
-                        </option>
-                        <option value="museum">
-                            <i class="fas fa-university"></i> Museums
-                        </option>
-                        <option value="restaurant">
-                            <i class="fas fa-utensils"></i> Restaurants
-                        </option>
-                        <option value="viewpoint">
-                            <i class="fas fa-mountain"></i> Viewpoints
-                        </option>
+                        <option value="attraction"><i class="fas fa-landmark"></i> Attractions</option>
+                        <option value="museum"><i class="fas fa-university"></i> Museums</option>
+                        <option value="restaurant"><i class="fas fa-utensils"></i> Restaurants</option>
+                        <option value="viewpoint"><i class="fas fa-mountain"></i> Viewpoints</option>
                     </select>
-                    <div class="radius-control">
+                    <div *ngIf="hasLocation" class="radius-control">
                         <i class="fas fa-circle-notch"></i>
                         <input type="range" [(ngModel)]="searchRadius" min="500" max="5000" step="500"
                             (change)="onRadiusChange()" />
                         <span>{{ searchRadius }}m</span>
                     </div>
                     <button class="update-location-btn" (click)="updateLocation()">
-                        <i class="fas fa-sync-alt"></i> Update Location
+                        <i class="fas" [ngClass]="{'fa-sync-alt': hasLocation, 'fa-crosshairs': !hasLocation}"></i> {{
+                        hasLocation ? 'Update Location' : 'Allow Location' }}
                     </button>
                 </div>
             </div>
-
             <div class="places-list">
                 <div *ngIf="loading" class="loading">
                     <i class="fas fa-spinner fa-spin"></i> Loading places...
                 </div>
-                <div *ngIf="error" class="error">
+                <div *ngIf="error && !hasLocation" class="no-location-prompt">
+                    <i class="fas fa-map-marker-slash fa-3x"></i>
+                    <p>{{ error }}</p>
+                </div>
+                <div *ngIf="error && hasLocation" class="error">
                     <i class="fas fa-exclamation-circle"></i> {{ error }}
                 </div>
-
-                <div *ngIf="!loading && !error && places.length === 0" class="no-places">
+                <div *ngIf="!loading && !error && places.length === 0 && hasLocation" class="no-places">
                     <i class="fas fa-search"></i> No places found in this area
                 </div>
-
                 <div *ngFor="let place of places" class="place-card" [class.selected]="place === selectedPlace"
                     (click)="selectPlace(place)">
                     <h3>
                         <i class="fas" [ngClass]="{
-              'fa-hotel': place.type === 'hotel',
-              'fa-landmark': place.type === 'attraction',
-              'fa-university': place.type === 'museum',
-              'fa-utensils': place.type === 'restaurant',
-              'fa-mountain': place.type === 'viewpoint',
-              'fa-map-marker-alt': ![
-                'hotel',
-                'attraction',
-                'museum',
-                'restaurant',
-                'viewpoint'
-              ].includes(place.type)
-            }"></i>
+                          'fa-hotel': place.type === 'hotel',
+                          'fa-landmark': place.type === 'attraction',
+                          'fa-university': place.type === 'museum',
+                          'fa-utensils': place.type === 'restaurant',
+                          'fa-mountain': place.type === 'viewpoint',
+                          'fa-map-marker-alt': ![
+                            'hotel',
+                            'attraction',
+                            'museum',
+                            'restaurant',
+                            'viewpoint'
+                          ].includes(place.type)
+                        }"></i>
                         {{ place.name }}
                     </h3>
                     <p class="place-type">{{ place.type }}</p>
@@ -132,9 +115,37 @@
                             {{ savingVisitedId === place.id ? 'Visiting...' : (isPlaceVisited(place) ? 'Visited' : 'Mark
                             as Visited') }}
                         </button>
+                        <button class="btn-small btn-review" (click)="openReviewForm(place); $event.stopPropagation();">
+                            <i class="fas fa-star"></i>
+                            {{ getReviewForPlace(place.id) ? 'Edit Review' : 'Add Review' }}
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
-    </ng-container>
+    </div>
+</div>
+
+<div class="review-modal-overlay" *ngIf="reviewForm">
+    <div class="review-modal">
+        <h3>Review for {{ selectedPlaceForReview?.name }}</h3>
+        <div class="form-group">
+            <label><i class="fas fa-star"></i> Rating</label>
+            <select [(ngModel)]="reviewForm.rating">
+                <option *ngFor="let r of [1,2,3,4,5]" [value]="r">{{ r }} Star{{ r > 1 ? 's' : '' }}</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="fas fa-comment"></i> Comment</label>
+            <textarea [(ngModel)]="reviewForm.comment" placeholder="Write your review here..."></textarea>
+        </div>
+        <div class="button-group">
+            <button class="btn-save" (click)="saveReview()">
+                <i class="fas fa-save"></i> Save Review
+            </button>
+            <button class="btn-cancel" (click)="cancelReview()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
 </div>

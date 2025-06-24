@@ -55,7 +55,6 @@ export class AuthService {
   login(email: string, password: string): Observable<User> {
     return this.http
       .get<User>(`${environment.apiUrl}/users/current`, {
-        headers: this.createAuthHeaders(email, password),
         withCredentials: true,
       })
       .pipe(
@@ -135,10 +134,5 @@ export class AuthService {
     }
 
     return throwError(() => new Error(errorMessage));
-  }
-
-  private createAuthHeaders(email: string, password: string) {
-    const credentials = btoa(`${email}:${password}`);
-    return { Authorization: `Basic ${credentials}` };
   }
 }

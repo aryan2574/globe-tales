@@ -9,6 +9,8 @@ import { PlacesService } from '../../services/places.service';
 import { Place } from '../../models/place.model';
 import { VisitedSiteService } from '../../services/visited-site.service';
 import { VisitedSite } from '../../models/visited-site.model';
+import { PlaceReviewService } from '../../services/place-review.service';
+import { PlaceReview } from '../../models/place-review.model';
 
 @Component({
   selector: 'app-my-story',
@@ -16,9 +18,11 @@ import { VisitedSite } from '../../models/visited-site.model';
   imports: [CommonModule, FormsModule],
   templateUrl: './my-story.component.html',
   styleUrls: ['./my-story.component.scss'],
+  providers: [PlacesService],
 })
 export class MyStoryComponent implements OnInit {
   stories: UserStory[] = [];
+  reviews: PlaceReview[] = [];
   selectedStory: UserStory | null = null;
   newStory: Partial<UserStory> = { title: '', content: '' };
   isLoggedIn$: Observable<boolean>;
@@ -27,6 +31,7 @@ export class MyStoryComponent implements OnInit {
 
   constructor(
     private userStoryService: UserStoryService,
+    private placeReviewService: PlaceReviewService,
     private authService: AuthService,
     private placesService: PlacesService,
     private visitedSiteService: VisitedSiteService
@@ -38,10 +43,12 @@ export class MyStoryComponent implements OnInit {
     this.isLoggedIn$.subscribe((loggedIn) => {
       if (loggedIn) {
         this.loadStories();
+        this.loadReviews();
         this.loadVisitedSites();
         this.loadAllPlaces();
       } else {
         this.stories = [];
+        this.reviews = [];
         this.visitedSites = [];
         this.allPlaces = [];
       }
@@ -57,6 +64,14 @@ export class MyStoryComponent implements OnInit {
   loadStories(): void {
     this.userStoryService.getStories().subscribe((stories) => {
       this.stories = stories;
+    });
+  }
+
+  loadReviews(): void {
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+    this.placeReviewService.getReviewsByUserId(userId).subscribe((reviews) => {
+      this.reviews = reviews;
     });
   }
 
@@ -120,5 +135,9 @@ export class MyStoryComponent implements OnInit {
     a.download = `${story.title || 'story'}.txt`;
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  getReviewForPlace(placeId: string | number): PlaceReview | undefined {
+    return this.reviews.find((r) => r.placeId == placeId?.toString());
   }
 }

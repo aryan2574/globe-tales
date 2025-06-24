@@ -7,4 +7,5 @@ export interface UserStory {
   createdAt?: Date;
   updatedAt?: Date;
   visitDate?: Date;
+  rating?: number;
 }

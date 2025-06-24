@@ -19,6 +19,9 @@ import { User } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
 import { VisitedSiteService } from '../../services/visited-site.service';
 import { VisitedSite } from '../../models/visited-site.model';
+import { UserStoryService } from '../../services/user-story.service';
+import { PlaceReviewService } from '../../services/place-review.service';
+import { PlaceReview } from '../../models/place-review.model';
 
 type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
 
@@ -35,6 +38,7 @@ type TransportMode = 'driving-car' | 'foot-walking' | 'cycling-regular';
     MapComponent,
     WeatherWidgetComponent,
   ],
+  providers: [PlacesService],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   places: Place[] = [];
@@ -58,6 +62,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private currentUser!: User;
   private hasFetchedPlaces = false;
   private visitedSites: VisitedSite[] = [];
+  userReviews: PlaceReview[] = [];
+  selectedPlaceForReview: Place | null = null;
+  reviewForm: {
+    rating: number;
+    comment: string;
+    placeId?: string;
+    placeName?: string;
+    id?: string;
+  } | null = null;
 
   constructor(
     private mapService: MapService,
@@ -68,7 +81,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private userFavouriteService: UserFavouriteService,
     private authService: AuthService,
     private userService: UserService,
-    private visitedSiteService: VisitedSiteService
+    private visitedSiteService: VisitedSiteService,
+    private placeReviewService: PlaceReviewService
   ) {}
 
   ngOnInit(): void {
@@ -83,8 +97,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.fetchAndLoadPlaces();
         } else {
           this.hasLocation = false;
-          this.error =
-            'No saved location found. Please update your location in your profile.';
+          this.error = 'Please allow location to view nearby places';
         }
       },
       error: (err) => {
@@ -94,6 +107,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
     this.loadSavedVisited();
     this.loadVisitedSites();
+    this.loadUserReviews();
   }
 
   ngOnDestroy(): void {
@@ -157,6 +171,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   updateLocation(): void {
+    this.error = null;
     // Only use geolocation when user clicks update
     this.loading = true;
     this.locationService.requestAndSaveLocation().subscribe({
@@ -406,5 +421,68 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   isPlaceVisited(place: Place): boolean {
     return this.visitedIds.has(place.id.toString());
+  }
+
+  loadUserReviews(): void {
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+    this.placeReviewService.getReviewsByUserId(userId).subscribe((reviews) => {
+      this.userReviews = reviews;
+    });
+  }
+
+  getReviewForPlace(placeId: string | number): PlaceReview | undefined {
+    return this.userReviews.find((r) => r.placeId == placeId.toString());
+  }
+
+  openReviewForm(place: Place): void {
+    this.selectedPlaceForReview = place;
+    const existingReview = this.getReviewForPlace(place.id);
+    if (existingReview) {
+      this.reviewForm = {
+        id: existingReview.id,
+        rating: existingReview.rating,
+        comment: existingReview.comment,
+        placeId: existingReview.placeId,
+        placeName: existingReview.placeName,
+      };
+    } else {
+      this.reviewForm = {
+        rating: 5,
+        comment: '',
+        placeId: place.id.toString(),
+        placeName: place.name,
+      };
+    }
+  }
+
+  saveReview(): void {
+    if (!this.reviewForm || !this.selectedPlaceForReview) return;
+
+    const reviewData: Partial<PlaceReview> = {
+      ...this.reviewForm,
+      userId: this.currentUser.id,
+    };
+
+    if (this.reviewForm.id) {
+      // Update existing review
+      this.placeReviewService
+        .updateReview(this.reviewForm.id, reviewData)
+        .subscribe(() => {
+          this.loadUserReviews();
+          this.cancelReview();
+        });
+    } else {
+      // Create new review
+      this.placeReviewService.createReview(reviewData).subscribe(() => {
+        this.loadUserReviews();
+        this.cancelReview();
+      });
+    }
+  }
+
+  cancelReview(): void {
+    this.selectedPlaceForReview = null;
+    this.reviewForm = null;
   }
 }
