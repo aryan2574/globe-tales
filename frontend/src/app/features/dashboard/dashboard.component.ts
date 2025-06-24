@@ -94,7 +94,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.currentLatitude = user.latitude;
           this.currentLongitude = user.longitude;
           this.hasLocation = true;
-          this.fetchAndLoadPlaces();
+          this.searchNearbyPlaces(); // Initial search on load
         } else {
           this.hasLocation = false;
           this.error = 'Please allow location to view nearby places';
@@ -121,53 +121,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   fetchAndLoadPlaces(): void {
     if (this.currentLatitude === null || this.currentLongitude === null) return;
-    // Use a bounding box of ±0.02 degrees for a more focused area
-    const south = this.currentLatitude - 0.02;
-    const north = this.currentLatitude + 0.02;
-    const west = this.currentLongitude - 0.02;
-    const east = this.currentLongitude + 0.02;
-    this.loading = true;
-    this.placesService.fetchPlacesForArea(south, west, north, east).subscribe({
-      next: () => {
-        // After fetch, load places from backend
-        this.placesService.getAllPlaces().subscribe({
-          next: (places) => {
-            // Remove duplicates by id
-            const uniquePlaces = new Map<number, Place>();
-            for (const place of places) {
-              if (!uniquePlaces.has(place.id)) {
-                uniquePlaces.set(place.id, place);
-              }
-            }
-            this.places = Array.from(uniquePlaces.values());
-            this.loading = false;
-          },
-          error: (err) => {
-            this.error = 'Failed to load places from backend.';
-            this.loading = false;
-          },
-        });
-      },
-      error: (err) => {
-        // Even if fetch fails, try to load places from backend
-        this.placesService.getAllPlaces().subscribe({
-          next: (places) => {
-            const uniquePlaces = new Map<number, Place>();
-            for (const place of places) {
-              if (!uniquePlaces.has(place.id)) {
-                uniquePlaces.set(place.id, place);
-              }
-            }
-            this.places = Array.from(uniquePlaces.values());
-            this.loading = false;
-          },
-          error: (err) => {
-            this.error = 'Failed to load places from backend.';
-            this.loading = false;
-          },
-        });
-      },
-    });
+    this.searchNearbyPlaces();
   }
 
   updateLocation(): void {
@@ -180,7 +134,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.currentLatitude = location.latitude;
           this.currentLongitude = location.longitude;
           this.hasLocation = true;
-          this.fetchAndLoadPlaces();
+          this.searchNearbyPlaces();
           this.loading = false;
         });
       },
@@ -189,6 +143,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loading = false;
       },
     });
+    this.routeInfo = null;
   }
 
   async searchNearbyPlaces(): Promise<void> {
@@ -316,15 +271,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   onTypeChange(): void {
-    if (this.hasLocation) {
-      this.searchNearbyPlaces();
-    }
+    this.searchNearbyPlaces();
   }
 
   onRadiusChange(): void {
-    if (this.hasLocation) {
-      this.searchNearbyPlaces();
-    }
+    this.searchNearbyPlaces();
   }
 
   loadSavedVisited(): void {

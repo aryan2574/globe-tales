@@ -218,8 +218,19 @@ export class MapService implements OnDestroy {
     radius: number = 1000,
     type?: string
   ): Observable<Place[]> {
-    const typeFilter = type ? `["tourism"="${type}"]` : '["tourism"]';
-    const query = `[out:json][timeout:25];(node${typeFilter}(around:${radius},${lat},${lng});way${typeFilter}(around:${radius},${lat},${lng});relation${typeFilter}(around:${radius},${lat},${lng}););out body;>;out skel qt;`;
+    let queryTags = '';
+    if (type) {
+      if (type === 'restaurant') {
+        queryTags = `["amenity"="restaurant"]`;
+      } else {
+        queryTags = `["tourism"="${type}"]`;
+      }
+    } else {
+      // For "All types", we search for common keys.
+      queryTags = `["tourism"]`;
+    }
+
+    const query = `[out:json][timeout:25];(node${queryTags}(around:${radius},${lat},${lng});way${queryTags}(around:${radius},${lat},${lng});relation${queryTags}(around:${radius},${lat},${lng}););out body;>;out skel qt;`;
 
     return this.http
       .get(this.OVERPASS_API, {
@@ -262,7 +273,7 @@ export class MapService implements OnDestroy {
         description: element.tags.description || '',
         latitude: element.lat,
         longitude: element.lon,
-        type: element.tags.tourism || 'unknown',
+        type: element.tags.tourism || element.tags.amenity || 'unknown',
         tags: element.tags || {},
       }));
   }
