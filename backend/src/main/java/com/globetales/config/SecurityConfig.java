@@ -44,6 +44,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/stories", "/api/stories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reviews/place/**").permitAll()
                 .requestMatchers("/api/reviews/**").authenticated()
+                .requestMatchers("/v3/api-docs/**").permitAll()
+                .requestMatchers("/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic(); // Enable HTTP Basic Auth
