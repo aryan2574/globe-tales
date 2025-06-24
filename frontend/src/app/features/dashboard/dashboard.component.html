@@ -115,7 +115,8 @@
                             {{ savingVisitedId === place.id ? 'Visiting...' : (isPlaceVisited(place) ? 'Visited' : 'Mark
                             as Visited') }}
                         </button>
-                        <button class="btn-small btn-review" (click)="openReviewForm(place); $event.stopPropagation();">
+                        <button class="btn-small btn-review" [class.has-review]="getReviewForPlace(place.id)"
+                            (click)="openReviewForm(place); $event.stopPropagation();">
                             <i class="fas fa-star"></i>
                             {{ getReviewForPlace(place.id) ? 'Edit Review' : 'Add Review' }}
                         </button>
@@ -128,7 +129,7 @@
 
 <div class="review-modal-overlay" *ngIf="reviewForm">
     <div class="review-modal">
-        <h3>Review for {{ selectedPlaceForReview?.name }}</h3>
+        <h3><i class="fas fa-star-half-alt"></i>Review for {{ selectedPlaceForReview?.name }}</h3>
         <div class="form-group">
             <label><i class="fas fa-star"></i> Rating</label>
             <select [(ngModel)]="reviewForm.rating">
