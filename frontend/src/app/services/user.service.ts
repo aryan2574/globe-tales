@@ -44,12 +44,9 @@ export class UserService {
 
   updateUser(id: string, user: User): Observable<User> {
     const creds = this.authService.getCredentials();
-    return this.apiService.put<User>(
-      `/users/${id}`,
-      user,
-      creds?.email,
-      creds?.password
-    );
+    return this.apiService
+      .put<User>(`/users/${id}`, user, creds?.email, creds?.password)
+      .pipe(tap(() => this.refreshCurrentUser()));
   }
 
   deleteUser(id: string): Observable<void> {
