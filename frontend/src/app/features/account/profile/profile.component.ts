@@ -11,109 +11,13 @@ import { MapService } from '../../../services/map.service';
 import { UserService } from '../../../services/user.service';
 import { MapComponent } from '../../../shared/components/map/map.component';
 import { User } from '../../../models/user.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MapComponent],
-  template: `
-    <div class="profile-container">
-      <h2>Profile Information</h2>
-
-      <div class="gamification-stats" *ngIf="user">
-        <div class="stat-item">
-          <i class="fas fa-star"></i>
-          <label>Level</label>
-          <span>{{ user.level || 'Beginner' }}</span>
-        </div>
-        <div class="stat-item">
-          <i class="fas fa-gem"></i>
-          <label>Experience</label>
-          <span>{{ user.experiencePoints || 0 }} XP</span>
-        </div>
-      </div>
-
-      <form
-        [formGroup]="profileForm"
-        (ngSubmit)="onSubmit()"
-        class="profile-form"
-      >
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            formControlName="username"
-            placeholder="Enter your username"
-          />
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="Enter your email"
-            readonly
-          />
-        </div>
-        <div class="form-group">
-          <label for="location">Location</label>
-          <ng-container *ngIf="locationChecked">
-            <ng-container
-              *ngIf="
-                user && user.latitude != null && user.longitude != null;
-                else noLocation
-              "
-            >
-              <div class="profile-map-box">
-                <app-map
-                  [latitude]="user.latitude"
-                  [longitude]="user.longitude"
-                ></app-map>
-              </div>
-              <div
-                style="font-size: 0.95em; color: #555; margin-bottom: 0.5rem;"
-              >
-                Lat: {{ user.latitude }}, Lng: {{ user.longitude }}
-              </div>
-              <button
-                type="button"
-                class="btn-set-location"
-                (click)="updateLocation()"
-                [disabled]="updatingLocation"
-              >
-                <span *ngIf="!updatingLocation"
-                  ><i class="fas fa-sync-alt"></i> Update Location</span
-                >
-                <span *ngIf="updatingLocation"
-                  ><i class="fas fa-spinner fa-spin"></i> Updating...</span
-                >
-              </button>
-            </ng-container>
-            <ng-template #noLocation>
-              <button
-                type="button"
-                class="btn-set-location"
-                (click)="setLocation()"
-                [disabled]="loadingLocation"
-              >
-                <span *ngIf="!loadingLocation"
-                  ><i class="fas fa-map-marker-alt"></i> Set My Location</span
-                >
-                <span *ngIf="loadingLocation"
-                  ><i class="fas fa-spinner fa-spin"></i> Setting...</span
-                >
-              </button>
-            </ng-template>
-          </ng-container>
-        </div>
-        <button type="submit" class="btn-save" [disabled]="profileForm.invalid">
-          Save Changes
-        </button>
-      </form>
-    </div>
-  `,
+  templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
@@ -127,7 +31,8 @@ export class ProfileComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private userService: UserService,
-    private mapService: MapService
+    private mapService: MapService,
+    private router: Router
   ) {
     this.profileForm = this.fb.group({
       username: ['', Validators.required],
@@ -247,6 +152,26 @@ export class ProfileComponent implements OnInit {
         error: (err) => {
           console.error('Failed to update profile', err);
           alert('Failed to update profile');
+        },
+      });
+    }
+  }
+
+  onDeleteAccount() {
+    if (!this.user) return;
+    if (
+      window.confirm(
+        'Are you sure you want to delete your account? This action cannot be undone.'
+      )
+    ) {
+      this.userService.deleteUser(this.user.id).subscribe({
+        next: () => {
+          this.authService.logout();
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          alert('Failed to delete account.');
+          console.error(err);
         },
       });
     }

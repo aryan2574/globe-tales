@@ -21,6 +21,10 @@ public class CustomUserDetailsService implements UserDetailsService {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        if (user.isDeleted()) {
+            throw new UsernameNotFoundException("User account is deleted");
+        }
+
         return new User(
                 user.getEmail(),
                 user.getPassword(),
