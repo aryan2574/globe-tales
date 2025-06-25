@@ -1,6 +1,5 @@
 import {
   Component,
-  OnDestroy,
   ViewChild,
   ElementRef,
   AfterViewChecked,
@@ -12,6 +11,8 @@ import { firstValueFrom } from 'rxjs';
 import { ChatbotService } from '../../../services/chatbot.service';
 import { ChatbotRequest, ChatbotResponse } from '../../../models/chatbot.model';
 import { LocationService, Location } from '../../../services/location.service';
+import { AuthService } from '../../../services/auth.service';
+import { User } from '../../../models/user.model';
 
 interface Message {
   text: string;
@@ -25,42 +26,61 @@ interface Message {
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.scss'],
 })
-export class ChatbotComponent implements OnDestroy, AfterViewChecked {
+export class ChatbotComponent implements AfterViewChecked {
   isChatOpen = false;
   userMessage = '';
   messages: Message[] = [];
-  private locationSubscription: Subscription | null = null;
+  private currentUser: User | null = null;
   @ViewChild('chatBody') chatBody!: ElementRef;
   @ViewChild('scrollAnchor') scrollAnchor!: ElementRef;
 
+  quickActions = [
+    { label: 'Show me popular places', action: 'popular_places' },
+    { label: 'Get weather update', action: 'weather_update' },
+    { label: 'My achievements', action: 'my_achievements' },
+    { label: 'My favorites', action: 'my_favorites' },
+  ];
+
   constructor(
     private chatbotService: ChatbotService,
-    private locationService: LocationService
-  ) {}
+    private locationService: LocationService,
+    private authService: AuthService
+  ) {
+    this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user;
+    });
+  }
 
   toggleChat() {
     this.isChatOpen = !this.isChatOpen;
     if (this.isChatOpen && this.messages.length === 0) {
-      this.getGreetingMessage();
-    } else if (!this.isChatOpen && this.locationSubscription) {
-      this.locationSubscription.unsubscribe();
-      this.locationSubscription = null;
+      const greeting = this.currentUser
+        ? `Hi ${this.currentUser.username}, how may I help you?`
+        : 'Hi, how may I help you?';
+      this.messages.push({ text: greeting, isUser: false });
     }
   }
 
-  private getGreetingMessage() {
-    this.locationSubscription = this.locationService.location$.subscribe(
-      (location) => {
-        if (location) {
-          this.chatbotService
-            .getGreeting(location.latitude, location.longitude)
-            .subscribe((response) => {
-              const botMsg: Message = { text: response.reply, isUser: false };
-              this.messages.push(botMsg);
-            });
-        }
-      }
-    );
+  handleQuickAction(action: string) {
+    let message = '';
+    switch (action) {
+      case 'popular_places':
+        message = 'Show me popular places';
+        break;
+      case 'weather_update':
+        message = 'Get weather update';
+        break;
+      case 'my_achievements':
+        message = 'My achievements';
+        break;
+      case 'my_favorites':
+        message = 'My favorites';
+        break;
+      default:
+        return;
+    }
+    this.userMessage = message;
+    this.sendMessage();
   }
 
   async sendMessage() {
@@ -91,12 +111,6 @@ export class ChatbotComponent implements OnDestroy, AfterViewChecked {
     });
 
     this.userMessage = '';
-  }
-
-  ngOnDestroy() {
-    if (this.locationSubscription) {
-      this.locationSubscription.unsubscribe();
-    }
   }
 
   ngAfterViewChecked() {

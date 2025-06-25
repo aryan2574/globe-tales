@@ -15,6 +15,12 @@
                 [ngClass]="{'user-message': msg.isUser, 'bot-message': !msg.isUser}">
                 <p>{{ msg.text }}</p>
             </div>
+            <!-- Quick action buttons: show only after greeting, if it's the first message -->
+            <div *ngIf="messages.length === 1 && !messages[0].isUser" class="quick-actions">
+                <button *ngFor="let action of quickActions" (click)="handleQuickAction(action.action)">
+                    {{ action.label }}
+                </button>
+            </div>
             <div #scrollAnchor></div>
         </div>
         <div class="chat-footer">

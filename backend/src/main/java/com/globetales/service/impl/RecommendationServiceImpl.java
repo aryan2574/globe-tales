@@ -90,8 +90,8 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         List<RecommendationDTO> allPossibleRecommendations = new ArrayList<>();
         int apiHits = 0;
-        final int MAX_API_HITS = 50;
-        final int MAX_RECOMMENDATIONS = 30;
+        final int MAX_API_HITS = 20;
+        final int MAX_RECOMMENDATIONS = 15;
 
         for (Place place : placesToConsider) {
             if (apiHits >= MAX_API_HITS || allPossibleRecommendations.size() >= MAX_RECOMMENDATIONS) {
