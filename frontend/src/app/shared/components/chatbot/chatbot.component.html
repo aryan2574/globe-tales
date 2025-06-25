@@ -1,9 +1,9 @@
 <div class="chatbot-container">
-    <button class="chat-toggle-button" (click)="toggleChat()">
+    <button class="chat-toggle-button" *ngIf="!isChatOpen" (click)="toggleChat()">
         <i class="fas fa-comment"></i>
     </button>
 
-    <div class="chat-window" *ngIf="isChatOpen">
+    <div class="chat-window" [ngClass]="{ 'closed': !isChatOpen }">
         <div class="chat-header">
             <h3>GlobeTales Assistant</h3>
             <button class="close-button" (click)="toggleChat()">
@@ -15,8 +15,8 @@
                 [ngClass]="{'user-message': msg.isUser, 'bot-message': !msg.isUser}">
                 <p>{{ msg.text }}</p>
             </div>
-            <!-- Quick action buttons: show only after greeting, if it's the first message -->
-            <div *ngIf="messages.length === 1 && !messages[0].isUser" class="quick-actions">
+            <!-- Quick action buttons: always show -->
+            <div class="quick-actions">
                 <button *ngFor="let action of quickActions" (click)="handleQuickAction(action.action)">
                     {{ action.label }}
                 </button>

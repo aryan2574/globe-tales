@@ -106,8 +106,16 @@ export class ChatbotComponent implements AfterViewChecked {
     }
 
     this.chatbotService.chat(request).subscribe((response: ChatbotResponse) => {
-      const botMsg: Message = { text: response.reply, isUser: false };
+      const reply =
+        response.reply || "Sorry, I'm having trouble at the moment.";
+      const botMsg: Message = { text: reply, isUser: false };
       this.messages.push(botMsg);
+
+      const followupMsg: Message = {
+        text: 'Is there anything else I can help you with?',
+        isUser: false,
+      };
+      this.messages.push(followupMsg);
     });
 
     this.userMessage = '';
