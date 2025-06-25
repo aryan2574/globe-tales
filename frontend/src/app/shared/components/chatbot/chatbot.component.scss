@@ -12,9 +12,9 @@
 }
 
 .chatbot-container {
-    position: fixed !important;
-    bottom: 20px !important;
-    right: 20px !important;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     z-index: 1050; // Ensure it's above most elements
 }
 

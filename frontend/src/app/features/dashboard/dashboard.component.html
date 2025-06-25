@@ -1,7 +1,9 @@
 <div class="dashboard-background">
     <div class="dashboard-container">
         <div class="map-section">
-            <app-weather-widget class="weather-widget-overlay"></app-weather-widget>
+            <app-weather-widget *ngIf="hasLocation" [latitude]="currentLatitude" [longitude]="currentLongitude"
+                class="weather-widget-overlay">
+            </app-weather-widget>
             <app-map *ngIf="hasLocation" [latitude]="currentLatitude!" [longitude]="currentLongitude!" [places]="places"
                 [selectedPlace]="selectedPlace" [routeGeometry]="routeInfo?.geometry"></app-map>
             <div class="route-controls" *ngIf="selectedPlace">

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { WeatherService } from '../../../services/weather.service';
@@ -13,6 +13,9 @@ import { WeatherResponse } from '../../../models/weather.model';
   styleUrls: ['./weather-widget.component.scss'],
 })
 export class WeatherWidgetComponent implements OnInit, OnDestroy {
+  @Input() latitude?: number | null;
+  @Input() longitude?: number | null;
+
   weather: WeatherResponse | null = null;
   weatherDescription = '';
   weatherIconClass = 'fas fa-question-circle';
@@ -86,26 +89,30 @@ export class WeatherWidgetComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    if (this.latitude && this.longitude) {
+      this.fetchWeather(this.latitude, this.longitude);
+    }
+
     this.locationSubscription = this.locationService.location$.subscribe(
       (location) => {
         if (location) {
-          this.weatherService
-            .getWeather(location.latitude, location.longitude)
-            .subscribe((weatherData) => {
-              this.weather = weatherData;
-              this.weatherDescription =
-                WeatherWidgetComponent.WMO_CODES[
-                  weatherData.current.weather_code
-                ] || 'Unknown';
-              this.weatherIconClass = `fas ${
-                WeatherWidgetComponent.ICON_MAP[
-                  weatherData.current.weather_code
-                ] || 'fa-question-circle'
-              }`;
-            });
+          this.fetchWeather(location.latitude, location.longitude);
         }
       }
     );
+  }
+
+  private fetchWeather(lat: number, lon: number): void {
+    this.weatherService.getWeather(lat, lon).subscribe((weatherData) => {
+      this.weather = weatherData;
+      this.weatherDescription =
+        WeatherWidgetComponent.WMO_CODES[weatherData.current.weather_code] ||
+        'Unknown';
+      this.weatherIconClass = `fas ${
+        WeatherWidgetComponent.ICON_MAP[weatherData.current.weather_code] ||
+        'fa-question-circle'
+      }`;
+    });
   }
 
   ngOnDestroy(): void {

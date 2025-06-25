@@ -38,6 +38,13 @@
     height: 100%;
     flex-grow: 1;
 
+    .weather-widget-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+    }
+
     app-map {
         flex: 1 1 auto;
         position: relative;
