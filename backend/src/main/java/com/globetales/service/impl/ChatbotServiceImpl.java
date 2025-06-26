@@ -142,6 +142,16 @@ public class ChatbotServiceImpl implements ChatbotService {
 
         // Default: OpenAI
         String fullSystemMessage = systemMessage;
+        if (user != null) {
+            String userContext = String.format(
+                " The user's name is %s, they are level %s and have %d experience points.",
+                user.getDisplayName(),
+                user.getLevel(),
+                user.getExperiencePoints()
+            );
+            fullSystemMessage += userContext;
+        }
+
         if (chatbotRequest.getLatitude() != null && chatbotRequest.getLongitude() != null) {
             String locationContext = String.format(
                 " The user's current location is latitude: %s and longitude: %s. Use this information to answer any location-based questions.",

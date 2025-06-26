@@ -4,6 +4,7 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './shared/components/header/header.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { ChatbotComponent } from './shared/components/chatbot/chatbot.component';
+import { LocationService } from './services/location.service';
 
 @Component({
   selector: 'app-root',
@@ -44,7 +45,18 @@ import { ChatbotComponent } from './shared/components/chatbot/chatbot.component'
   ],
 })
 export class AppComponent implements OnInit {
-  constructor() {}
+  constructor(private locationService: LocationService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.locationService.getCurrentLocation().subscribe({
+      next: (location) => {
+        if (location) {
+          console.log('Location successfully retrieved:', location);
+        }
+      },
+      error: (error) => {
+        console.error('Error getting location:', error);
+      },
+    });
+  }
 }
