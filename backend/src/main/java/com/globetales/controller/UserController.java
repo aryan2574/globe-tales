@@ -2,6 +2,7 @@ package com.globetales.controller;
 
 import com.globetales.dto.UserDTO;
 import com.globetales.dto.LocationDTO;
+import com.globetales.dto.UserListResponse;
 import com.globetales.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,13 @@ public class UserController {
 
     public UserController(UserService userService) {
         this.userService = userService;
+    }
+
+    @Operation(summary = "Get all softly deleted users", description = "Returns a list of all users that are softly deleted.")
+    @GetMapping("/deleted")
+    public ResponseEntity<UserListResponse<UserDTO>> getAllSoftDeletedUsers() {
+        List<UserDTO> users = userService.findAllSoftDeleted();
+        return ResponseEntity.ok(new UserListResponse<>(users.size(), users));
     }
 
     @Operation(summary = "Get user by ID", description = "Returns a single user by their UUID.")

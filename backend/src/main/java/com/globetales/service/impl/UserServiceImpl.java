@@ -149,4 +149,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserDTO> findAllSoftDeleted() {
+        return userRepository.findAllSoftDeleted().stream()
+                .map(userMapper::toDTO)
+                .toList();
+    }
 } 
