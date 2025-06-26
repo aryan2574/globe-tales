@@ -1,3 +1,0 @@
-ALTER TABLE users
-ADD COLUMN experience_points INT NOT NULL DEFAULT 0,
-ADD COLUMN level VARCHAR(255) NOT NULL DEFAULT 'Beginner'; 

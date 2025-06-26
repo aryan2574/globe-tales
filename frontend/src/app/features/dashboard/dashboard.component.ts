@@ -192,14 +192,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.selectedPlace = place;
     try {
-      const creds = this.authService.getCredentials();
       this.routeService
         .getRoute(
           [this.currentLatitude, this.currentLongitude],
           [place.latitude, place.longitude],
-          this.transportMode,
-          creds?.email,
-          creds?.password
+          this.transportMode
         )
         .subscribe({
           next: (routeInfo) => {
@@ -284,25 +281,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.savedIds.clear();
     this.visitedIds.clear();
     const user = this.authService.getCurrentUser();
-    const creds = this.authService.getCredentials();
-    if (!user || !creds) return;
-    this.userFavouriteService
-      .getFavouritesByUser(user.id, creds.email, creds.password)
-      .subscribe({
-        next: (favs) => {
-          favs.forEach((fav) => this.savedIds.add(fav.siteId));
-        },
-        error: (err) => {
-          console.error('Failed to load favourites from database', err);
-        },
-      });
+    if (!user) return;
+    this.userFavouriteService.getFavouritesByUser(user.id).subscribe({
+      next: (favs) => {
+        favs.forEach((fav) => this.savedIds.add(fav.siteId));
+      },
+      error: (err) => {
+        console.error('Failed to load favourites from database', err);
+      },
+    });
   }
 
   saveToFavorites(place: Place): void {
     if (this.savingFavouriteId === place.id || this.isPlaceSaved(place)) return;
     const user = this.authService.getCurrentUser();
-    const creds = this.authService.getCredentials();
-    if (!user || !creds) return;
+    if (!user) return;
     this.savingFavouriteId = place.id;
     const payload = {
       userId: user.id,
@@ -310,19 +303,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       siteType: place.type,
       placeName: place.name,
     };
-    this.userFavouriteService
-      .createFavourite(payload, creds.email, creds.password)
-      .subscribe({
-        next: () => {
-          this.loadSavedVisited();
-        },
-        error: (err) => {
-          console.error('Failed to save favourite', err);
-        },
-        complete: () => {
-          this.savingFavouriteId = null;
-        },
-      });
+    this.userFavouriteService.createFavourite(payload).subscribe({
+      next: () => {
+        this.loadSavedVisited();
+      },
+      error: (err) => {
+        console.error('Failed to save favourite', err);
+      },
+      complete: () => {
+        this.savingFavouriteId = null;
+      },
+    });
   }
 
   isPlaceSaved(place: Place): boolean {
@@ -388,7 +379,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.userReviews.find((r) => r.placeId == placeId.toString());
   }
 
-  openReviewForm(place: Place): void {
+  openReviewForm(place: Place, event?: Event): void {
+    if (event) event.stopPropagation();
+    console.log('Review button clicked');
     this.selectedPlaceForReview = place;
     const existingReview = this.getReviewForPlace(place.id);
     if (existingReview) {
@@ -411,7 +404,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   saveReview(): void {
     if (!this.reviewForm || !this.selectedPlaceForReview) return;
-
+    if (!this.currentUser) {
+      alert('User data not loaded. Please try again.');
+      return;
+    }
     const reviewData: Partial<PlaceReview> = {
       ...this.reviewForm,
       userId: this.currentUser.id,

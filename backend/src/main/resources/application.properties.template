@@ -11,3 +11,8 @@ spring.jpa.properties.hibernate.validator.apply_to_ddl=false
 spring.jpa.properties.hibernate.globally_quoted_identifiers=true
 spring.jpa.properties.hibernate.check_nullability=true
 spring.jpa.properties.hibernate.schema_validation.enabled=false
+
+# JWT Settings
+application.security.jwt.secret-key=YOUR_SUPER_SECRET_JWT_KEY_NEEDS_TO_BE_LONG_AND_SECURE
+application.security.jwt.expiration=86400000 # 24 hours
+application.security.jwt.refresh-token.expiration=604800000 # 7 days

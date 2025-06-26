@@ -117,8 +117,9 @@
                             {{ savingVisitedId === place.id ? 'Visiting...' : (isPlaceVisited(place) ? 'Visited' : 'Mark
                             as Visited') }}
                         </button>
-                        <button class="btn-small btn-review" [class.has-review]="getReviewForPlace(place.id)"
-                            (click)="openReviewForm(place); $event.stopPropagation();">
+                        <button type="button" tabindex="0" class="btn-small btn-review"
+                            [class.has-review]="getReviewForPlace(place.id)" style="z-index: 10; position: relative;"
+                            (click)="openReviewForm(place, $event)">
                             <i class="fas fa-star"></i>
                             {{ getReviewForPlace(place.id) ? 'Edit Review' : 'Add Review' }}
                         </button>

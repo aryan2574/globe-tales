@@ -71,29 +71,23 @@ export class FavoritesComponent implements OnInit {
   private loadFavorites() {
     if (!this.user) return;
     this.loading = true;
-    const creds = this.authService.getCredentials();
-    this.userFavouriteService
-      .getFavouritesByUser(this.user.id, creds?.email, creds?.password)
-      .subscribe({
-        next: (favs) => {
-          this.favorites = favs;
-          this.loading = false;
-        },
-        error: () => {
-          this.error = 'Failed to load favorites';
-          this.loading = false;
-        },
-      });
+    this.userFavouriteService.getFavouritesByUser(this.user.id).subscribe({
+      next: (favs) => {
+        this.favorites = favs;
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'Failed to load favorites';
+        this.loading = false;
+      },
+    });
   }
 
   removeFavorite(siteId: number) {
     if (!this.user) return;
-    const creds = this.authService.getCredentials();
-    this.userFavouriteService
-      .removeFavourite(this.user.id, siteId, creds?.email, creds?.password)
-      .subscribe({
-        next: () => this.loadFavorites(),
-        error: () => (this.error = 'Failed to remove favorite'),
-      });
+    this.userFavouriteService.deleteFavourite(this.user.id, siteId).subscribe({
+      next: () => this.loadFavorites(),
+      error: () => (this.error = 'Failed to remove favorite'),
+    });
   }
 }

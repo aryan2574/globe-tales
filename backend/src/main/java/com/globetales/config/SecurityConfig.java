@@ -1,5 +1,6 @@
 package com.globetales.config;
 
+import com.globetales.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +19,17 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final UserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -35,21 +38,26 @@ public class SecurityConfig {
             .and()
             .csrf().disable()
             .authorizeHttpRequests()
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/register").permitAll()
-                .requestMatchers("/api/routes").permitAll()
-                .requestMatchers("/api/weather").permitAll()
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/api/register",
+                        "/api/routes",
+                        "/api/weather",
+                        "/v3/api-docs/**",
+                        "/swagger-ui.html",
+                        "/swagger-ui/**"
+                ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/chat/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/stories", "/api/stories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reviews/place/**").permitAll()
-                .requestMatchers("/api/reviews/**").authenticated()
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
             .and()
-            .httpBasic(); // Enable HTTP Basic Auth
+            .sessionManagement()
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 

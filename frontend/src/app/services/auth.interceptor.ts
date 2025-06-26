@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {
+  HttpRequest,
+  HttpHandler,
   HttpEvent,
   HttpInterceptor,
-  HttpHandler,
-  HttpRequest,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -13,19 +13,17 @@ export class AuthInterceptor implements HttpInterceptor {
   constructor(private authService: AuthService) {}
 
   intercept(
-    req: HttpRequest<any>,
+    request: HttpRequest<unknown>,
     next: HttpHandler
-  ): Observable<HttpEvent<any>> {
-    const credentials = this.authService.getCredentials();
-    if (credentials) {
-      const { email, password } = credentials;
-      const headers = req.headers.set(
-        'Authorization',
-        'Basic ' + btoa(`${email}:${password}`)
-      );
-      const authReq = req.clone({ headers });
-      return next.handle(authReq);
+  ): Observable<HttpEvent<unknown>> {
+    const token = this.authService.getToken();
+    if (token) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     }
-    return next.handle(req);
+    return next.handle(request);
   }
 }

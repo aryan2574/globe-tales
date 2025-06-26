@@ -16,6 +16,7 @@ import { catchError } from 'rxjs/operators';
 export class AuthService {
   private readonly USER_KEY = 'current_user';
   private readonly CREDENTIALS_KEY = 'auth_credentials';
+  private tokenKey = 'auth_token';
 
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
@@ -46,7 +47,9 @@ export class AuthService {
       .pipe(
         tap((response) => {
           this.handleAuthResponse(response);
-          this.storeCredentials(request.email, request.password);
+          if (response && response.token) {
+            localStorage.setItem(this.tokenKey, response.token);
+          }
         }),
         catchError(this.handleError)
       );
@@ -58,8 +61,10 @@ export class AuthService {
       .post<AuthResponse>(`${environment.apiUrl}/auth/login`, loginRequest)
       .pipe(
         tap((response) => {
-          this.storeCredentials(email, password);
           this.handleAuthResponse(response);
+          if (response && response.token) {
+            localStorage.setItem(this.tokenKey, response.token);
+          }
         }),
         map((response) => response.user),
         catchError((error: HttpErrorResponse) => {
@@ -75,6 +80,7 @@ export class AuthService {
     this.currentUserSubject.next(null);
     localStorage.removeItem(this.CREDENTIALS_KEY);
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.tokenKey);
   }
 
   isAuthenticated(): boolean {
@@ -91,24 +97,7 @@ export class AuthService {
   }
 
   updateCurrentUser(user: User): void {
-    this.handleAuthResponse({ user });
-  }
-
-  getCredentials(): { email: string; password: string } | null {
-    const creds = localStorage.getItem(this.CREDENTIALS_KEY);
-    if (!creds) return null;
-    try {
-      return JSON.parse(creds);
-    } catch {
-      return null;
-    }
-  }
-
-  private storeCredentials(email: string, password: string) {
-    localStorage.setItem(
-      this.CREDENTIALS_KEY,
-      JSON.stringify({ email, password })
-    );
+    this.handleAuthResponse({ user, token: '' });
   }
 
   private handleAuthResponse(response: AuthResponse): void {
@@ -139,5 +128,13 @@ export class AuthService {
     }
 
     return throwError(() => new Error(errorMessage));
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem(this.tokenKey);
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
   }
 }

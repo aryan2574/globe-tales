@@ -35,9 +35,7 @@ export class RouteService {
   getRoute(
     start: [number, number],
     end: [number, number],
-    transportMode: 'driving-car' | 'foot-walking' | 'cycling-regular',
-    username?: string,
-    password?: string
+    transportMode: 'driving-car' | 'foot-walking' | 'cycling-regular'
   ): Observable<RouteInfo> {
     const url = `${this.API_URL}/routes`;
     const body = {
@@ -45,15 +43,7 @@ export class RouteService {
       end: { latitude: end[0], longitude: end[1] },
       transportMode,
     };
-    let options: { headers?: HttpHeaders; withCredentials?: boolean } = {};
-    if (username && password) {
-      const credentials = btoa(`${username}:${password}`);
-      options.headers = new HttpHeaders({
-        Authorization: `Basic ${credentials}`,
-      });
-      options.withCredentials = true;
-    }
-    return this.http.post<any>(url, body, { withCredentials: true }).pipe(
+    return this.http.post<any>(url, body).pipe(
       map((response) => ({
         distance: response.distance,
         duration: response.duration,

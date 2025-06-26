@@ -26,68 +26,27 @@ export class ApiService {
     return throwError(() => new Error(errorMessage));
   }
 
-  // Helper to create Basic Auth headers
-  private createAuthHeaders(username: string, password: string): HttpHeaders {
-    const credentials = btoa(`${username}:${password}`);
-    return new HttpHeaders({
-      Authorization: `Basic ${credentials}`,
-    });
-  }
-
-  get<T>(path: string, username?: string, password?: string): Observable<T> {
-    const headers =
-      username && password
-        ? this.createAuthHeaders(username, password)
-        : undefined;
+  get<T>(path: string): Observable<T> {
     return this.http
-      .get<T>(`${this.apiUrl}${path}`, { headers, withCredentials: true })
+      .get<T>(`${this.apiUrl}${path}`)
       .pipe(catchError(this.handleError));
   }
 
-  post<T>(
-    path: string,
-    body: any,
-    username?: string,
-    password?: string
-  ): Observable<T> {
-    const headers =
-      username && password
-        ? this.createAuthHeaders(username, password)
-        : undefined;
+  post<T>(path: string, body: any): Observable<T> {
     return this.http
-      .post<T>(`${this.apiUrl}${path}`, body, {
-        headers,
-        withCredentials: true,
-      })
+      .post<T>(`${this.apiUrl}${path}`, body)
       .pipe(catchError(this.handleError));
   }
 
-  put<T>(
-    path: string,
-    body: any,
-    username?: string,
-    password?: string
-  ): Observable<T> {
-    const headers =
-      username && password
-        ? this.createAuthHeaders(username, password)
-        : undefined;
+  put<T>(path: string, body: any): Observable<T> {
     return this.http
-      .put<T>(`${this.apiUrl}${path}`, body, { headers, withCredentials: true })
+      .put<T>(`${this.apiUrl}${path}`, body)
       .pipe(catchError(this.handleError));
   }
 
-  delete<T = void>(
-    path: string,
-    username?: string,
-    password?: string
-  ): Observable<T> {
-    const headers =
-      username && password
-        ? this.createAuthHeaders(username, password)
-        : undefined;
+  delete<T = void>(path: string): Observable<T> {
     return this.http
-      .delete<T>(`${this.apiUrl}${path}`, { headers, withCredentials: true })
+      .delete<T>(`${this.apiUrl}${path}`)
       .pipe(catchError(this.handleError));
   }
 }

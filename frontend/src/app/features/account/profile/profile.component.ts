@@ -43,28 +43,23 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     // Always fetch latest user from backend for location
-    const creds = this.authService.getCredentials();
-    if (creds) {
-      this.userService.getCurrentUser().subscribe({
-        next: (user) => {
-          this.user = user;
-          this.profileForm.patchValue({
-            username: user.username,
-            email: user.email,
-            location:
-              user.latitude != null && user.longitude != null
-                ? `${user.latitude}, ${user.longitude}`
-                : '',
-          });
-          this.locationChecked = true;
-        },
-        error: () => {
-          this.locationChecked = true;
-        },
-      });
-    } else {
-      this.locationChecked = true;
-    }
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.user = user;
+        this.profileForm.patchValue({
+          username: user.username,
+          email: user.email,
+          location:
+            user.latitude != null && user.longitude != null
+              ? `${user.latitude}, ${user.longitude}`
+              : '',
+        });
+        this.locationChecked = true;
+      },
+      error: () => {
+        this.locationChecked = true;
+      },
+    });
   }
 
   updateLocation(): void {

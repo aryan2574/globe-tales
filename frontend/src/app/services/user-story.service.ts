@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { UserStory } from '../models/user-story.model';
 import { AuthService } from './auth.service';
@@ -12,51 +12,31 @@ export class UserStoryService {
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
-  private getAuthHeaders(): HttpHeaders {
-    const creds = this.authService.getCredentials();
-    if (!creds) {
-      return new HttpHeaders();
-    }
-    const basicAuth = 'Basic ' + btoa(creds.email + ':' + creds.password);
-    return new HttpHeaders().set('Authorization', basicAuth);
-  }
-
   createStory(story: UserStory): Observable<UserStory> {
-    const headers = this.getAuthHeaders();
-    return this.http.post<UserStory>(this.apiUrl, story, { headers });
+    return this.http.post<UserStory>(this.apiUrl, story);
   }
 
   getStories(): Observable<UserStory[]> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<UserStory[]>(this.apiUrl, { headers });
+    return this.http.get<UserStory[]>(this.apiUrl);
   }
 
   getStory(id: string): Observable<UserStory> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<UserStory>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.get<UserStory>(`${this.apiUrl}/${id}`);
   }
 
   updateStory(id: string, story: UserStory): Observable<UserStory> {
-    const headers = this.getAuthHeaders();
-    return this.http.put<UserStory>(`${this.apiUrl}/${id}`, story, { headers });
+    return this.http.put<UserStory>(`${this.apiUrl}/${id}`, story);
   }
 
   deleteStory(id: string): Observable<void> {
-    const headers = this.getAuthHeaders();
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, { headers });
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   markSiteAsVisited(placeId: string): Observable<UserStory> {
-    const headers = this.getAuthHeaders();
-    return this.http.post<UserStory>(
-      `${this.apiUrl}/visit/${placeId}`,
-      {},
-      { headers }
-    );
+    return this.http.post<UserStory>(`${this.apiUrl}/visit/${placeId}`, {});
   }
 
   getVisitedSites(): Observable<UserStory[]> {
-    const headers = this.getAuthHeaders();
-    return this.http.get<UserStory[]>(`${this.apiUrl}/visited`, { headers });
+    return this.http.get<UserStory[]>(`${this.apiUrl}/visited`);
   }
 }

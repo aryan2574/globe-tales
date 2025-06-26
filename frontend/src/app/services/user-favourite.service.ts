@@ -17,51 +17,25 @@ export class UserFavouriteService {
     return this.apiService.get<UserFavourite>(`/user-favourites/${id}`);
   }
 
-  createFavourite(
-    favourite: UserFavourite,
-    username?: string,
-    password?: string
-  ): Observable<UserFavourite> {
-    return this.apiService.post<UserFavourite>(
-      '/user-favourites',
-      favourite,
-      username,
-      password
+  createFavourite(favourite: UserFavourite): Observable<UserFavourite> {
+    return this.apiService.post<UserFavourite>('/user-favourites', favourite);
+  }
+
+  deleteFavourite(userId: string, siteId: number): Observable<void> {
+    return this.apiService.delete<void>(
+      `/user-favourites/user/${userId}/site/${siteId}`
     );
   }
 
-  deleteFavourite(id: number): Observable<void> {
-    return this.apiService.delete(`/user-favourites/${id}`);
-  }
-
-  getFavouritesByUser(
-    userId: string,
-    username?: string,
-    password?: string
-  ): Observable<UserFavourite[]> {
+  getFavouritesByUser(userId: string): Observable<UserFavourite[]> {
     return this.apiService.get<UserFavourite[]>(
-      `/user-favourites/user/${userId}`,
-      username,
-      password
+      `/user-favourites/user/${userId}`
     );
   }
 
   checkFavouriteExists(userId: string, siteId: number): Observable<boolean> {
     return this.apiService.get<boolean>(
       `/user-favourites/check?userId=${userId}&siteId=${siteId}`
-    );
-  }
-
-  removeFavourite(
-    userId: string,
-    siteId: number,
-    username?: string,
-    password?: string
-  ): Observable<void> {
-    return this.apiService.delete(
-      `/user-favourites/user/${userId}/site/${siteId}`,
-      username,
-      password
     );
   }
 

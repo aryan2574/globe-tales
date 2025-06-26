@@ -52,30 +52,17 @@ export class PlacesService {
     east: number
   ): Observable<any> {
     const bbox = `${south},${west},${north},${east}`;
-    const creds = this.authService.getCredentials();
-    let headers = undefined;
-    if (creds) {
-      const basicAuth = 'Basic ' + btoa(creds.email + ':' + creds.password);
-      headers = { Authorization: basicAuth };
-    }
     return this.http.post(`${this.apiUrl}/fetch`, null, {
       params: { bbox },
-      headers,
     });
   }
 
   getAllPlaces(): Observable<Place[]> {
-    const creds = this.authService.getCredentials();
-    let headers = undefined;
-    if (creds) {
-      const basicAuth = 'Basic ' + btoa(creds.email + ':' + creds.password);
-      headers = { Authorization: basicAuth };
-    }
-    return this.http.get<Place[]>(this.apiUrl, { headers });
+    return this.http.get<Place[]>(this.apiUrl);
   }
 
   /**
-   * Update sites for a given bounding box (manual update, requires Basic Auth)
+   * Update sites for a given bounding box (manual update)
    */
   updateSitesForArea(
     south: number,
@@ -84,15 +71,8 @@ export class PlacesService {
     east: number
   ): Observable<any> {
     const bbox = `${south},${west},${north},${east}`;
-    const creds = this.authService.getCredentials();
-    let headers = undefined;
-    if (creds) {
-      const basicAuth = 'Basic ' + btoa(creds.email + ':' + creds.password);
-      headers = { Authorization: basicAuth };
-    }
     return this.http.post(`${this.apiUrl}/update-area`, null, {
       params: { bbox },
-      headers,
     });
   }
 

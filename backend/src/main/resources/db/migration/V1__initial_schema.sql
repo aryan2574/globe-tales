@@ -12,7 +12,9 @@ CREATE TABLE users (
     longitude DOUBLE PRECISION,
     created_at TIMESTAMP WITH TIME ZONE,
     deleted_at TIMESTAMP WITH TIME ZONE,
-    is_deleted BOOLEAN DEFAULT FALSE
+    is_deleted BOOLEAN DEFAULT FALSE,
+    experience_points INT NOT NULL DEFAULT 0,
+    level VARCHAR(255) NOT NULL DEFAULT 'Beginner'
 );
 
 -- Create user_roles table
@@ -37,10 +39,10 @@ CREATE TABLE user_favourites (
 -- Create user_achievements table
 CREATE TABLE user_achievements (
     user_id UUID NOT NULL,
-    achievement_code VARCHAR(50) NOT NULL,
-    earned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    achievement_code VARCHAR(255) NOT NULL,
+    achieved_at TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (user_id, achievement_code),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- Create indexes
@@ -51,7 +53,7 @@ CREATE INDEX idx_user_favourites_site_id ON user_favourites(site_id);
 CREATE INDEX idx_user_achievements_user_id ON user_achievements(user_id);
 CREATE INDEX idx_user_achievements_achievement_code ON user_achievements(achievement_code);
 
--- Create user_story table (with visit_date)
+-- Create user_story table
 CREATE TABLE user_story (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
@@ -61,7 +63,6 @@ CREATE TABLE user_story (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     visit_date TIMESTAMP WITH TIME ZONE,
-    rating integer,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -93,4 +94,20 @@ CREATE TABLE visited_sites (
 );
 
 CREATE INDEX idx_visited_sites_user_id ON visited_sites(user_id);
-CREATE INDEX idx_visited_sites_place_id ON visited_sites(place_id); 
+CREATE INDEX idx_visited_sites_place_id ON visited_sites(place_id);
+
+-- Create place_reviews table
+CREATE TABLE place_reviews (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL,
+    place_id VARCHAR(255) NOT NULL,
+    place_name VARCHAR(255),
+    comment TEXT,
+    rating INTEGER,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_place_reviews_user_id ON place_reviews(user_id);
+CREATE INDEX idx_place_reviews_place_id ON place_reviews(place_id); 

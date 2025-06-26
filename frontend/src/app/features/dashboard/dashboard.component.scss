@@ -698,6 +698,45 @@
         display: flex;
         justify-content: flex-end;
         gap: 1rem;
+        margin-top: 2rem;
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            &:active {
+                transform: translateY(0);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #4a90e2, #2ecc71);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f0f2f5;
+            color: #555;
+
+            &:hover {
+                background: #e4e6e9;
+            }
+        }
     }
 }
 
@@ -714,6 +753,21 @@
 }
 
 .btn-review {
+    border: 2px solid transparent;
+    background: #f5fafd;
+    color: #1a5276;
+    font-weight: 600;
+    z-index: 10;
+    position: relative;
+    box-shadow: 0 1px 2px rgba(74, 144, 226, 0.04);
+    transition: background 0.2s, color 0.2s, border 0.2s;
+
+    &:hover {
+        background: #e0eafc;
+        color: #3498db;
+        border-color: #3498db;
+    }
+
     &.has-review {
         background-color: #28a745;
         color: white;

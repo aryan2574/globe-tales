@@ -10,6 +10,7 @@ import com.globetales.exception.ResourceNotFoundException;
 import com.globetales.mapper.UserMapper;
 import com.globetales.repository.UserRepository;
 import com.globetales.service.AuthenticationService;
+import com.globetales.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,6 +28,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @Override
     public AuthenticationResponse register(RegisterRequest request) {
@@ -52,9 +54,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         userRepository.save(user);
         var userDTO = userMapper.toDTO(user);
+        var jwtToken = jwtService.generateToken(user);
 
         return AuthenticationResponse.builder()
                 .user(userDTO)
+                .token(jwtToken)
                 .build();
     }
 
@@ -75,8 +79,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         var userDTO = userMapper.toDTO(user);
+        var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
             .user(userDTO)
+            .token(jwtToken)
             .build();
     }
 } 

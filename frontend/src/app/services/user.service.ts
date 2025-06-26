@@ -30,12 +30,8 @@ export class UserService {
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 
-  getUserById(
-    id: string,
-    username?: string,
-    password?: string
-  ): Observable<User> {
-    return this.apiService.get<User>(`/users/${id}`, username, password);
+  getUserById(id: string): Observable<User> {
+    return this.apiService.get<User>(`/users/${id}`);
   }
 
   createUser(user: User, password: string): Observable<User> {
@@ -43,9 +39,8 @@ export class UserService {
   }
 
   updateUser(id: string, user: User): Observable<User> {
-    const creds = this.authService.getCredentials();
     return this.apiService
-      .put<User>(`/users/${id}`, user, creds?.email, creds?.password)
+      .put<User>(`/users/${id}`, user)
       .pipe(tap(() => this.refreshCurrentUser()));
   }
 
@@ -64,9 +59,8 @@ export class UserService {
   }
 
   updateCurrentUserLocation(location: LocationDTO): Observable<void> {
-    const creds = this.authService.getCredentials();
     return this.apiService
-      .put<void>(`/users/location`, location, creds?.email, creds?.password)
+      .put<void>(`/users/location`, location)
       .pipe(tap(() => this.getCurrentUser().subscribe()));
   }
 }
