@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { DistancePipe } from '../../pipes/distance.pipe';
-import { DurationPipe } from '../../pipes/duration.pipe';
+import { DurationPipe } from '../../shared/pipes/duration.pipe';
 import { MapService } from '../../services/map.service';
 import { LocationService, Location } from '../../services/location.service';
 import { PlacesService } from '../../services/places.service';
@@ -105,7 +105,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // Fetch favourites for the user
         this.userFavouriteService.getFavouritesByUser(user.id).subscribe({
           next: (favs) => {
-            console.log('Fetched user favourites:', favs);
             // For each favourite, fetch the place details
             const placeObservables = favs.map((fav) =>
               this.placesService.getPlaceByOsmId(fav.siteId.toString())
@@ -113,14 +112,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
             Promise.all(placeObservables.map((o) => o.toPromise())).then(
               (places) => {
                 this.favourites = places.filter((p): p is Place => !!p);
-                console.log('Mapped favourite places:', this.favourites);
               }
             );
           },
           error: (err) => {
             // Ignore error, just don't show favourites
             this.favourites = [];
-            console.error('Error fetching user favourites:', err);
           },
         });
       },
@@ -194,7 +191,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           },
           error: (error) => {
             this.error = 'Failed to load places. Please try again.';
-            console.error('Error searching places:', error);
           },
           complete: () => {
             this.loading = false;
@@ -202,7 +198,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
     } catch (error) {
       this.error = 'Failed to load places. Please try again.';
-      console.error('Error searching places:', error);
     }
   }
 
@@ -225,12 +220,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.routeInfo = routeInfo;
           },
           error: (error) => {
-            console.error('Error getting route:', error);
             this.error = 'Failed to get route. Please try again.';
           },
         });
     } catch (error) {
-      console.error('Error getting current location:', error);
       this.error = 'Failed to get current location. Please try again.';
     }
   }
@@ -262,7 +255,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.routeInfo = routeInfo;
         },
         error: (error) => {
-          console.error('Error getting route:', error);
           this.error = 'Failed to get route. Please try again.';
         },
         complete: () => {
@@ -302,9 +294,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: (favs) => {
         favs.forEach((fav) => this.savedIds.add(fav.siteId));
       },
-      error: (err) => {
-        console.error('Failed to load favourites from database', err);
-      },
     });
   }
 
@@ -324,9 +313,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.loadSavedVisited();
         this.userService.refreshCurrentUser();
       },
-      error: (err) => {
-        console.error('Failed to save favourite', err);
-      },
+      error: (err) => {},
       complete: () => {
         this.savingFavouriteId = null;
       },
@@ -348,9 +335,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
           if (site.placeId) this.visitedIds.add(site.placeId.toString());
         });
       },
-      error: (err) => {
-        console.error('Failed to load visited sites', err);
-      },
     });
   }
 
@@ -371,9 +355,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       next: () => {
         this.loadVisitedSites();
       },
-      error: (err) => {
-        console.error('Failed to mark as visited', err);
-      },
+      error: (err) => {},
       complete: () => {
         this.savingVisitedId = null;
       },
@@ -398,7 +380,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   openReviewForm(place: Place, event?: Event): void {
     if (event) event.stopPropagation();
-    console.log('Review button clicked');
     this.selectedPlaceForReview = place;
     const existingReview = this.getReviewForPlace(place.id);
     if (existingReview) {

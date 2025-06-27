@@ -304,10 +304,6 @@ export class MapService implements OnDestroy {
 
   displayFavourites(favourites: Place[]): void {
     if (!this.map) return;
-    console.log('Displaying favourite markers:', favourites);
-    // Remove previous favourite markers
-    this.favouriteMarkers.forEach((marker) => marker.remove());
-    this.favouriteMarkers = [];
     favourites.forEach((place) => {
       if (
         typeof place.latitude === 'number' &&

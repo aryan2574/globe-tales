@@ -51,7 +51,6 @@ export class AppComponent implements OnInit {
     this.locationService.getCurrentLocation().subscribe({
       next: (location) => {
         if (location) {
-          console.log('Location successfully retrieved:', location);
         }
       },
       error: (error) => {

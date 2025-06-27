@@ -67,16 +67,15 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     // Aggressively check and invalidate size until the map is properly rendered
     const map = this.mapService.getMap();
     if (map) {
-      const interval = setInterval(() => {
-        const mapSize = map.getSize();
-        if (mapSize.x > 0 && mapSize.y > 0) {
-          map.invalidateSize();
-          clearInterval(interval); // Stop checking once the map is sized
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+            map.invalidateSize();
+            resizeObserver.disconnect(); // Stop observing once the map is sized
+          }
         }
-      }, 50);
-
-      // Failsafe to stop the interval after a few seconds
-      setTimeout(() => clearInterval(interval), 2000);
+      });
+      resizeObserver.observe(this.mapContainer.nativeElement);
     }
   }
 

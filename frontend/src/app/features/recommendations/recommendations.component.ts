@@ -6,7 +6,7 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DistancePipe } from '../../pipes/distance.pipe';
-import { DurationPipe } from '../../pipes/duration.pipe';
+import { DurationPipe } from '../../shared/pipes/duration.pipe';
 import { UserService } from '../../services/user.service';
 import { LocationService } from '../../services/location.service';
 import { User } from '../../models/user.model';
