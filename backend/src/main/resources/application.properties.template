@@ -1,18 +1,58 @@
-openrouteservice.api.key=YOUR_OPENROUTESERVICE_API_KEY
+# Application Name
+spring.application.name=backend
 
-#OpenAI Configuration
-openai.api.key=<YOUR_OPENAI_API_KEY>
-openai.chatbot.system-message=You are a helpful assistant for the GlobeTales application. You can answer questions about places and provide travel recommendations.
+# Database Configuration
+spring.datasource.url=jdbc:postgresql://localhost:5432/<YOUR_DB_NAME>
+spring.datasource.username=<YOUR_DB_USERNAME>
+spring.datasource.password=<YOUR_DB_PASSWORD>
+spring.datasource.driver-class-name=org.postgresql.Driver
 
+# JPA/Hibernate Configuration
 spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.validator.apply_to_ddl=false
 spring.jpa.properties.hibernate.globally_quoted_identifiers=true
 spring.jpa.properties.hibernate.check_nullability=true
 spring.jpa.properties.hibernate.schema_validation.enabled=false
 
-# JWT Settings
-application.security.jwt.secret-key=YOUR_SUPER_SECRET_JWT_KEY_NEEDS_TO_BE_LONG_AND_SECURE
+# Flyway Configuration
+spring.flyway.enabled=true
+spring.flyway.baseline-on-migrate=true
+spring.flyway.locations=classpath:db/migration
+spring.flyway.schemas=public
+spring.flyway.clean-disabled=true
+spring.flyway.clean-on-validation-error=true
+
+# Enable PostGIS support
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+# Server Configuration
+server.port=8080
+
+# Logging Configuration
+logging.level.org.springframework.security=DEBUG
+logging.level.com.example.backend=DEBUG
+logging.level.root=DEBUG
+logging.level.org.springframework=DEBUG
+
+# JWT Configuration
+application.security.jwt.secret-key=<YOUR_SUPER_SECRET_JWT_KEY>
 application.security.jwt.expiration=86400000 # 24 hours
 application.security.jwt.refresh-token.expiration=604800000 # 7 days
+
+# CORS Configuration
+spring.web.cors.allowed-origins=http://localhost:4200
+spring.web.cors.allowed-methods=GET,POST,PUT,DELETE,OPTIONS,PATCH
+spring.web.cors.allowed-headers=Authorization,Content-Type,Accept,Origin,X-Requested-With,Access-Control-Request-Method,Access-Control-Request-Headers
+spring.web.cors.exposed-headers=Authorization
+spring.web.cors.allow-credentials=true
+spring.web.cors.max-age=3600
+
+# OpenRouteService Configuration
+openrouteservice.api.key=<YOUR_OPENROUTESERVICE_API_KEY>
+
+# OpenAI Configuration
+openai.api.key=<YOUR_OPENAI_API_KEY>
+openai.chatbot.system-message=You are a helpful assistant for the GlobeTales application. You can answer questions about places and provide travel recommendations.
