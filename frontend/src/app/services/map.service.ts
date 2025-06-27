@@ -16,6 +16,7 @@ export class MapService implements OnDestroy {
   private userLocationMarker: L.Marker | null = null;
   private routeLayer: L.Polyline | null = null;
   private readonly OVERPASS_API = 'https://overpass-api.de/api/interpreter';
+  private favouriteMarkers: L.Marker[] = [];
 
   constructor(private http: HttpClient) {}
 
@@ -299,5 +300,35 @@ export class MapService implements OnDestroy {
 
   getMap(): L.Map | null {
     return this.map;
+  }
+
+  displayFavourites(favourites: Place[]): void {
+    if (!this.map) return;
+    console.log('Displaying favourite markers:', favourites);
+    // Remove previous favourite markers
+    this.favouriteMarkers.forEach((marker) => marker.remove());
+    this.favouriteMarkers = [];
+    favourites.forEach((place) => {
+      if (
+        typeof place.latitude === 'number' &&
+        typeof place.longitude === 'number' &&
+        !isNaN(place.latitude) &&
+        !isNaN(place.longitude)
+      ) {
+        const marker = L.marker([place.latitude, place.longitude], {
+          icon: L.divIcon({
+            className: 'custom-fa-marker favourite-marker',
+            html: '<i class="fas fa-heart favourite-heart-icon"></i>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+          }),
+        }).bindPopup(`
+            <strong>${place.name}</strong><br>
+            ${place.description || ''}
+          `);
+        marker.addTo(this.map!);
+        this.favouriteMarkers.push(marker);
+      }
+    });
   }
 }

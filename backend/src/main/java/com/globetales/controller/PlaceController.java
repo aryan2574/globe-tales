@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 
 @RestController
 @RequestMapping("/api/places")
@@ -69,5 +70,24 @@ public class PlaceController {
             logger.error("Update failed for bbox: {}: {}", bbox, e.getMessage());
             throw e;
         }
+    }
+
+    @GetMapping("/osm/{osmId}")
+    public Place getPlaceByOsmId(@PathVariable Long osmId) {
+        return placeService.getPlaceByOsmId(osmId);
+    }
+
+    @PostMapping("/import-osm")
+    public ResponseEntity<?> importOsmPlaces(@RequestBody List<Long> osmIds) {
+        int imported = 0;
+        for (Long osmId : osmIds) {
+            try {
+                placeService.importPlaceByOsmId(osmId);
+                imported++;
+            } catch (Exception e) {
+                // log and skip
+            }
+        }
+        return ResponseEntity.ok("Imported/ensured " + imported + " places.");
     }
 } 

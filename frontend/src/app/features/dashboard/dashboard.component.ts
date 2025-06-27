@@ -73,6 +73,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     placeName?: string;
     id?: string;
   } | null = null;
+  favourites: Place[] = [];
 
   constructor(
     private mapService: MapService,
@@ -101,6 +102,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.hasLocation = false;
           this.error = 'Please allow location to view nearby places';
         }
+        // Fetch favourites for the user
+        this.userFavouriteService.getFavouritesByUser(user.id).subscribe({
+          next: (favs) => {
+            console.log('Fetched user favourites:', favs);
+            // For each favourite, fetch the place details
+            const placeObservables = favs.map((fav) =>
+              this.placesService.getPlaceByOsmId(fav.siteId.toString())
+            );
+            Promise.all(placeObservables.map((o) => o.toPromise())).then(
+              (places) => {
+                this.favourites = places.filter((p): p is Place => !!p);
+                console.log('Mapped favourite places:', this.favourites);
+              }
+            );
+          },
+          error: (err) => {
+            // Ignore error, just don't show favourites
+            this.favourites = [];
+            console.error('Error fetching user favourites:', err);
+          },
+        });
       },
       error: (err) => {
         this.error = 'Failed to load user data.';

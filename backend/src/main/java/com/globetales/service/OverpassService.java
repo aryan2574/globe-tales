@@ -113,4 +113,39 @@ public class OverpassService {
     public void updateSitesForArea(double south, double west, double north, double east) throws Exception {
         fetchAndStorePlaces(south, west, north, east);
     }
+
+    public Place fetchAndStorePlaceByOsmId(Long osmId) throws Exception {
+        Place existing = placeRepository.findByOsmId(osmId);
+        if (existing != null) {
+            return existing;
+        }
+        String overpassUrl = "https://overpass-api.de/api/interpreter";
+        String query = String.format("[out:json][timeout:25];node(id:%d);out body;", osmId);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        String body = "data=" + URLEncoder.encode(query, StandardCharsets.UTF_8);
+        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(overpassUrl, request, String.class);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(response.getBody());
+        for (JsonNode element : root.get("elements")) {
+            if (!element.has("lat") || !element.has("lon")) continue;
+            Place place = new Place();
+            place.setOsmId(element.get("id").asLong());
+            place.setLatitude(element.get("lat").asDouble());
+            place.setLongitude(element.get("lon").asDouble());
+            if (element.has("tags")) {
+                JsonNode tags = element.get("tags");
+                place.setName(tags.has("name") ? tags.get("name").asText() : null);
+                place.setType(tags.has("amenity") ? tags.get("amenity").asText() :
+                              tags.has("tourism") ? tags.get("tourism").asText() : null);
+                place.setAddress(tags.has("addr:full") ? tags.get("addr:full").asText() : null);
+                place.setTags(mapper.convertValue(tags, new TypeReference<Map<String, Object>>() {}));
+            }
+            placeRepository.save(place);
+            return place;
+        }
+        return null;
+    }
 } 

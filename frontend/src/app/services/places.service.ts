@@ -79,4 +79,8 @@ export class PlacesService {
   getPlaceById(id: string): Observable<Place> {
     return this.http.get<Place>(`${this.apiUrl}/${id}`);
   }
+
+  getPlaceByOsmId(osmId: string): Observable<Place> {
+    return this.http.get<Place>(`${this.apiUrl}/osm/${osmId}`);
+  }
 }

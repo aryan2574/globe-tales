@@ -37,6 +37,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() zoom: number = 14;
   @Input() places: Place[] = [];
   @Input() selectedPlace: Place | null = null;
+  @Input() favourites: Place[] = [];
 
   @Input() set routeGeometry(geometry: any) {
     if (geometry) {
@@ -87,6 +88,10 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
         this.lastCenter = [this.latitude, this.longitude];
       }
       this.updateMap();
+      // Update favourites if they change
+      if (changes['favourites']) {
+        this.mapService.displayFavourites(this.favourites);
+      }
     }
   }
 
@@ -107,6 +112,9 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
     if (this.places && this.places.length > 0) {
       this.mapService.displayPlaces(this.places);
+    }
+    if (this.favourites && this.favourites.length > 0) {
+      this.mapService.displayFavourites(this.favourites);
     }
   }
 }

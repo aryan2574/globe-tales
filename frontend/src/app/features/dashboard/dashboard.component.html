@@ -5,7 +5,8 @@
                 class="weather-widget-overlay">
             </app-weather-widget>
             <app-map *ngIf="hasLocation" [latitude]="currentLatitude!" [longitude]="currentLongitude!" [places]="places"
-                [selectedPlace]="selectedPlace" [routeGeometry]="routeInfo?.geometry"></app-map>
+                [selectedPlace]="selectedPlace" [routeGeometry]="routeInfo?.geometry"
+                [favourites]="favourites"></app-map>
             <div class="route-controls" *ngIf="selectedPlace">
                 <div class="route-info" *ngIf="routeInfo">
                     <div class="info-item">
