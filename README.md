@@ -4,12 +4,8 @@
   <p align="center">
     Every place has a story.
     <br />
-    <a href="https://github.com/your_username/GlobeTales"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/aryan2574/GlobeTales"><strong>Explore the docs »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/your_username/GlobeTales/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/your_username/GlobeTales/issues">Request Feature</a>
   </p>
 </div>
 
@@ -42,7 +38,7 @@
 
 ## About The Project
 
-GlobeTales is a full-featured travel platform that allows users to discover new places, plan their trips, and share their travel experiences with a community of fellow adventurers. The application provides intelligent recommendations, route planning, and even a gamified system of achievements to make travel more engaging.
+GlobeTales is a travel platform that allows users to discover new places, plan their trips, and share their travel experiences with a community of fellow adventurers. The application provides intelligent recommendations, route planning, and even a gamified system of achievements to make travel more engaging.
 
 ### Built With
 
@@ -105,7 +101,7 @@ This is the easiest way to get the entire application running.
 
 1.  Clone the repo
     ```sh
-    git clone https://github.com/your_username/GlobeTales.git
+    git clone https://github.com/aryan2574/GlobeTales.git
     cd GlobeTales
     ```
 2.  Create your backend configuration file.

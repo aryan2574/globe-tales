@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Controller for managing places.
+ */
 @RestController
 @RequestMapping("/api/places")
 public class PlaceController {
@@ -22,16 +25,30 @@ public class PlaceController {
         this.overpassService = overpassService;
     }
 
+    /**
+     * Get all places.
+     * @return List of all places
+     */
     @GetMapping
     public List<Place> getAllPlaces() {
         return placeService.getAllPlaces();
     }
 
+    /**
+     * Get a place by its internal ID.
+     * @param id Internal database ID
+     * @return Place object
+     */
     @GetMapping("/{id}")
     public Place getPlaceById(@PathVariable Long id) {
         return placeService.getPlaceById(id);
     }
 
+    /**
+     * Fetch and store places for a given bounding box.
+     * @param bbox Bounding box in format south,west,north,east
+     * @return Status message
+     */
     @PostMapping("/fetch")
     public String fetchPlacesForArea(@RequestParam("bbox") String bbox) throws Exception {
         // bbox format: south,west,north,east
@@ -46,8 +63,10 @@ public class PlaceController {
     }
 
     /**
-     * POST /api/places/update-area?bbox=south,west,north,east
-     * Triggers an update for the given bounding box (for when user is outside Chemnitz)
+     * Update sites for a given bounding box (for when user is outside Chemnitz).
+     * @param bbox Bounding box in format south,west,north,east
+     * @return Status message
+     * @throws Exception if update fails
      */
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/update-area")
@@ -72,11 +91,21 @@ public class PlaceController {
         }
     }
 
+    /**
+     * Get a place by its OSM ID.
+     * @param osmId OSM node ID
+     * @return Place object
+     */
     @GetMapping("/osm/{osmId}")
     public Place getPlaceByOsmId(@PathVariable Long osmId) {
         return placeService.getPlaceByOsmId(osmId);
     }
 
+    /**
+     * Import a list of places by OSM IDs. Fetches from Overpass if missing.
+     * @param osmIds List of OSM IDs
+     * @return Status message
+     */
     @PostMapping("/import-osm")
     public ResponseEntity<?> importOsmPlaces(@RequestBody List<Long> osmIds) {
         int imported = 0;
