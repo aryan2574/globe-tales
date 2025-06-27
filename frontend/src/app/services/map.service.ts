@@ -99,13 +99,32 @@ export class MapService implements OnDestroy {
         !isNaN(place.longitude)
       ) {
         const iconClass = this.getIconClassForPlace(place.type);
-        const iconHtml = `<i class=\"fas ${iconClass}\"></i>`;
+        // Assign a color based on place type
+        let color = '#007bff'; // default blue
+        switch (place.type) {
+          case 'hotel':
+            color = '#e67e22';
+            break; // orange
+          case 'attraction':
+            color = '#e74c3c';
+            break; // red
+          case 'museum':
+            color = '#8e44ad';
+            break; // purple
+          case 'restaurant':
+            color = '#27ae60';
+            break; // green
+          case 'viewpoint':
+            color = '#2980b9';
+            break; // dark blue
+        }
+        const iconHtml = `<i class=\"fas ${iconClass}\" style=\"font-size:2.2rem;color:${color};text-shadow:0 0 4px #fff;\"></i>`;
         const marker = L.marker([place.latitude, place.longitude], {
           icon: L.divIcon({
             className: 'custom-fa-marker',
             html: iconHtml,
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
+            iconSize: [48, 48], // Larger marker
+            iconAnchor: [24, 48], // Bottom center
           }),
         }).bindPopup(`
             <strong>${place.name}</strong><br>
@@ -144,9 +163,9 @@ export class MapService implements OnDestroy {
       this.userLocationMarker = L.marker(coordinates, {
         icon: L.divIcon({
           className: 'custom-fa-marker user-location',
-          html: '<i class="fas fa-location-arrow"></i>',
-          iconSize: [36, 36],
-          iconAnchor: [18, 36],
+          html: '<i class="fas fa-location-arrow user-location-icon"></i>',
+          iconSize: [54, 54], // Larger marker
+          iconAnchor: [27, 54], // Bottom center
         }),
       }).addTo(this.map!);
     }
