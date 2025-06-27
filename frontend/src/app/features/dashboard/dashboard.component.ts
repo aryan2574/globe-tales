@@ -322,6 +322,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userFavouriteService.createFavourite(payload).subscribe({
       next: () => {
         this.loadSavedVisited();
+        this.userService.refreshCurrentUser();
       },
       error: (err) => {
         console.error('Failed to save favourite', err);
