@@ -37,7 +37,15 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() zoom: number = 14;
   @Input() places: Place[] = [];
   @Input() selectedPlace: Place | null = null;
-  @Input() routeGeometry: any = null;
+
+  @Input() set routeGeometry(geometry: any) {
+    if (geometry) {
+      this.mapService.displayRoute(geometry);
+    } else {
+      this.mapService.clearRoute();
+    }
+  }
+
   @ViewChild('mapContainer', { static: true })
   mapContainer!: ElementRef<HTMLDivElement>;
 
@@ -99,11 +107,6 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
     if (this.places && this.places.length > 0) {
       this.mapService.displayPlaces(this.places);
-    }
-    if (this.routeGeometry) {
-      this.mapService.displayRoute(this.routeGeometry);
-    } else {
-      this.mapService.clearRoute();
     }
   }
 }

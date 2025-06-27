@@ -201,9 +201,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (routeInfo) => {
             this.routeInfo = routeInfo;
-            if (routeInfo.geometry) {
-              this.mapService.displayRoute(routeInfo.geometry);
-            }
           },
           error: (error) => {
             console.error('Error getting route:', error);
@@ -241,9 +238,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (routeInfo) => {
           this.routeInfo = routeInfo;
-          if (routeInfo.geometry) {
-            this.mapService.displayRoute(routeInfo.geometry);
-          }
         },
         error: (error) => {
           console.error('Error getting route:', error);

@@ -162,7 +162,7 @@ export class MapService implements OnDestroy {
 
     this.clearRoute();
     const latLngs = geometry.coordinates.map(
-      (coord) => [coord[1], coord[0]] as [number, number]
+      (coord) => [coord[0], coord[1]] as [number, number]
     );
     this.routeLayer = L.polyline(latLngs, {
       color: '#3388ff',
