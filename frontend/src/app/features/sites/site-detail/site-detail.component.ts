@@ -54,9 +54,8 @@ interface Site {
           <div class="site-actions">
             <button class="btn-favorite" (click)="toggleFavorite()">
               <i
-                class="fas"
-                [class.fa-heart]="isFavorite"
-                [class.fa-heart-o]="!isFavorite"
+                [class.fas]="isFavorite"
+                [class.far]="!isFavorite"
               ></i>
               {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
             </button>
