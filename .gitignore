@@ -134,3 +134,25 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/*
+frontend/.vscode
+
+# Docker
+.docker/
+docker-compose.override.yml
+*.env
+.env.*
+
+# Ignore application.properties
+backend/src/main/resources/application.properties
+
+# Ignore environment.ts
+frontend/src/environments/environment.ts

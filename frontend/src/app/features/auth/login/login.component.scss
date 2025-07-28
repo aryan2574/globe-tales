@@ -1,0 +1,110 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f6fa;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+
+    h2 {
+        color: #2c3e50;
+        margin-bottom: 2rem;
+        text-align: center;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        font-weight: 500;
+    }
+
+    input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+
+        &:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+    }
+}
+
+.btn-login {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+        background-color: #2980b9;
+    }
+
+    &:disabled {
+        background-color: #bdc3c7;
+        cursor: not-allowed;
+    }
+}
+
+.auth-links {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+
+    a {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: 500;
+        margin-left: 0.5rem;
+        transition: color 0.3s;
+        position: relative;
+
+        &:hover {
+            color: #2980b9;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background-color: #2980b9;
+            }
+        }
+    }
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}

@@ -1,0 +1,51 @@
+<div class="recommendations-container">
+    <h3>Discover New Places</h3>
+    <div class="controls">
+        <div class="transport-modes">
+            <button (click)="setTransportMode('foot-walking')" [class.active]="transportMode === 'foot-walking'">
+                <i class="fas fa-walking"></i> Walking
+            </button>
+            <button (click)="setTransportMode('cycling-road')" [class.active]="transportMode === 'cycling-road'">
+                <i class="fas fa-bicycle"></i> Cycling
+            </button>
+        </div>
+        <div class="distance-slider">
+            <label for="distance">Max Distance: {{ maxDistance }} km</label>
+            <input type="range" id="distance" min="1" max="20" [(ngModel)]="maxDistance"
+                (ngModelChange)="onDistanceChange($event)">
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-spinner">
+        <p>Loading recommendations...</p>
+    </div>
+
+    <div *ngIf="!isLoading && recommendations.length > 0" class="results">
+        <div *ngFor="let rec of recommendations" class="recommendation-card">
+            <div class="rec-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="rec-content">
+                <p>
+                    The {{ rec.place.type | titlecase }} <strong>{{ rec.place.name }}</strong> is just <strong>{{
+                        rec.distance | distance }}</strong> away.
+                </p>
+                <small>It will take you about {{ rec.duration | duration }} to get there by {{ transportMode ===
+                    'foot-walking' ? 'walking' : 'bike' }}.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="show-more-container" *ngIf="hasMore && !isLoading">
+        <button (click)="loadMore()" class="btn-show-more" [disabled]="isLoading">Show More</button>
+    </div>
+
+    <div *ngIf="!isLoading && recommendations.length === 0 && !locationMissing" class="no-results">
+        <p>No recommendations found for the selected criteria. Try increasing the distance.</p>
+    </div>
+
+    <div *ngIf="locationMissing" class="no-results">
+        <p>Please enable location access to get recommendations.</p>
+        <button (click)="requestLocation()" class="btn-primary">Set Location</button>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="chatbot-container">
+    <button class="chat-toggle-button" *ngIf="!isChatOpen" (click)="toggleChat()" aria-label="Open chat">
+        <i class="fas fa-comment"></i>
+    </button>
+
+    <div class="chat-window" [ngClass]="{ 'closed': !isChatOpen }">
+        <div class="chat-header">
+            <h3>GlobeTales Assistant</h3>
+            <button class="close-button" (click)="toggleChat()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-body" #chatBody>
+            <div *ngFor="let msg of messages" class="message"
+                [ngClass]="{'user-message': msg.isUser, 'bot-message': !msg.isUser}">
+                <p>{{ msg.text }}</p>
+            </div>
+            <!-- Quick action buttons: always show -->
+            <div class="quick-actions">
+                <button *ngFor="let action of quickActions" (click)="handleQuickAction(action.action)">
+                    {{ action.label }}
+                </button>
+            </div>
+            <div #scrollAnchor></div>
+        </div>
+        <div class="chat-footer">
+            <input type="text" [(ngModel)]="userMessage" (keyup.enter)="sendMessage()" placeholder="Ask something..." />
+            <button (click)="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>

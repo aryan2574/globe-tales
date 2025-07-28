@@ -1,0 +1,311 @@
+.app-header {
+    background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+    box-shadow: 0 4px 16px rgba(24, 90, 157, 0.08), 0 1.5px 0 #43cea2;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    animation: navbarFadeIn 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes navbarFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.nav-brand {
+    font-size: 2rem;
+    font-weight: bold;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.brand-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.tagline {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #e0f7fa;
+    margin-top: -5px;
+    margin-left: 35px;
+    letter-spacing: 0.5px;
+    animation: fadeIn 1s 0.5s ease-in-out forwards;
+    opacity: 0;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.brand-link {
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.8rem;
+    transition: color 0.3s, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.brand-link::before {
+    content: "\f5a0";
+    /* Font Awesome globe-americas */
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    color: #ffe082;
+    font-size: 1.5rem;
+    margin-right: 0.3rem;
+    transition: color 0.3s;
+}
+
+.brand-link:hover {
+    color: #ffe082;
+    transform: scale(1.06) rotate(-2deg);
+}
+
+.brand-link:hover::before {
+    color: #fff;
+}
+
+.user-status-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 280px;
+    background: linear-gradient(135deg, #2c3e50, #46637f);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    color: white;
+}
+
+.user-level {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+
+    .fa-star {
+        color: #f1c40f;
+    }
+}
+
+.xp-bar-container {
+    flex-grow: 1;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #2ecc71, #86e49d);
+    border-radius: 4px;
+    transition: width 0.5s ease-in-out;
+}
+
+.xp-text {
+    font-size: 0.85rem;
+    font-weight: 500;
+    min-width: 80px;
+    text-align: right;
+}
+
+.nav-links {
+    display: flex;
+    gap: 3.2rem;
+    align-items: center;
+    margin-left: 2.5rem;
+}
+
+.nav-link {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: color 0.3s, background 0.3s, box-shadow 0.3s;
+    padding: 0.7rem 1.6rem;
+    border-radius: 10px;
+    position: relative;
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: 0 1px 2px #185a9d11;
+    font-size: 1.08rem;
+    margin-right: 0.2rem;
+}
+
+.nav-link:hover {
+    color: #ffe082;
+    background: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 2px 8px #43cea233;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #ffe082;
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+.nav-auth {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-left: 2.5rem;
+}
+
+.btn {
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+    background: linear-gradient(90deg, #43cea2 0%, #185a9d 100%);
+    color: #fff;
+    box-shadow: 0 1px 4px #185a9d22;
+}
+
+.btn-login {
+    background: transparent;
+    color: #ffe082;
+    border: 1.5px solid #ffe082;
+}
+
+.btn-login:hover {
+    background: #ffe082;
+    color: #185a9d;
+}
+
+.btn-register {
+    background: #ffe082;
+    color: #185a9d;
+    border: 1.5px solid #ffe082;
+}
+
+.btn-register:hover {
+    background: #43cea2;
+    color: #fff;
+    border-color: #43cea2;
+}
+
+.btn-logout {
+    background: #e74c3c;
+    color: #fff;
+    border: 1.5px solid #e74c3c;
+}
+
+.btn-logout:hover {
+    background: #c0392b;
+}
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    z-index: 2;
+}
+
+.menu-icon {
+    display: block;
+    width: 25px;
+    height: 2px;
+    background-color: #2c3e50;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #2c3e50;
+    transition: transform 0.3s ease;
+}
+
+.menu-icon::before {
+    transform: translateY(-8px);
+}
+
+.menu-icon::after {
+    transform: translateY(8px);
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        background-color: white;
+        flex-direction: column;
+        padding: 5rem 2rem;
+        transition: right 0.3s ease;
+        box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .nav-auth {
+        position: fixed;
+        bottom: 2rem;
+        left: 0;
+        right: 0;
+        justify-content: center;
+        padding: 1rem;
+        background-color: white;
+        box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+    }
+}

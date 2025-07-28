@@ -1,0 +1,31 @@
+<div class="account-container">
+    <button class="btn-logout" (click)="logout()">Logout</button>
+    <div class="account-card">
+        <h2>My Account</h2>
+        <div class="profile-info" *ngIf="user">
+            <div class="info-item">
+                <label>Name:</label>
+                <span>{{ user.displayName }}</span>
+            </div>
+            <div class="info-item">
+                <label>Email:</label>
+                <span>{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+                <label>Level:</label>
+                <span>{{ user.level }}</span>
+            </div>
+            <div class="info-item">
+                <label>Experience Points:</label>
+                <span>{{ user.experiencePoints }}</span>
+            </div>
+            <div class="info-item" *ngIf="user.createdAt">
+                <label>Member Since:</label>
+                <span>{{ user.createdAt | date:'mediumDate' }}</span>
+            </div>
+        </div>
+        <a routerLink="reviews" routerLinkActive="active">
+            <i class="fas fa-star-half-alt"></i> Reviews
+        </a>
+    </div>
+</div>

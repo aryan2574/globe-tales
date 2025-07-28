@@ -1,0 +1,63 @@
+<div class="reviews-container">
+    <div class="reviews-header">
+        <h2>My Reviews</h2>
+        <button class="btn-primary" (click)="createNewReview()">
+            <i class="fas fa-plus"></i> New Review
+        </button>
+    </div>
+
+    <div *ngIf="selectedReview" class="review-editor">
+        <h3>{{ isNewReview ? 'Create Review' : 'Edit Review' }}</h3>
+        <div class="form-group">
+            <label>Place Name</label>
+            <input [(ngModel)]="selectedReview.placeName" placeholder="Enter place name" required>
+        </div>
+        <div class="form-group">
+            <label>Comment</label>
+            <textarea [(ngModel)]="selectedReview.comment" placeholder="Write your review here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Rating</label>
+            <select [(ngModel)]="selectedReview.rating">
+                <option *ngFor="let r of [1,2,3,4,5]" [value]="r">{{ r }} Star{{ r > 1 ? 's' : '' }}</option>
+            </select>
+        </div>
+        <div class="button-group">
+            <button class="btn-save" (click)="saveReview()" [disabled]="!selectedReview.placeName">
+                <i class="fas fa-save"></i> Save
+            </button>
+            <button class="btn-cancel" (click)="cancelEdit()">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
+
+    <div class="reviews-grid">
+        <div *ngIf="loading" class="loading">Loading reviews...</div>
+        <div *ngIf="error" class="error">{{ error }}</div>
+        <div *ngIf="!loading && !error && reviews.length === 0" class="no-reviews">
+            You haven't written any reviews yet.
+        </div>
+        <div *ngFor="let review of reviews" class="review-card">
+            <div class="review-header">
+                <span class="review-place-name">{{ review.placeName }}</span>
+                <div class="review-actions">
+                    <button class="btn-icon" (click)="editReview(review)" title="Edit Review">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon btn-delete" (click)="deleteReview(review.id!)" title="Delete Review">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="review-rating">
+                <i *ngFor="let star of [].constructor(review.rating)" class="fas fa-star"></i>
+                <span class="rating-number">({{ review.rating }})</span>
+            </div>
+            <div class="review-comment">{{ review.comment }}</div>
+            <div class="review-date">
+                {{ review.createdAt | date : 'medium' }}
+            </div>
+        </div>
+    </div>
+</div>

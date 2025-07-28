@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+.site-list-container {
+    padding: 2.5rem 1rem 3rem 1rem;
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    min-height: 100vh;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.filters-section {
+    margin-bottom: 2.5rem;
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(44, 62, 80, 0.10);
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+}
+
+h2 {
+    color: #1a5276;
+    margin-bottom: 1.5rem;
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+
+    &::before {
+        content: '\f5a0';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #4a90e2;
+        font-size: 1.5rem;
+    }
+}
+
+.search-filters {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.search-input,
+.type-select,
+.sort-select,
+.page-size-select {
+    padding: 0.8rem 1.3rem 0.8rem 2.5rem;
+    border: 1.5px solid #b3c6e6;
+    border-radius: 24px;
+    font-size: 1.08rem;
+    background: #fff url('data:image/svg+xml;utf8,<svg fill="%234a90e2" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99c.41.41 1.09.41 1.5 0s.41-1.09 0-1.5l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 1rem center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.06);
+}
+
+.search-input:focus,
+.type-select:focus,
+.sort-select:focus,
+.page-size-select:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 4px 16px rgba(74, 144, 226, 0.13);
+}
+
+.search-input {
+    flex: 2;
+    min-width: 180px;
+    background-position: 1rem center;
+}
+
+.type-select,
+.sort-select,
+.page-size-select {
+    flex: 1;
+    min-width: 120px;
+    background-position: 1rem center;
+}
+
+.sites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 2.5rem;
+}
+
+.site-card {
+    background: linear-gradient(120deg, #fff 60%, #e0eafc 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(74, 144, 226, 0.10);
+    cursor: pointer;
+    transition: transform 0.25s, box-shadow 0.25s;
+    border: 1.5px solid #b3c6e6;
+    display: flex;
+    flex-direction: column;
+    min-height: 360px;
+    position: relative;
+
+    &:hover {
+        transform: translateY(-10px) scale(1.04);
+        box-shadow: 0 16px 32px rgba(74, 144, 226, 0.18);
+        border-color: #4a90e2;
+    }
+}
+
+.site-icon {
+    height: 180px;
+    background: linear-gradient(120deg, #e0eafc 0%, #cfdef3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+
+    i {
+        font-size: 4.5rem;
+        color: #4a90e2;
+        filter: drop-shadow(0 2px 8px rgba(74, 144, 226, 0.12));
+    }
+}
+
+.site-rating {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(90deg, #4a90e2 60%, #2ecc71 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.12);
+
+    i {
+        color: #f1c40f;
+        font-size: 1.1rem;
+    }
+}
+
+.site-content {
+    padding: 1.7rem 1.3rem 1.3rem 1.3rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+h3 {
+    color: #1a5276;
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+        content: '\f3c5';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #4a90e2;
+        font-size: 1.1rem;
+    }
+}
+
+.site-type {
+    color: #2ecc71;
+    font-size: 1.05rem;
+    margin: 0.5rem 0 0.5rem 0;
+    text-transform: capitalize;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    &::before {
+        content: '\f02d';
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        color: #2ecc71;
+        font-size: 1rem;
+    }
+}
+
+.site-description {
+    color: #666;
+    font-size: 1.05rem;
+    margin: 0.5rem 0 0 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+.loading,
+.error,
+.no-sites {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #666;
+    grid-column: 1 / -1;
+    font-size: 1.2rem;
+    font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.error {
+    color: #e74c3c;
+}
+
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.2rem;
+    margin-top: 2.5rem;
+}
+
+.pagination-controls button {
+    background: linear-gradient(90deg, #4a90e2 60%, #2ecc71 100%);
+    color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 24px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.08);
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(90deg, #2980b9 60%, #27ae60 100%);
+        transform: scale(1.05);
+    }
+}
+
+.pagination-controls button:disabled {
+    background: #b3c6e6;
+    cursor: not-allowed;
+}
+
+.pagination-controls span {
+    font-size: 1.1rem;
+    color: #1a5276;
+    font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .sites-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .site-list-container {
+        padding: 1rem 0.5rem 2rem 0.5rem;
+    }
+}

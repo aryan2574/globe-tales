@@ -1,0 +1,111 @@
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>Write Your Story</h1>
+    <p class="subtitle">"Every place has a story, and every story has a place. Share yours with the world."</p>
+</div>
+
+<div class="my-story-container" *ngIf="isLoggedIn$ | async; else pleaseLogin">
+    <div class="story-list-panel">
+        <div class="panel-header">
+            <h2><i class="fas fa-book"></i> My Stories</h2>
+            <button class="btn-new" (click)="createNewStory()">
+                <i class="fas fa-plus"></i> New Story
+            </button>
+        </div>
+        <ul class="story-list">
+            <li *ngFor="let story of stories" (click)="selectStory(story)"
+                [class.active]="selectedStory?.id === story.id">
+                <div class="story-item">
+                    <span class="story-title">
+                        <i class="fas fa-feather-alt"></i>
+                        {{ story.title }}
+                    </span>
+                    <div class="story-actions">
+                        <button class="btn-icon" (click)="downloadStory(story); $event.stopPropagation();"
+                            title="Download Story">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn-icon btn-delete" (click)="deleteStory(story.id!); $event.stopPropagation();"
+                            title="Delete Story">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="visited-section">
+        <h2><i class="fas fa-check-circle"></i> Visited Sites</h2>
+        <div *ngIf="visitedSites.length === 0" class="no-visited">
+            <i class="fas fa-info-circle"></i> You haven't marked any sites as visited yet.
+        </div>
+        <div *ngIf="visitedSites.length > 0" class="visited-cards-grid">
+            <div class="visited-card" *ngFor="let site of visitedSites">
+                <div class="visited-card-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span class="visited-place-name">{{ site.placeName }}</span>
+                </div>
+                <div class="visited-card-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>{{ site.visitedAt | date:'medium' }}</span>
+                </div>
+                <ng-container *ngIf="getReviewForPlace(site.placeId) as review">
+                    <div class="visited-card-review">
+                        <i class="fas fa-star"></i> {{ review.rating || 'N/A' }}<br>
+                        <span>{{ review.comment }}</span>
+                    </div>
+                </ng-container>
+            </div>
+        </div>
+    </div>
+
+    <div class="story-detail-panel">
+        <div *ngIf="selectedStory" class="story-editor">
+            <h3><i class="fas fa-edit"></i> Edit Story</h3>
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Title</label>
+                <input [(ngModel)]="selectedStory.title" placeholder="Enter story title" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-paragraph"></i> Content</label>
+                <textarea [(ngModel)]="selectedStory.content" placeholder="Write your story here..."
+                    required></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn-save" (click)="saveStory()"
+                    [disabled]="!selectedStory.title || !selectedStory.content">
+                    <i class="fas fa-save"></i> Save
+                </button>
+                <button class="btn-delete" (click)="deleteStory(selectedStory.id!)">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="!selectedStory" class="story-editor">
+            <h3><i class="fas fa-plus-circle"></i> New Story</h3>
+            <div class="form-group">
+                <label><i class="fas fa-heading"></i> Title</label>
+                <input [(ngModel)]="newStory.title" placeholder="Enter story title" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-paragraph"></i> Content</label>
+                <textarea [(ngModel)]="newStory.content" placeholder="Write your story here..." required></textarea>
+            </div>
+            <div class="button-group">
+                <button class="btn-save" (click)="saveStory()" [disabled]="!newStory.title || !newStory.content">
+                    <i class="fas fa-save"></i> Create
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #pleaseLogin>
+    <div class="please-login">
+        <i class="fas fa-lock fa-3x"></i>
+        <h2>My Stories</h2>
+        <p>Please log in to create and view your stories.</p>
+    </div>
+</ng-template>

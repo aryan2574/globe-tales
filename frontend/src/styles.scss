@@ -1,0 +1,34 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+.leaflet-marker-icon.custom-fa-marker.user-location .user-location-icon {
+    color: #3498db !important;
+    /* soft blue */
+    font-size: 1.2rem !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 50% !important;
+    padding: 6px 7px 6px 8px !important;
+    box-shadow: 0 2px 8px #3498db33, 0 2px 8px #0001 !important;
+    display: inline-block !important;
+    text-shadow: 0 1px 4px #fff, 0 2px 8px #0001 !important;
+}
+
+.leaflet-marker-icon.favourite-marker .favourite-heart-icon {
+    color: #e74c3c !important;
+    /* red */
+    font-size: 2rem !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border-radius: 50% !important;
+    padding: 6px !important;
+    box-shadow: 0 2px 8px #e74c3c33, 0 2px 8px #0001 !important;
+    display: inline-block !important;
+}
