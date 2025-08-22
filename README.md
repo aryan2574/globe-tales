@@ -147,4 +147,4 @@ Distributed under the MIT License.
 
 ## Contact
 
-Project Link: [https://github.com/aryan2574/GlobeTales](https://github.com/aryan2574/GlobeTales)
+Project Link: [Globe Tales](https://github.com/aryan2574/globe-tales)
